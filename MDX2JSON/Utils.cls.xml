@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="MDX2JSON.Utils">
+<Description><![CDATA[
+Utility class, wrapping processing of MDX queries.<br>
+Outputs JSON, JSONP and XML/A.]]></Description>
+<Super>%RegisteredObject</Super>
+<TimeCreated>63165,65653.547419</TimeCreated>
+
+<Method name="WriteJSONPfromMDX">
+<Description><![CDATA[
+Automatic processing of MDX query and outputting resulting JSONP.<br>
+<b>pMDX</b> - String containing MDX query.<br>
+Returns NULL if there is an error in MDX query.]]></Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>pMDX:%String</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	try {
+		set PageSize = 1000
+		set CurrPage = 1
+		set Params = ""
+		set RS = ##class(%DeepSee.ResultSet).%New()
+		#dim st As %Status = $$$OK
+		set RS = ##class(%DeepSee.ResultSet).%ExecuteDirect(pMDX,.Params,st)
+		do RS.%OutputJSON(PageSize,CurrPage,,PageSize)
+	} catch ex {
+		set st = ex.AsStatus()
+	}
+	quit st
+]]></Implementation>
+</Method>
+
+<Method name="WriteDrillthroughJSON">
+<Description><![CDATA[
+Automatic processing of MDX Drillthrough query and outputting resulting listing as JSON.<br>
+<b>pMDX</b> - String containing MDX Drillthrough query.<br>
+Returns NULL if there is an error in MDX query.]]></Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>pMDX:%String</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	try {
+		set Params = ""
+		set RS = ##class(%DeepSee.ResultSet).%New()
+		#dim st As %Status = $$$OK
+		set RS = ##class(%DeepSee.ResultSet).%ExecuteDirect(pMDX,.Params,st)
+		set SQL = RS.%GetListingSQL()
+		do ##class(%ZEN.Auxiliary.jsonSQLProvider).%WriteJSONFromSQL(,SQL,,$$$MaxCacheInt)
+	} catch ex {
+		set st = ex.AsStatus()
+	}
+	quit st
+]]></Implementation>
+</Method>
+
+<Method name="WriteXMLAfromMDX">
+<Description><![CDATA[
+Automatic processing of MDX query and outputting resulting XML/A.<br>
+<b>pMDX</b> - String containing MDX query.<br>
+Returns NULL if there is an error in MDX query.]]></Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>pMDX:%String</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	try {
+		set Params = ""
+		set RS = ##class(%DeepSee.ResultSet).%New()
+		#dim st As %Status = $$$OK
+		set RS = ##class(%DeepSee.ResultSet).%ExecuteDirect(pMDX,.Params,st)
+		set st = RS.%OutputXMLA()
+	} catch ex {
+		set st = ex.AsStatus()
+	}
+	quit st
+]]></Implementation>
+</Method>
+</Class>
+</Export>
