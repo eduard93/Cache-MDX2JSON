@@ -10,7 +10,8 @@ with body: { "MDX":"QUERY" }, where QUERY is a correct MDX statement, ex:  <br>
 } <br>
 You can send requests to:<br> <ul>
 	<li>webapplication/test - to get test info, %request, %response<br> 
-	<li>webapplication/MDX - to get result in JSONP format for MDX query<br> 
+	<li>webapplication/MDX - to get result in JSON format for MDX query<br> 
+	<li>webapplication/MDX2JSONP - to get result in JSONP format for MDX query<br> 
 	<li>webapplication/MDXDrillthrough - to get resulting listing in JSON format for MDX Drillthrough query<br> 
 	<li>webapplication/MDX2XMLA - to get result in XML/A format for MDX query<br></ul> ]]></Description>
 <Super>%CSP.REST</Super>
