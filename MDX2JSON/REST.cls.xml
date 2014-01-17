@@ -20,7 +20,8 @@ You can send requests to:<br> <ul>
 <Data><![CDATA[
 <Routes>
 	<!-- Send objects in this format: {"MDX":"QUERY"} HTTP method: POST	-->
-   <Route Url="/MDX" Method="POST" Call="WriteJSONPfromMDX"/>
+   <Route Url="/MDX" Method="POST" Call="WriteJSONfromMDX"/>
+   <Route Url="/MDX2JSONP" Method="POST" Call="WriteJSONPfromMDX"/>  
    <Route Url="/MDXDrillthrough" Method="POST" Call="WriteDrillthroughJSON"/>
    <Route Url="/MDX2XMLA" Method="POST" Call="WriteXMLAfromMDX"/>  
    
@@ -42,6 +43,7 @@ Test method, outputs <b>%request</b> and <b>%response</b> objects. ]]></Descript
 	&html<<h1>Status: OK!</h1><br>>
 	zw %request
 	&html<<br><br>>
+	d %response.SetHeader("Access-Control-Allow-Origin","*")
 	zw %response
 	quit $$$OK
 ]]></Implementation>
@@ -78,6 +80,23 @@ Do not use.</Description>
 ]]></Implementation>
 </Method>
 
+<Method name="WriteJSONfromMDX">
+<Description>
+Wrapper for ##class(MDX2JSON.Utils).WriteJSONPfromMDX(pMDX)
+Converts incoming request object and calls abovementioned method.</Description>
+<ClassMethod>1</ClassMethod>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	d %response.SetHeader("Access-Control-Allow-Origin","*")
+	set st = $$$OK
+	set obj = ##class(%ZEN.proxyObject).%New()
+	set st = ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(%request.Content,,.obj,1)
+	quit:$$$ISERR(st) st
+  	set st = ##class(MDX2JSON.Utils).WriteJSONfromMDX(obj.MDX)
+  	quit st
+]]></Implementation>
+</Method>
+
 <Method name="WriteJSONPfromMDX">
 <Description>
 Wrapper for ##class(MDX2JSON.Utils).WriteJSONPfromMDX(pMDX)
@@ -85,6 +104,7 @@ Converts incoming request object and calls abovementioned method.</Description>
 <ClassMethod>1</ClassMethod>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
+	d %response.SetHeader("Access-Control-Allow-Origin","*")
 	set st = $$$OK
 	set obj = ##class(%ZEN.proxyObject).%New()
 	set st = ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(%request.Content,,.obj,1)
