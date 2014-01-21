@@ -4301,5 +4301,417 @@ the status value into a SOAP fault.]]></Description>
 	Quit tSC
 ]]></Implementation>
 </Method>
+
+<Method name="OutputJSON">
+<Description>
+Half-copy of system method. This one returns REAL json.</Description>
+<Internal>1</Internal>
+<FormalSpec>pPageSize:%Integer,pCurrPage:%Integer,pRowLabels:%List="",pMaxRows:%Integer=""</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	Set tSC = $$$OK
+	Try {
+		Set tCubeIndex = ..%CubeKey
+		Set tCubeName = $$$UPPER(..%Cube)
+		Set tQueryKey = ..%QueryKey
+		Set tStatus = ..%GetQueryStatus(..%Cube,tQueryKey)
+		If (tStatus < 100) {
+			// wait a bit!
+			Hang 1
+			// try again
+			Set tStatus = ..%GetQueryStatus(..%Cube,tQueryKey)
+		}
+
+		If (tStatus < 100) {
+			Write "null",!
+			Quit
+		}
+
+		// window
+		Set tMaxCols = 500
+		Set tStartRow = ((pCurrPage-1)*pPageSize)+1
+		Set tEndRow = tStartRow + pPageSize - 1
+		Set tRowCount = 0
+		Set tColCount = 0
+
+		// write out *all* rows and let the client page through the results
+		// meta data consists of an array of up to 2 axes.
+		// Each axis has list of tuples: {c:caption,f:format}
+		// these correspond to leaf nodes.
+		// and a graph of groups that refer to the tuples:
+		// groups:[{caption:'',groups:[...],tuples:[]
+
+		// data consists of a single array of values (cells: q.v.)
+
+		Set tAxisCount = ..%GetAxisCount()
+		For a = 1:1:tAxisCount {
+			Set tAxisSize(a) = ..%GetAxisSize(a)
+			Set tAxisKeys(a) = $G($$$DeepSeeResultsGLVN(tCubeIndex,tQueryKey,"axis",a))
+		}
+
+		Set tColCount = +$G(tAxisSize(1))
+		Set tRowCount = +$G(tAxisSize(2))
+		// JMD1128 
+		Set tMaxJSONRows = $S(pMaxRows="":2000,1:+pMaxRows)
+		Set:tRowCount>tMaxJSONRows tRowCount = tMaxJSONRows
+		Set:tColCount>tMaxCols tColCount = tMaxCols
+
+		Set tStartRow = 1
+		Set tEndRow = tStartRow + tRowCount - 1
+
+		If (..%Query.queryType = "DRILLTHROUGH") {
+			Write "null",!
+			Quit
+		}	
+
+		#; determine default format
+		Set tDefaultFormat = ..%GetDefaultFormat(.tDefaultCaption)
+
+		// find name of cube in original case
+		Set tCubeClass = $G($$$DeepSeeMetaGLVN("cubes",tCubeName))
+		Set tCubeName = $G($$$DeepSeeMetaGLVN("classes",tCubeClass))
+
+		Write "{"
+		Write !,$$$ZENJSPAIR("cubeName",tCubeName),","
+		Write !,$$$ZENJSPAIR("cubeClass",tCubeClass),","
+		Write !,$$$ZENJSPAIR("defaultFormat",tDefaultFormat),","
+		Write !,$$$ZENJSPAIR("defaultCaption",tDefaultCaption),","
+
+		// row level captions
+		Write !,"""rowCaptions"":[",!
+		Set rc = $O(pRowLabels(""))
+		While (rc'="") {
+			Write $$$ZENJSVALUE(pRowLabels(rc))
+			Set rc = $O(pRowLabels(rc))
+			Write:rc'="" ","
+		}
+		Write "],",! // rowCaptions
+
+		Write !,"""axes"":[",!
+
+		// ?JMD- should we write out tuples post-json?
+		If (tAxisCount = 0) {
+			// default axes
+			Write "{" // axis object
+			Write """key"":","null",",",!
+			Write """tuples"":[",!
+				Set tCaption = "All"
+				Write "{" // tuple object
+				Write $$$ZENJSPAIR("caption",tCaption)
+				Write "}",! // tuple object
+			Write "]",! // tuples
+			Write "}",! // axis object
+
+			Write ",{",! // axis object
+			Write """key"":","null",",",!
+			Write """tuples"":[",!
+				Set tCaption = "Count"
+				Write "{",! // tuple object
+				Write $$$ZENJSPAIR("caption",tCaption)
+				Write "}",! // tuple object
+			Write "]",! // tuples
+			Write "}",! // axis object
+		}
+
+		// axis info
+		For a = 1:1:tAxisCount {
+			Set tAxisKey = tAxisKeys(a)
+			Set tHasGroups = 0
+
+			// JMD1128: construct set of groups within this axis
+			Set tGroupCount = 1	// node # in groups graph
+			Kill tGroups		// group info by number, with hierarchy as graph
+								// leaf nodes contain leaf #
+			Kill tGroupIndex 	// node # to group #
+
+			Write:a>1 ","
+			Write "{" // axis object
+			Write !,$$$ZENJSPAIR("key",tAxisKey),","
+			Write !,"""tuples"":[",!
+
+			// walk down leaf index and get node #s for this axis
+			// make sure we only write out values for current page
+			If (a = 2) {
+				Set tStart = tStartRow
+				Set tEnd = tEndRow
+			}
+			Else {
+				Set tStart = 1
+				Set tEnd = tMaxCols
+			}
+
+			Set n = 0 // items written
+			Set item = 0 // actual item #
+			Set tItemNo = $O($$$DeepSeeResultsGLVN(tCubeIndex,tQueryKey,"leaf",a,""),1,tNodeNo)
+			While ((tItemNo '= "")&&(item<tEnd)) {
+				Set item = item + 1
+				If (item >= tStart) {
+					// use node number to get details for the axis node
+					// (this comes from the axis cache)
+					Set tNode = $G($$$DeepSeeAxisGLVN(tCubeIndex,tAxisKey,"axes",tNodeNo))
+
+					Set tType = $LG(tNode,1)
+					Set tParent = $LG(tNode,4)
+					Set tCaption = $LG(tNode,5)
+					Set tMbrId = $LG(tNode,6)
+					Set tDimNo = +$LG(tNode,9)
+					Set tHierNo = +$LG(tNode,10)
+					Set tLevelNo = +$LG(tNode,11)
+					Set tFmt = $LG(tNode,12)
+					Set tGroupNo = ""
+
+					// JMD: test if we are showing a date value;
+					// these may need to be reformatted on the client
+					Set tKey = ""
+					Set tDateType = ""
+					If ((tDimNo'="")&&(tHierNo'="")&&(tLevelNo'="")) {
+						If '$D(tMbrTypes(tDimNo,tHierNo,tLevelNo)) {
+							Set tDimInfo = $G($$$DeepSeeMetaGLVN("cubes",tCubeIndex,"mbr#",tDimNo,tHierNo,tLevelNo))
+							Set tTimeClass = $LG(tDimInfo,6)
+							Set tDType = ""
+							// n.b. use the level class to guess the type
+							If (tTimeClass = "%DeepSee.Time.Year") {
+								// Set tDType = "year" -- no need
+							}
+							ElseIf (tTimeClass = "%DeepSee.Time.MonthYear") {
+								Set tDType = "month"
+							}
+							ElseIf (tTimeClass = "%DeepSee.Time.QuarterYear") {
+								Set tDType = "quarter"
+							}
+							ElseIf (tTimeClass = "%DeepSee.Time.WeekYear") {
+								// Set tDType = "week" // ignore for now
+							}
+							ElseIf (tTimeClass = "%DeepSee.Time.DayMonthYear") {
+								Set tDType = "day"
+							}
+							Set tMbrTypes(tDimNo,tHierNo,tLevelNo) = tDType
+						}
+						Set tDateType = $G(tMbrTypes(tDimNo,tHierNo,tLevelNo))
+					}
+					Set:tDateType'="" tKey = $LG(tNode,13)
+
+					// JMD1128: test if we are part of a group
+					If (tParent'="") {
+						If $D(tGroupIndex(tParent)) {
+							// point to existing group
+							Set tGroupNo = tGroupIndex(tParent)
+						}
+						Else {
+							// build list of parents above this node
+							Kill tPList
+							Set pn = 0
+							While (tParent'="") {
+								Set tParentNode = $G($$$DeepSeeAxisGLVN(tCubeIndex,tAxisKey,"axes",tParent))
+								Set tParentType = $LG(tParentNode,1)
+								If ((tParentType="mbr")||(tParentType="msr")) {
+									Set tHasGroups = 1
+									Set tPList(pn) = tParent
+									Set pn = pn + 1
+								}
+								Set tParent = $LG(tParentNode,4)
+							}
+
+							// now walk down the list
+							Set tLastParent = 0
+							Set pn = $O(tPList(""),-1)
+							While (pn'="") {
+								Set tParent = tPList(pn)
+								If $D(tGroupIndex(tParent)) {
+									Set gc = tGroupIndex(tParent)
+								}
+								Else {
+									Set gc = tGroupCount
+									Set tGroupCount = tGroupCount + 1
+								}
+								Set tGroupIndex(tParent) = gc
+								Set tGroups(gc) = tParent
+								Set tGroups(tLastParent,"ch",gc) = ""
+								Set tLastParent = gc
+								Set tGroupNo = gc
+								Set pn = $O(tPList(pn),-1)
+							}
+						}
+					}
+
+					Set n = n + 1
+					If (tGroupNo'="") {
+						Set tGroups(tGroupNo,"leaf",n) = ""
+					}
+
+					Write:n>1 ","
+					Write "{" // tuple object
+					Write $$$ZENJSPAIR("caption",tCaption)
+					Write:tDateType'="" ",", $$$ZENJSPAIR("type",tDateType)
+					Write:tKey'="" ",", $$$ZENJSPAIR("key",tKey)
+					Write:tGroupNo'="" ",",$$$ZENJSPAIR("g",tGroupNo)
+					Write:tFmt'="" ",",$$$ZENJSPAIR("format",tFmt)
+					Write "}",! // tuple object
+				}
+				Set tItemNo = $O($$$DeepSeeResultsGLVN(tCubeIndex,tQueryKey,"leaf",a,tItemNo),1,tNodeNo)
+			}
+			Write "]" // tuples
+
+			Write ",""hasGroups"":",$S(tHasGroups:"true",1:"false"),!
+
+			// JMD1128: groups and children
+			If $D(tGroups) {
+				//Do ..%OutputAxisGroupJSON(.tGroups,0,tCubeIndex,tAxisKey)
+				// JMD1148: write out flat list of groups
+				Write ",""groups"":["
+				Set gn = 0
+				Set g = $O(tGroups(""))
+				While (g'="") {
+					Set tCaption = ""
+					Set tParentNo = ""
+					Set tNodeNo = $G(tGroups(g))
+					If (tNodeNo'="") {
+						Set tGroupNode = $G($$$DeepSeeAxisGLVN(tCubeIndex,tAxisKey,"axes",tNodeNo))
+						Set tCaption = $LG(tGroupNode,5)
+						Set tParentNo = $LG(tGroupNode,4)
+					}
+					Set gn = gn + 1
+					Write:gn>1 ","
+					Write "{" // group object
+					Write:tCaption'="" $$$ZENJSPAIR("caption",tCaption),","
+					If (tParentNo'="") {
+						Set tParentGroup = $G(tGroupIndex(tParentNo))
+						Write:tParentGroup'="" $$$ZENJSPAIR("g",tParentGroup),","
+					}
+					If $D(tGroups(g,"ch")) {
+						Write """groups"":["
+						Set gc = $O(tGroups(g,"ch",""))
+						While (gc'="") {
+							Write gc
+							Set gc = $O(tGroups(g,"ch",gc))
+							Write:gc'="" ","
+						}
+						Write "],"
+					}
+					If $D(tGroups(g,"leaf")) {
+						Write """tuples"":["
+						Set gc = $O(tGroups(g,"leaf",""))
+						While (gc'="") {
+							Write gc
+							Set gc = $O(tGroups(g,"leaf",gc))
+							Write:gc'="" ","
+						}
+						Write "]"
+					}
+					Write "}",! // group object
+
+					Set g = $O(tGroups(g))
+				}
+				Write "]",!
+
+			}
+
+			Write "}",! // axis object
+		}
+
+		Write "],",! // axes
+
+
+		// Initial cell address
+		For a=1:1:tAxisCount {
+			Set tAxisKey = tAxisKeys(a)
+			Set tItemNo(a) = $O($$$DeepSeeResultsGLVN(tCubeIndex,tQueryKey,"leaf",a,""),1,tNodeNo)
+			Set tAddr(a) = $G(tNodeNo)
+		}
+
+		// write out size of data;
+		// this allows us to use 1 array for all data values
+
+		Write $$$ZENJSPAIR("rowCount",tRowCount),",",!
+		Write $$$ZENJSPAIR("columnCount",tColCount),",",!
+
+		// cells
+		// note: we only write out up to 2D results as our client has no use for
+		// higher order information
+		// JMD1148: simplify JSON for data
+		// fastest way is to not use pure JSON!
+		// instead, define an array of known-size and explicitly insert values into it.
+		// data is written out as [R1C1,R1C2,R1C3,R2C1,R2C2,R2C3]
+		// 
+		// NO ! NO ! NO! - Shmidt Ivan
+		
+		Write """cells"":[",!
+
+	
+	
+		//Write "o.data.cells = a;",!
+
+		If (tAxisCount = 0) {
+			Write $$$ZENJSVALUE(..%GetValue())_",",!
+		}
+		ElseIf (tAxisCount = 1) {
+			Set tRowCount = 1
+			Set c = 0
+			While((tItemNo(1)'="")&&(c<tMaxCols)) {
+				Write $$$ZENJSVALUE(..%GetValue(tAddr(1)))_",",!
+				Set c = c + 1
+				Set tItemNo(1) = $O($$$DeepSeeResultsGLVN(tCubeIndex,tQueryKey,"leaf",1,tItemNo(1)),1,tNodeNo)
+				Set tAddr(1) = tNodeNo
+			}
+		}
+		Else {
+			Set tCellCount = 0
+			Set row = 0 // actual row #
+			While((tItemNo(2)'="")&&(row<tEndRow)) {
+				Set row = row + 1
+				If (row >= tStartRow) {
+					Set c = 0
+					Set tItemNo(1) = $O($$$DeepSeeResultsGLVN(tCubeIndex,tQueryKey,"leaf",1,""),1,tNodeNo)
+					Set tAddr(1) = tNodeNo
+					While((tItemNo(1)'="")&&(c<tMaxCols)) {
+						Set c = c + 1
+						Set tValue = $Case(tAxisCount,
+							0:..%GetValue(),
+							1:..%GetValue(tAddr(1)),
+							2:..%GetValue(tAddr(1),tAddr(2)),
+							3:..%GetValue(tAddr(1),tAddr(2),tAddr(3)),
+							4:..%GetValue(tAddr(1),tAddr(2),tAddr(3),tAddr(4)),
+							5:..%GetValue(tAddr(1),tAddr(2),tAddr(3),tAddr(4),tAddr(5)),
+							6:..%GetValue(tAddr(1),tAddr(2),tAddr(3),tAddr(4),tAddr(5),tAddr(6)),
+							7:..%GetValue(tAddr(1),tAddr(2),tAddr(3),tAddr(4),tAddr(5),tAddr(6),tAddr(7)),
+							:"")
+						Write $$$ZENJSVALUE(tValue)
+						w:(tCellCount+1<(tRowCount*tColCount)) ","
+						w !
+						Set tCellCount = tCellCount + 1
+
+						Set tItemNo(1) = $O($$$DeepSeeResultsGLVN(tCubeIndex,tQueryKey,"leaf",1,tItemNo(1)),1,tNodeNo)
+						Set tAddr(1) = tNodeNo
+					}
+				}
+				Set tItemNo(2) = $O($$$DeepSeeResultsGLVN(tCubeIndex,tQueryKey,"leaf",2,tItemNo(2)),1,tNodeNo)
+				Set tAddr(2) = tNodeNo
+			}
+		}
+		w "],"
+		Write """rowTotals"":[],",!
+		Write """columnTotals"":[],",!
+
+		Write $$$ZENJSPAIR("grandTotal",+$G($$$DeepSeeResultsGLVN(tCubeIndex,tQueryKey,"total"))),",",!
+
+		Write $$$ZENJSPAIR("status",tStatus),! // last property
+		
+		
+		Write "}"
+
+		// JMD1148: violate JSON rules for speed's sake: 
+		// Shmidt Ivan: OMG!
+		//Write ";",!
+
+	}
+	Catch(ex) {
+		Set tSC = ex.AsStatus()
+		Write "/*"
+		Do $System.OBJ.DisplayError(tSC)
+		Write "*/"
+	}
+	Quit tSC
+]]></Implementation>
+</Method>
 </Class>
 </Export>
