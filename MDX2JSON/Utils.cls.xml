@@ -99,5 +99,68 @@ Returns NULL if there is an error in MDX query.]]></Description>
 	quit st
 ]]></Implementation>
 </Method>
+
+<Method name="WriteFiltersForMDX">
+<Description><![CDATA[
+Gets filters for MDX expression.<br>
+<b>pMDX</b> - String containing MDX query.<br>]]></Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>pMDX:%String</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	try {
+		set Params = ""
+		set filters= ""
+		set measure=""
+		set RS = ##class(%DeepSee.ResultSet).%New()
+		#dim st As %Status = $$$OK
+		set RS = ##class(%DeepSee.ResultSet).%ExecuteDirect(pMDX,.Params,st)
+		set st1=RS.%GetFiltersForCellRange(.filters,0,0,RS.%GetAxisSize(2),RS.%GetAxisSize(1),.measure)
+		zw filters
+	} catch ex {
+		set st = ex.AsStatus()
+	}
+	quit st
+]]></Implementation>
+</Method>
+
+<Method name="WriteFiltersForCube">
+<Description><![CDATA[
+Get all filters for DeepSee Cube in JSON format.<br>
+<b>pCube</b> - name of DeepSee cube.]]></Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>pCube:%String</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	try {
+		#dim st As %Status = $$$OK
+		set st = ##class(%DeepSee.Dashboard.Utils).%GetFiltersForDataSource(pCube_".cube",.tFilters)
+		do ##class(%ZEN.Auxiliary.jsonProvider).%ArrayToJSON($lb("name","path","info"),.tFilters)
+	} catch ex {
+		set st = ex.AsStatus()
+	}
+	quit st
+]]></Implementation>
+</Method>
+
+<Method name="WriteFilterValues">
+<Description><![CDATA[
+Get all values for Filter for DeepSee Cube in JSON format.<br>
+<b>pCube</b> - name of DeepSee cube.<br>
+<b>pFilter</b> - path of filter. For example: [DateOfSale].[Actual].[MonthSold]]]></Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>pCube:%String,pFilter:%String</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	try {
+		#dim st As %Status = $$$OK
+		set st = ##class(%DeepSee.Dashboard.Utils).%GetMembersForFilter(pCube,pFilter,.tFilters,.tDefaultFilterValue,,.tRelatedFilters,0,,.tValueList)
+		do ##class(%ZEN.Auxiliary.jsonProvider).%ArrayToJSON($lb("name","value"),.tFilters)
+	} catch ex {
+		set st = ex.AsStatus()
+	}
+	quit st
+]]></Implementation>
+</Method>
 </Class>
 </Export>
