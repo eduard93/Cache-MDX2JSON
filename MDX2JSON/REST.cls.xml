@@ -10,8 +10,7 @@ with body: { "MDX":"QUERY" }, where QUERY is a correct MDX statement, ex:  <br>
 } <br>
 You can send requests to:<br> <ul>
 	<li>webapplication/test - to get test info, %request, %response<br> 
-	<li>webapplication/MDX - to get result in JSON format for MDX query<br> 
-	<li>webapplication/MDX2JSONP - to get result in JSONP format for MDX query<br> 
+	<li>webapplication/MDX - to get result in JSONP format for MDX query<br> 
 	<li>webapplication/MDXDrillthrough - to get resulting listing in JSON format for MDX Drillthrough query<br> 
 	<li>webapplication/MDX2XMLA - to get result in XML/A format for MDX query<br></ul> ]]></Description>
 <Super>%CSP.REST</Super>
@@ -27,7 +26,7 @@ You can send requests to:<br> <ul>
    <Route Url="/MDX2XMLA" Method="POST" Call="WriteXMLAfromMDX"/>  
    
    <!-- Valid but illicit, do not use-->
-   <Route Url="/MDX/:query" Method="GET" Call="WriteJSONPfromMDXURL"/>  
+   <Route Url="/MDX/:query" Method="GET" Call="WriteJSONfromMDXURL"/>  
    
    <!-- Test method-->
    <Route Url="/test" Method="GET" Call="Test"/>
@@ -66,7 +65,7 @@ Converts incoming request object and calls abovementioned method.]]></Descriptio
 ]]></Implementation>
 </Method>
 
-<Method name="WriteJSONPfromMDXURL">
+<Method name="WriteJSONfromMDXURL">
 <Description>
 Wrapper for ##class(MDX2JSON.Utils).WriteJSONPfromMDX(pMDX)
 Do not use.</Description>
@@ -76,7 +75,7 @@ Do not use.</Description>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
   set MDX = $ZCONVERT($ZCONVERT(MDX ,"I","URL") ,"I","UTF8")
-  set st = ##class(MDX2JSON.Utils).WriteJSONPfromMDX(MDX)
+  set st = ##class(MDX2JSON.Utils).WriteJSONfromMDX(MDX)
   quit st
 ]]></Implementation>
 </Method>
