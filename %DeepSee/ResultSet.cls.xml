@@ -2530,6 +2530,7 @@ the axis and only information about this member is returned.<br/>]]></Descriptio
 				Set:tLeafNo="" tNodeNo = ""
 			}
 			While (tNodeNo '= "") {
+
 				Set n = n + 1
 				If ((pItemNo="")||(pItemNo=n)) {
 					Set tNode = $G($$$DeepSeeAxisGLVN(tCubeIndex,tAxisKey,"axes",tNodeNo))
@@ -4346,9 +4347,11 @@ Half-copy of system method. This one returns REAL json.</Description>
 		Set tAxisCount = ..%GetAxisCount()
 		For a = 1:1:tAxisCount {
 			Set tAxisSize(a) = ..%GetAxisSize(a)
+			
+			
 			Set tAxisKeys(a) = $G($$$DeepSeeResultsGLVN(tCubeIndex,tQueryKey,"axis",a))
 		}
-
+		
 		Set tColCount = +$G(tAxisSize(1))
 		Set tRowCount = +$G(tAxisSize(2))
 		// JMD1128 
@@ -4449,7 +4452,10 @@ Half-copy of system method. This one returns REAL json.</Description>
 					// use node number to get details for the axis node
 					// (this comes from the axis cache)
 					Set tNode = $G($$$DeepSeeAxisGLVN(tCubeIndex,tAxisKey,"axes",tNodeNo))
-
+					
+					
+					
+					
 					Set tType = $LG(tNode,1)
 					Set tParent = $LG(tNode,4)
 					Set tCaption = $LG(tNode,5)
@@ -4459,6 +4465,15 @@ Half-copy of system method. This one returns REAL json.</Description>
 					Set tLevelNo = +$LG(tNode,11)
 					Set tFmt = $LG(tNode,12)
 					Set tGroupNo = ""
+					
+					
+					//Shmidt Ivan: for path purposes
+					// I think i don't need this
+					Set tMbrInfo = $G($$$DeepSeeMetaGLVN("cubes",$zconvert(tCubeName,"u"),"mbr#",tDimNo,tHierNo,tLevelNo))
+					//s ^|"TFOMS"|TestGlob = 
+
+					
+					//
 
 					// JMD: test if we are showing a date value;
 					// these may need to be reformatted on the client
@@ -4542,6 +4557,9 @@ Half-copy of system method. This one returns REAL json.</Description>
 					Write:n>1 ","
 					Write "{" // tuple object
 					Write $$$ZENJSPAIR("caption",tCaption)
+					//Added by Shmidt Ivan
+					//Path for Axes
+					W ",", $$$ZENJSPAIR("path",##class(%DeepSee.Query.Engine).%GetSpecForAxisNode($$$UPPER(tCubeName),tQueryKey,a, tNodeNo))
 					Write:tDateType'="" ",", $$$ZENJSPAIR("type",tDateType)
 					Write:tKey'="" ",", $$$ZENJSPAIR("key",tKey)
 					Write:tGroupNo'="" ",",$$$ZENJSPAIR("g",tGroupNo)
@@ -4560,6 +4578,8 @@ Half-copy of system method. This one returns REAL json.</Description>
 				// JMD1148: write out flat list of groups
 				Write ",""groups"":["
 				Set gn = 0
+				//Had an issue with commas. Fixed by Shmidt Ivan
+				Set tFirstFlag=1
 				Set g = $O(tGroups(""))
 				While (g'="") {
 					Set tCaption = ""
@@ -4579,6 +4599,8 @@ Half-copy of system method. This one returns REAL json.</Description>
 						Write:tParentGroup'="" $$$ZENJSPAIR("g",tParentGroup),","
 					}
 					If $D(tGroups(g,"ch")) {
+						//w:'tFirstFlag ","
+						s tFirstFlag=0
 						Write """groups"":["
 						Set gc = $O(tGroups(g,"ch",""))
 						While (gc'="") {
@@ -4586,7 +4608,8 @@ Half-copy of system method. This one returns REAL json.</Description>
 							Set gc = $O(tGroups(g,"ch",gc))
 							Write:gc'="" ","
 						}
-						Write "],"
+						Write "]"
+						
 					}
 					If $D(tGroups(g,"leaf")) {
 						Write """tuples"":["
@@ -4711,6 +4734,566 @@ Half-copy of system method. This one returns REAL json.</Description>
 		Write "*/"
 	}
 	Quit tSC
+]]></Implementation>
+</Method>
+
+<Method name="OutputJSON3">
+<FormalSpec>pPageSize:%Integer,pCurrPage:%Integer,pRowLabels:%List="",pMaxRows:%Integer=""</FormalSpec>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[
+	     
+	set obj=##class(%ZEN.proxyObject).%New()
+	
+     If (..%Query.queryType = "DRILLTHROUGH") {
+	    set obj.Status = "0" // A надо это? Может одну строчку оставить? Или совсем убрать?
+	    set obj.Error = "DRILLTHROUGH queries are not supported"
+		return obj.%ToJSON()
+	}
+      
+    Set tMaxCols = 500
+	Set tStartRow = ((pCurrPage-1)*pPageSize)+1
+	Set tEndRow = tStartRow + pPageSize - 1
+	Set tRowCount = 0
+	Set tColCount = 0
+	// JMD1128 
+    Set tMaxJSONRows = $S(pMaxRows="":2000,1:+pMaxRows)
+	Set:tRowCount>tMaxJSONRows tRowCount = tMaxJSONRows
+	Set:tColCount>tMaxCols tColCount = tMaxCols
+
+	Set tStartRow = 1
+	Set tEndRow = tStartRow + tRowCount - 1
+                                                    
+                                                    
+	set obj.Info = ..InfoToJSON() //returns proxy object
+	set obj.Cols = ..ColsToJSON()
+	set obj.Rows = ..RowsToJSON()
+	set obj.Data = ..DataToJSON()
+	
+	return obj.%ToJSON()
+]]></Implementation>
+</Method>
+
+<Method name="OutputJSON2">
+<Internal>1</Internal>
+<FormalSpec>pPageSize:%Integer,pCurrPage:%Integer,pRowLabels:%List="",pMaxRows:%Integer=""</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	Set tSC = $$$OK
+	Set obj = ##class(%ZEN.proxyObject).%New()
+	Try {
+		Set tCubeIndex = ..%CubeKey
+		Set tCubeName = $$$UPPER(..%Cube)
+		Set tQueryKey = ..%QueryKey
+		Set tStatus = ..%GetQueryStatus(..%Cube,tQueryKey)
+		If (tStatus < 100) {
+			// wait a bit!
+			Hang 2
+			// try again
+			Set tStatus = ..%GetQueryStatus(..%Cube,tQueryKey)
+		}
+
+		If (tStatus < 100) {
+			w "{Error:"_$$$ZENJSUSTR($System.Status.GetErrorText(tStatus))_"}"
+			Return tStatus
+		}
+		Set tMaxCols = 500
+		Set tStartRow = ((pCurrPage-1)*pPageSize)+1
+		Set tEndRow = tStartRow + pPageSize - 1
+		Set tRowCount = 0
+		Set tColCount = 0
+
+		// write out *all* rows and let the client page through the results
+		// meta data consists of an array of up to 2 axes.
+		// Each axis has list of tuples: {c:caption,f:format}
+		// these correspond to leaf nodes.
+		// and a graph of groups that refer to the tuples:
+		// groups:[{caption:'',groups:[...],tuples:[]
+
+		// data consists of a single array of values (cells: q.v.)
+
+		Set tAxisCount = ..%GetAxisCount()
+		For a = 1:1:tAxisCount {
+			Set tAxisSize(a) = ..%GetAxisSize(a)
+
+
+			Set tAxisKeys(a) = $G($$$DeepSeeResultsGLVN(tCubeIndex,tQueryKey,"axis",a))
+		}
+
+		Set tColCount = +$G(tAxisSize(1))
+		Set tRowCount = +$G(tAxisSize(2))
+		// JMD1128
+		Set tMaxJSONRows = $S(pMaxRows="":2000,1:+pMaxRows)
+		Set:tRowCount>tMaxJSONRows tRowCount = tMaxJSONRows
+		Set:tColCount>tMaxCols tColCount = tMaxCols
+
+		Set tStartRow = 1
+		Set tEndRow = tStartRow + tRowCount - 1
+
+		If (..%Query.queryType = "DRILLTHROUGH") {
+			Write "{Error:""Internal error DRILLTHROUGH query""}"
+			Return
+		}
+
+		// determine default format
+		Set tDefaultFormat = ..%GetDefaultFormat(.tDefaultCaption)
+
+		// find name of cube in original case
+		Set tCubeClass = $G($$$DeepSeeMetaGLVN("cubes",tCubeName))
+		Set tCubeName = $G($$$DeepSeeMetaGLVN("classes",tCubeClass))
+
+		set obj.cubeName = tCubeName
+		set obj.cubeClass = tCubeClass
+		set obj.defaultFormat = tDefaultFormat
+		set obj.defaultCaption = tDefaultCaption
+		set obj.axes = ##class(%ListOfDataTypes).%New()
+		// row level captions
+    	set obj.rowCaptions =##class(%ListOfDataTypes).%New()
+		Set rc = $O(pRowLabels(""))
+		While (rc'="") {
+			d obj.rowCaptions.Insert(pRowLabels(rc).%ConstructClone(1))
+			Set rc = $O(pRowLabels(rc))
+		}
+                                                                                                                                                           set obj.axes = ##class(%ListOfDataTypes).%New()
+        //axesArray
+		If (tAxisCount = 0) {
+			// default axes
+      s tAxis = ##class(%ZEN.proxyObject).%New()                                                                                                                                                                       s tAxis = ##class(%ZEN.proxyObject).%New()
+			s tAxis.key = "null"
+			s tAxis.tuples = ##class(%ListOfDataTypes).%New()
+            //tuplesArray
+      s tuple = ##class(%ZEN.proxyObject).%New()
+			s tuple.caption = "All"
+      d tAxis.tuples.Insert(tuple.%ConstructClone(1))
+			d obj.axes.Insert(tAxis.%ConstructClone(1))
+
+
+			s tAxis2 = ##class(%ZEN.proxyObject).%New()
+                                                                                                                                                                            //Here I Stopped: Shmidt Ivan
+			s tAxis2.key = "null"
+			s tAxis2.tuples = ##class(%ListOfDataTypes).%New()
+			s tuple2 = ##class(%ZEN.proxyObject).%New()
+			s tuple2.caption = "Count"
+			d tAxis2.tuples.Insert(tuple2.%ConstructClone(1))
+			d obj.axes.Insert(tAxis2.%ConstructClone(1))
+
+		}
+
+		// axis info
+		For a = 1:1:tAxisCount {
+			Set tAxisKey = tAxisKeys(a)
+			Set tHasGroups = 0
+			
+			// JMD1128: construct set of groups within this axis
+			Set tGroupCount = 1	// node # in groups graph
+			Kill tGroups		// group info by number, with hierarchy as graph
+								// leaf nodes contain leaf #
+			Kill tGroupIndex 	// node # to group #
+			Kill tAxis
+
+			s tAxis = ##class(%ZEN.proxyObject).%New()
+			s tAxis.key = tAxisKey
+			s tAxis.tuples = ##class(%ListOfDataTypes).%New()
+			
+			// walk down leaf index and get node #s for this axis
+			// make sure we only write out values for current page
+			If (a = 2) {
+				Set tStart = tStartRow
+				Set tEnd = tEndRow
+			}
+			Else {
+				Set tStart = 1
+				Set tEnd = tMaxCols
+			}
+
+			Set n = 0 // items written
+			Set item = 0 // actual item #
+			Set tItemNo = $O($$$DeepSeeResultsGLVN(tCubeIndex,tQueryKey,"leaf",a,""),1,tNodeNo)
+			While ((tItemNo '= "")&&(item<tEnd)) {
+				Set item = item + 1
+				If (item >= tStart) {
+					// use node number to get details for the axis node
+					// (this comes from the axis cache)
+					Set tNode = $G($$$DeepSeeAxisGLVN(tCubeIndex,tAxisKey,"axes",tNodeNo))
+					
+
+
+					Set tType = $LG(tNode,1)
+					Set tParent = $LG(tNode,4)
+					Set tCaption = $LG(tNode,5)
+					Set tMbrId = $LG(tNode,6)
+					Set tDimNo = +$LG(tNode,9)
+					Set tHierNo = +$LG(tNode,10)
+					Set tLevelNo = +$LG(tNode,11)
+					Set tFmt = $LG(tNode,12)
+					Set tGroupNo = ""
+					//w "<br><br>",$name($$$DeepSeeMetaGLVN("cubes",$zconvert(tCubeName,"u"),"mbr#",tDimNo,tHierNo,tLevelNo)), "<br>"
+					//s theCube = ##class(%DeepSee.Model.cube).%New()
+					//w "<br>DIM="_tDimNo_", HIER="_tHierNo_"<br>"
+					//zw theCube
+					//w "<br><br>"
+					//s qqqq= ..%Query
+					//s sAxes = qqqq.axes
+					//s sAxis = sAxes.GetAt(2)
+					//s schild = sAxis.children.GetAt(1).children.GetAt(1).children
+					//zw schild
+					s tAxisCaption = ""
+					d ##class(%DeepSee.Utils).%GetDimensionCaption(tCubeName,tDimNo, tHierNo,tLevelNo, .tAxisCaption)
+					s tAxis.caption = tAxisCaption
+					//
+
+					// JMD: test if we are showing a date value;
+					// these may need to be reformatted on the client
+					Set tKey = ""
+					Set tDateType = ""
+					If ((tDimNo'="")&&(tHierNo'="")&&(tLevelNo'="")) {
+						If '$D(tMbrTypes(tDimNo,tHierNo,tLevelNo)) {
+							Set tDimInfo = $G($$$DeepSeeMetaGLVN("cubes",tCubeIndex,"mbr#",tDimNo,tHierNo,tLevelNo))
+							Set tTimeClass = $LG(tDimInfo,6)
+							Set tDType = ""
+							// n.b. use the level class to guess the type
+							If (tTimeClass = "%DeepSee.Time.Year") {
+								// Set tDType = "year" -- no need
+							}
+							ElseIf (tTimeClass = "%DeepSee.Time.MonthYear") {
+								Set tDType = "month"
+							}
+							ElseIf (tTimeClass = "%DeepSee.Time.QuarterYear") {
+								Set tDType = "quarter"
+							}
+							ElseIf (tTimeClass = "%DeepSee.Time.WeekYear") {
+								// Set tDType = "week" // ignore for now
+							}
+							ElseIf (tTimeClass = "%DeepSee.Time.DayMonthYear") {
+								Set tDType = "day"
+							}
+							Set tMbrTypes(tDimNo,tHierNo,tLevelNo) = tDType
+						}
+						Set tDateType = $G(tMbrTypes(tDimNo,tHierNo,tLevelNo))
+					}
+					Set:tDateType'="" tKey = $LG(tNode,13)
+
+					// JMD1128: test if we are part of a group
+					If (tParent'="") {
+						If $D(tGroupIndex(tParent)) {
+							// point to existing group
+							Set tGroupNo = tGroupIndex(tParent)
+						}
+						Else {
+							// build list of parents above this node
+							Kill tPList
+							Set pn = 0
+							While (tParent'="") {
+								Set tParentNode = $G($$$DeepSeeAxisGLVN(tCubeIndex,tAxisKey,"axes",tParent))
+								Set tParentType = $LG(tParentNode,1)
+								If ((tParentType="mbr")||(tParentType="msr")) {
+									Set tHasGroups = 1
+									Set tPList(pn) = tParent
+									Set pn = pn + 1
+								}
+								Set tParent = $LG(tParentNode,4)
+							}
+
+							// now walk down the list
+							Set tLastParent = 0
+							Set pn = $O(tPList(""),-1)
+							While (pn'="") {
+								Set tParent = tPList(pn)
+								If $D(tGroupIndex(tParent)) {
+									Set gc = tGroupIndex(tParent)
+								}
+								Else {
+									Set gc = tGroupCount
+									Set tGroupCount = tGroupCount + 1
+								}
+								Set tGroupIndex(tParent) = gc
+								Set tGroups(gc) = tParent
+								Set tGroups(tLastParent,"ch",gc) = ""
+								Set tLastParent = gc
+								Set tGroupNo = gc
+								Set pn = $O(tPList(pn),-1)
+							}
+						}
+					}
+
+					Set n = n + 1
+					If (tGroupNo'="") {
+						Set tGroups(tGroupNo,"leaf",n) = ""
+					}
+
+					k tTuple
+					s tTuple = ##class(%ZEN.proxyObject).%New() // tuple object
+					s tTuple.caption = tCaption
+					//Added by Shmidt Ivan
+					//Path for Axes
+					s tTuple.path = ##class(%DeepSee.Query.Engine).%GetSpecForAxisNode($$$UPPER(tCubeName),tQueryKey,a, tNodeNo)
+					s:tDateType'="" tTuple.type = tDateType
+					s:tKey'="" tTuple.key = tKey
+					s:tGroupNo'="" tTuple.g = tGroupNo
+					s:tFmt'="" tTuple.format = tFmt
+					d tAxis.tuples.Insert(tTuple.%ConstructClone(1))
+					// tuple object
+				}
+				Set tItemNo = $O($$$DeepSeeResultsGLVN(tCubeIndex,tQueryKey,"leaf",a,tItemNo),1,tNodeNo)
+			}
+			//tuples end
+
+			s tAxis.hasGroups = $S(tHasGroups:"true",1:"false")
+
+			// JMD1128: groups and children
+			If $D(tGroups) {
+				//Do ..%OutputAxisGroupJSON(.tGroups,0,tCubeIndex,tAxisKey)
+				// JMD1148: write out flat list of groups
+				s tGroups = ##class(%ListOfDataTypes).%New()
+				Set gn = 0
+				//Had an issue with commas. Fixed by Shmidt Ivan
+				Set tFirstFlag=1
+				Set g = $O(tGroups(""))
+				While (g'="") {
+					Set tCaption = ""
+					Set tParentNo = ""
+					Set tNodeNo = $G(tGroups(g))
+					If (tNodeNo'="") {
+						Set tGroupNode = $G($$$DeepSeeAxisGLVN(tCubeIndex,tAxisKey,"axes",tNodeNo))
+						Set tCaption = $LG(tGroupNode,5)
+						Set tParentNo = $LG(tGroupNode,4)
+					}
+					Set gn = gn + 1
+					s tGroup = ##class(%ZEN.proxyObject).%New() // group object
+					s:tCaption'="" tGroup.caption = tCaption
+					If (tParentNo'="") {
+						Set tParentGroup = $G(tGroupIndex(tParentNo))
+						s:tParentGroup'="" tGroup.g = tParentGroup
+					}
+					If $D(tGroups(g,"ch")) {
+						s tFirstFlag=0
+						s tGroup.childrenGroups = ##class(%ListOfDataTypes).%New()
+						Set gc = $O(tGroups(g,"ch",""))
+						While (gc'="") {
+							d tGroup.childrenGroups.Insert(gc)
+							Set gc = $O(tGroups(g,"ch",gc))
+						}
+						//End of tGroup.childrenGroups
+
+					}
+					If $D(tGroups(g,"leaf")) {
+						s tGroup.tuples = ##class(%ListOfDataTypes).%New()
+						Set gc = $O(tGroups(g,"leaf",""))
+						While (gc'="") {
+							d tGroup.tuples.Insert(gc)
+							Set gc = $O(tGroups(g,"leaf",gc))
+						}
+						// end of tGroup.tuples
+					}
+					d tGroups.Insert(tGroup.%ConstructClone(1))
+					// end of group object
+
+					Set g = $O(tGroups(g))
+				}
+				s tAxis.groups = tGroups.%ConstructClone(1)
+				// end of tGroups
+
+			}
+
+			d obj.axes.Insert(tAxis.%ConstructClone(1))
+		}
+
+	// end of obj.axes
+
+
+		// Initial cell address
+		For a=1:1:tAxisCount {
+			Set tAxisKey = tAxisKeys(a)
+			Set tItemNo(a) = $O($$$DeepSeeResultsGLVN(tCubeIndex,tQueryKey,"leaf",a,""),1,tNodeNo)
+			Set tAddr(a) = $G(tNodeNo)
+		}
+
+		// write out size of data;
+		// this allows us to use 1 array for all data values
+
+		s obj.rowCount = tRowCount
+		s obj.columnCount = tColCount
+
+		// cells
+		// note: we only write out up to 2D results as our client has no use for
+		// higher order information
+		// JMD1148: simplify JSON for data
+		// fastest way is to not use pure JSON!
+		// instead, define an array of known-size and explicitly insert values into it.
+		// data is written out as [R1C1,R1C2,R1C3,R2C1,R2C2,R2C3]
+		//
+		// NO ! NO ! NO! - Shmidt Ivan
+
+		s obj.cells = ##class(%ListOfDataTypes).%New()
+
+		If (tAxisCount = 1) {
+			Set tRowCount = 1
+			Set c = 0
+			While((tItemNo(1)'="")&&(c<tMaxCols)) {
+				d obj.cells.Insert(..%GetValue(tAddr(1)))
+				Set c = c + 1
+				Set tItemNo(1) = $O($$$DeepSeeResultsGLVN(tCubeIndex,tQueryKey,"leaf",1,tItemNo(1)),1,tNodeNo)
+				Set tAddr(1) = tNodeNo
+			}
+		}
+		Else {
+			Set tCellCount = 0
+			Set row = 0 // actual row #
+			While((tItemNo(2)'="")&&(row<tEndRow)) {
+				Set row = row + 1
+				If (row >= tStartRow) {
+					Set c = 0
+					Set tItemNo(1) = $O($$$DeepSeeResultsGLVN(tCubeIndex,tQueryKey,"leaf",1,""),1,tNodeNo)
+					Set tAddr(1) = tNodeNo
+					While((tItemNo(1)'="")&&(c<tMaxCols)) {
+						Set c = c + 1
+						Set tValue = $Case(tAxisCount,
+							0:..%GetValue(),
+							1:..%GetValue(tAddr(1)),
+							2:..%GetValue(tAddr(1),tAddr(2)),
+							3:..%GetValue(tAddr(1),tAddr(2),tAddr(3)),
+							4:..%GetValue(tAddr(1),tAddr(2),tAddr(3),tAddr(4)),
+							5:..%GetValue(tAddr(1),tAddr(2),tAddr(3),tAddr(4),tAddr(5)),
+							6:..%GetValue(tAddr(1),tAddr(2),tAddr(3),tAddr(4),tAddr(5),tAddr(6)),
+							7:..%GetValue(tAddr(1),tAddr(2),tAddr(3),tAddr(4),tAddr(5),tAddr(6),tAddr(7)),
+							:"")
+						d obj.cells.Insert(tValue)
+						Set tCellCount = tCellCount + 1
+
+						Set tItemNo(1) = $O($$$DeepSeeResultsGLVN(tCubeIndex,tQueryKey,"leaf",1,tItemNo(1)),1,tNodeNo)
+						Set tAddr(1) = tNodeNo
+					}
+				}
+				Set tItemNo(2) = $O($$$DeepSeeResultsGLVN(tCubeIndex,tQueryKey,"leaf",2,tItemNo(2)),1,tNodeNo)
+				Set tAddr(2) = tNodeNo
+			}
+		}
+		//end of obj.cells
+		//Write """rowTotals"":[],",!
+		//Write """columnTotals"":[],",!
+
+		set obj.grandTotal = +$G($$$DeepSeeResultsGLVN(tCubeIndex,tQueryKey,"total"))
+
+		set obj.status = tStatus // last property
+
+
+		//end of obj
+
+		// JMD1148: violate JSON rules for speed's sake:
+		// Shmidt Ivan: OMG!
+		//Write ";",!
+		d obj.%ValidateObject()
+		d obj.%ToJSON()
+		k obj
+	}
+	Catch(ex) {
+		Set tSC = ex.AsStatus()
+		Write "/*"
+		Do $System.OBJ.DisplayError(tSC)
+		Write "*/"
+	}
+	Quit tSC
+]]></Implementation>
+</Method>
+
+<Method name="InfoToJSON">
+<ReturnType>%ZEN.proxyObject</ReturnType>
+<Implementation><![CDATA[
+        Set tCubeIndex = ..%CubeKey
+		Set tCubeName = $$$UPPER(..%Cube)
+		Set tQueryKey = ..%QueryKey
+		Set tStatus = ..%GetQueryStatus(..%Cube,tQueryKey)
+		If (tStatus < 100) {
+			// wait a bit!
+			Hang 1
+			// try again
+			Set tStatus = ..%GetQueryStatus(..%Cube,tQueryKey)
+		}
+
+		If (tStatus < 100) {
+			Write "null",!
+			Quit
+		}
+
+
+		Set tAxisCount = ..%GetAxisCount()
+		For a = 1:1:tAxisCount {
+			Set tAxisSize(a) = ..%GetAxisSize(a)
+			Set tAxisKeys(a) = $G($$$DeepSeeResultsGLVN(tCubeIndex,tQueryKey,"axis",a))
+		}
+		
+		Set tColCount = +$G(tAxisSize(1))
+		Set tRowCount = +$G(tAxisSize(2))
+
+		// find name of cube in original case
+		Set tCubeClass = $G($$$DeepSeeMetaGLVN("cubes",tCubeName))
+		Set tCubeName = $G($$$DeepSeeMetaGLVN("classes",tCubeClass))
+                                                                                                                                        
+                                                                                                                                        
+        set info=##class(%ZEN.proxyObject).%New()
+	    set info.cubeName = tCubeName
+        set info.cubeClass = tCubeClass
+        set info.rowCount = tRowCount
+        set info.colCount = tColCount
+        w "<br>"
+        zw tAxisKeys 
+        w "<br>"                                                                                                                                                                                                                                                                              
+                                                                                                                    
+	return info
+]]></Implementation>
+</Method>
+
+<Method name="ColsToJSON">
+<ReturnType>%ZEN.proxyObject</ReturnType>
+<Implementation><![CDATA[
+	set cols=##class(%ZEN.proxyObject).%New()
+	
+	return cols
+]]></Implementation>
+</Method>
+
+<Method name="RowsToJSON">
+<ReturnType>%ZEN.proxyObject</ReturnType>
+<Implementation><![CDATA[
+    set rows=##class(%ZEN.proxyObject).%New()
+    
+    Set tCubeIndex = ..%CubeKey
+    Set tCubeName = $$$UPPER(..%Cube)
+	Set tQueryKey = ..%QueryKey      
+		Set tStatus = ..%GetQueryStatus(..%Cube,tQueryKey)
+		If (tStatus < 100) {
+			// wait a bit!
+			Hang 1
+			// try again
+			Set tStatus = ..%GetQueryStatus(..%Cube,tQueryKey)
+		}
+
+		If (tStatus < 100) {
+			Write "null",!
+			Quit
+		}                                                                                                                               
+	Set tAxisCount = ..%GetAxisCount()
+    Set tAxisKey = $G($$$DeepSeeResultsGLVN(tCubeIndex,tQueryKey,"axis",2))
+    set tNodeIndex = 1
+    w $name($$$DeepSeeAxisGLVN(tCubeIndex,tAxisKey,"axes",1))
+    Set tNode = $G($$$DeepSeeAxisGLVN(tCubeIndex,tAxisKey,"axes",1))    
+    while(tNode'=""){
+        w "<br>"
+        zw tNode
+        w "<br>"
+                                                                                                                                                                        
+       set tNodeIndex = tNodeIndex + 1
+       Set tNode = $G($$$DeepSeeAxisGLVN(tCubeIndex,tAxisKey,"axes",tNodeIndex))
+    }
+	return rows
+]]></Implementation>
+</Method>
+
+<Method name="DataToJSON">
+<ReturnType>%ZEN.proxyObject</ReturnType>
+<Implementation><![CDATA[
+	set data=##class(%ZEN.proxyObject).%New()
+	
+	return data
 ]]></Implementation>
 </Method>
 </Class>
