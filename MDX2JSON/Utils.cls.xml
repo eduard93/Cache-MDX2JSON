@@ -40,6 +40,34 @@ Returns NULL if there is an error in MDX query.]]></Description>
 ]]></Implementation>
 </Method>
 
+<Method name="WriteJSONfromMDXTest">
+<Description><![CDATA[
+Automatic processing of MDX query and outputting resulting JSON.<br>
+<b>pMDX</b> - String containing MDX query.<br>
+Returns NULL if there is an error in MDX query.]]></Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>pMDX:%String</FormalSpec>
+<ProcedureBlock>1</ProcedureBlock>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	s curNS = $namespace
+	zn ..#NAMESPACE
+	try {
+		set PageSize = 1000
+		set CurrPage = 1
+		set Params = ""
+		#dim st As %Status = $$$OK
+		set RS = ##class(MDX2JSON.ResultSet).%ExecuteDirect(pMDX,.Params,.st)
+		//h 4
+		d RS.OutputJSON3(PageSize,CurrPage,,PageSize)
+	} catch ex {
+		set st = ex.AsStatus()
+	}
+	zn curNS
+	quit st
+]]></Implementation>
+</Method>
+
 <Method name="WriteJSONPfromMDX">
 <Description><![CDATA[
 Automatic processing of MDX query and outputting resulting JSONP.<br>
@@ -185,7 +213,7 @@ do ##class(MDX2JSON.Utils).Export()</Description>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
 	
-	Set st=$system.OBJ.Export("%DeepSee.ResultSet.cls,MDX2JSON.REST.cls,MDX2JSON.Utils.cls,","/InterSystems/Cache2014/csp/sys/mdx2json.xml")
+	Set st=$system.OBJ.Export("MDX2JSON.ResultSet.cls,MDX2JSON.REST.cls,MDX2JSON.Utils.cls,","/InterSystems/Cache2014/csp/sys/mdx2json.xml")
 	Return st
 ]]></Implementation>
 </Method>

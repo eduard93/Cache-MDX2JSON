@@ -22,7 +22,7 @@ Example: send HTTP GET request to web application with Dispatch class <b>MDX2JSO
 <TimeCreated>63165,65257.8179</TimeCreated>
 
 <Parameter name="NAMESPACE">
-<Default>SAMPLES</Default>
+<Default>TFOMS</Default>
 </Parameter>
 
 <XData name="UrlMap">
@@ -48,6 +48,8 @@ Example: send HTTP GET request to web application with Dispatch class <b>MDX2JSO
 
    <!-- Test method-->
    <Route Url="/test" Method="GET" Call="Test"/>
+   <Route Url="/test2" Method="GET" Call="Test2"/>
+    <Route Url="/MDXTest" Method="POST" Call="WriteJSONfromMDXTest"/>
  </Routes>
 ]]></Data>
 </XData>
@@ -62,6 +64,34 @@ Test method, outputs <b>%request</b> and <b>%response</b> objects. ]]></Descript
 	zw %request
 	&html<<br><br>>
 	zw %response
+	quit $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="Test2">
+<Description><![CDATA[
+Test method, outputs <b>%request</b> and <b>%response</b> objects. ]]></Description>
+<ClassMethod>1</ClassMethod>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	
+	set a=##class(%ZEN.proxyObject).%New()
+	set a.caption = "Женский"
+	set a.children = ##class(%Library.ListOfDataTypes).%New()
+	set key = $O(^DeepSee.Cache.Axis("QUEUECUBE","ru2621201549","axes",""))
+	while (key'="")
+	{
+		set list = ^DeepSee.Cache.Axis("QUEUECUBE","ru2621201549","axes",key)
+		set b=##class(%ZEN.proxyObject).%New()
+		set b.caption = $LG(list,5,"Ничего нет")
+		do a.children.Insert(b)
+		set key = $O(^DeepSee.Cache.Axis("QUEUECUBE","ru2621201549","axes",key))
+	}
+
+
+	do a.children.Insert(b)
+	do a.children.Insert(b)
+	do a.%ToJSON()
 	quit $$$OK
 ]]></Implementation>
 </Method>
@@ -112,11 +142,10 @@ Test method, outputs <b>%request</b> and <b>%response</b> objects. ]]></Descript
 	s st = $$$OK
 	try {
 		
-		&sql(
-			
-		)
+		
 		 &sql( DECLARE C1 CURSOR FOR
-         SELECT fullName, title  into :dashName, :dashTitle FROM %DeepSee_Dashboard.Definition) // WHERE folderName NOT LIKE '$TRASH%')
+         SELECT fullName, title  into :dashName, :dashTitle FROM %DeepSee_Dashboard.Definition
+         WHERE folderName = 'Mobile')
      
      &sql(OPEN C1)
       &sql(FETCH C1)
@@ -298,6 +327,36 @@ Converts incoming request object and calls abovementioned method.</Description>
 		  	set st = ##class(MDX2JSON.Utils).WriteJSONfromMDX(tMDX)
 	} catch ex {
 		//zw obj
+		set st=ex.AsStatus()
+	}
+
+  	if callback'="" w ")"
+  	quit st
+]]></Implementation>
+</Method>
+
+<Method name="WriteJSONfromMDXTest">
+<Description>
+Wrapper for ##class(MDX2JSON.Utils).WriteJSONPfromMDX(pMDX)
+Converts incoming request object and calls abovementioned method.</Description>
+<ClassMethod>1</ClassMethod>
+<ProcedureBlock>0</ProcedureBlock>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+   // This actually acquires MDX from POST request
+   	set tMDX = $get(%request.Data("MDX",1))
+	set callback=$get(%request.Data("callback",1),"")
+	if callback'="" w callback_"("
+	set st = $$$OK
+	if (tMDX = "")
+	{
+		set st = ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(%request.Content,,.obj,1)
+		set tMDX = obj.MDX
+	}
+
+	try {
+		set st = ##class(MDX2JSON.Utils).WriteJSONfromMDXTest(tMDX)
+	} catch ex {
 		set st=ex.AsStatus()
 	}
 

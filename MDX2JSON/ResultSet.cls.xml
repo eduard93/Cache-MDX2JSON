@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="MDX2JSON.ResultSet">
+<Super>%DeepSee.ResultSet</Super>
+<TimeCreated>63463,69237.325048</TimeCreated>
+
+<Method name="OutputJSON3">
+<FormalSpec>pPageSize:%Integer,pCurrPage:%Integer,pRowLabels:%List="",pMaxRows:%Integer=""</FormalSpec>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[
+	     
+	set obj=##class(%ZEN.proxyObject).%New()
+	
+     If (..%Query.queryType = "DRILLTHROUGH") {
+	    set obj.Status = "0" // A надо это? Может одну строчку оставить? Или совсем убрать?
+	    set obj.Error = "DRILLTHROUGH queries are not supported"
+		return obj.%ToJSON()
+	}
+     
+    /* 
+    Set tMaxCols = 500
+	Set tStartRow = ((pCurrPage-1)*pPageSize)+1
+	Set tEndRow = tStartRow + pPageSize - 1
+	Set tRowCount = 0
+	Set tColCount = 0
+	// JMD1128 
+    Set tMaxJSONRows = $S(pMaxRows="":2000,1:+pMaxRows)
+	Set:tRowCount>tMaxJSONRows tRowCount = tMaxJSONRows
+	Set:tColCount>tMaxCols tColCount = tMaxCols
+
+	Set tStartRow = 1
+	Set tEndRow = tStartRow + tRowCount - 1
+    */                                           
+                                                    
+	set obj.Info = ..InfoToJSON() //returns proxy object
+	set obj.Cols = ..AxesToJSON()
+	set obj.Data = ..DataToJSON()
+
+	return obj.%ToJSON(,"aelotw")
+]]></Implementation>
+</Method>
+
+<Method name="InfoToJSON">
+<ReturnType>%ZEN.proxyObject</ReturnType>
+<Implementation><![CDATA[
+        Set tCubeIndex = ..%CubeKey
+		Set tCubeName = $$$UPPER(..%Cube)
+		Set tQueryKey = ..%QueryKey
+		Set tStatus = ..%GetQueryStatus(..%Cube,tQueryKey)
+		If (tStatus < 100) {
+			// wait a bit!
+			Hang 1
+			// try again
+			Set tStatus = ..%GetQueryStatus(..%Cube,tQueryKey)
+		}
+
+		If (tStatus < 100) {
+			Write "{Error:"_$$$ZENJSSTR($System.Status.GetErrorText(tStatus))_"}"
+			Return tStatus
+		}
+
+
+		Set tAxisCount = ..%GetAxisCount()
+		For a = 1:1:tAxisCount {
+			Set tAxisSize(a) = ..%GetAxisSize(a)
+			Set tAxisKeys(a) = $G($$$DeepSeeResultsGLVN(tCubeIndex,tQueryKey,"axis",a))
+		}
+		
+		Set tColCount = +$G(tAxisSize(1))
+		Set tRowCount = +$G(tAxisSize(2))
+
+		// find name of cube in original case
+		Set tCubeClass = $G($$$DeepSeeMetaGLVN("cubes",tCubeName))
+		Set tCubeName = $G($$$DeepSeeMetaGLVN("classes",tCubeClass))
+                                                                                                                                        
+                                                                                                                                        
+        set info=##class(%ZEN.proxyObject).%New()
+	    set info.cubeName = tCubeName
+        set info.cubeClass = tCubeClass
+        set info.rowCount = tRowCount
+        set info.colCount = tColCount
+        /*w "<br>"
+        zw tAxisKeys 
+        w "<br>"    */                                                                                                                                                                                                                                                                          
+                                                                                                                    
+	return info
+]]></Implementation>
+</Method>
+
+<Method name="AxesToJSON">
+<ReturnType>%ListOfDataTypes</ReturnType>
+<Implementation><![CDATA[
+	Set tCubeIndex = ..%CubeKey
+	Set tQueryKey = ..%QueryKey
+	//set axes=##class(%ZEN.proxyObject).%New()
+	set axes=##class(%ListOfDataTypes).%New()
+	Set tAxisCount = ..%GetAxisCount()
+	For a = 1:1:2 {
+		Set tAxisSize(a) = ..%GetAxisSize(a)
+		Set tAxisKeys(a) = $G($$$DeepSeeResultsGLVN(tCubeIndex,tQueryKey,"axis",a))
+		do axes.Insert(..ProcessOneAxis(tCubeIndex,tAxisKeys(a),a))
+	}
+	Set tColCount = +$G(tAxisSize(1))
+	Set tRowCount = +$G(tAxisSize(2))
+
+	//w $G(^DeepSee.Cache.Axis("QUEUECUBE","ru2621201549","axes",1,"ch")) //starting point
+	//w $G($$$DeepSeeAxisGLVN(tCubeIndex,tAxisKey,"axes",1,"ch")
+	return axes
+]]></Implementation>
+</Method>
+
+<Method name="ProcessOneAxis">
+<FormalSpec>CubeIndex,AxisKey,AxisNumber</FormalSpec>
+<ReturnType>%ZEN.proxyObject</ReturnType>
+<Implementation><![CDATA[
+	set axis=##class(%ZEN.proxyObject).%New()
+	set axis.spec = $G($$$DeepSeeAxisGLVN(CubeIndex,AxisKey,"spec"))
+	set axis.tuples = ##class(%ListOfDataTypes).%New()
+	do axis.tuples.Insert(..ProcessOneAxisCell(CubeIndex,AxisKey,AxisNumber,1))
+	
+	Return axis
+]]></Implementation>
+</Method>
+
+<Method name="ProcessOneAxisCell">
+<FormalSpec>CubeIndex,AxisKey,AxisNumber,Node</FormalSpec>
+<ReturnType>%ZEN.proxyObject</ReturnType>
+<Implementation><![CDATA[
+	set tCaption = ""
+	set cell=##class(%ZEN.proxyObject).%New()
+	
+	Set tCubeName = $$$UPPER(..%Cube)
+	Set tQueryKey = ..%QueryKey
+	
+	set tNode = $G($$$DeepSeeAxisGLVN(CubeIndex,AxisKey,"axes",Node))
+	
+	Set tCaption = $LG(tNode,5)
+	/*
+	Set tType = $LG(tNode,1)
+	Set tParent = $LG(tNode,4)
+	Set tMbrId = $LG(tNode,6)
+	Set tDimNo = +$LG(tNode,9)
+	Set tHierNo = +$LG(tNode,10)
+	Set tLevelNo = +$LG(tNode,11)
+	Set tFmt = $LG(tNode,12)*/
+	
+	set tAxisCaption = ""
+	//do ##class(%DeepSee.Utils).%GetDimensionCaption(tCubeName,tDimNo, tHierNo,tLevelNo, .tAxisCaption)
+	set cell.caption = tCaption //$ZCVT(tCaption,"O","UTF8")
+	set cell.path = ##class(%DeepSee.Query.Engine).%GetSpecForAxisNode(tCubeName,tQueryKey, AxisNumber, Node)
+	
+	if ($D($$$DeepSeeAxisGLVN(CubeIndex,AxisKey,"axes",Node,"ch")) = 10)
+	{
+		set cell.children = ##class(%ListOfDataTypes).%New()
+		set key = $O($$$DeepSeeAxisGLVN(CubeIndex,AxisKey,"axes",Node,"ch",""))
+		while (key'="")
+		{
+			do cell.children.Insert(..ProcessOneAxisCell(CubeIndex,AxisKey,AxisNumber,key))
+			set key = $O($$$DeepSeeAxisGLVN(CubeIndex,AxisKey,"axes",Node,"ch",key))
+		}
+	} 
+
+	Return cell
+]]></Implementation>
+</Method>
+
+<Method name="RowsToJSON">
+<ReturnType>%ZEN.proxyObject</ReturnType>
+<Implementation><![CDATA[
+	/*
+    set rows=##class(%ZEN.proxyObject).%New()
+    
+    Set tCubeIndex = ..%CubeKey
+    Set tCubeName = $$$UPPER(..%Cube)
+	Set tQueryKey = ..%QueryKey      
+		Set tStatus = ..%GetQueryStatus(..%Cube,tQueryKey)
+		If (tStatus < 100) {
+			// wait a bit!
+			Hang 1
+			// try again
+			Set tStatus = ..%GetQueryStatus(..%Cube,tQueryKey)
+		}
+
+		If (tStatus < 100) {
+			Write "null",!
+			Quit
+		}                                                                                                                               
+	Set tAxisCount = ..%GetAxisCount()
+    Set tAxisKey = $G($$$DeepSeeResultsGLVN(tCubeIndex,tQueryKey,"axis",2))
+    set tNodeIndex = 1
+    w $name($$$DeepSeeAxisGLVN(tCubeIndex,tAxisKey,"axes",1))
+    Set tNode = $G($$$DeepSeeAxisGLVN(tCubeIndex,tAxisKey,"axes",1))    
+    while(tNode'=""){
+        w "<br>"
+        zw tNode
+        w "<br>"
+                                                                                                                                                                        
+       set tNodeIndex = tNodeIndex + 1
+       Set tNode = $G($$$DeepSeeAxisGLVN(tCubeIndex,tAxisKey,"axes",tNodeIndex))
+    }
+	return rows*/
+]]></Implementation>
+</Method>
+
+<Method name="DataToJSON">
+<ReturnType>%ZEN.proxyObject</ReturnType>
+<Implementation><![CDATA[
+	set data=##class(%ZEN.proxyObject).%New()
+	
+	return data
+]]></Implementation>
+</Method>
+</Class>
+</Export>
