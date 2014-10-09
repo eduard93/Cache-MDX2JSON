@@ -60,7 +60,8 @@ Returns NULL if there is an error in MDX query.]]></Description>
         #dim st As %Status = $$$OK
         set RS = ##class(MDX2JSON.ResultSet).%ExecuteDirect(pMDX,.Params,.st)
         //h 4
-        w RS.OutputJSON3(PageSize,CurrPage,,PageSize)
+        set obj = RS.ToProxyObject()
+        w obj.%ToJSON()
     } catch ex {
         set st = ex.AsStatus()
     }

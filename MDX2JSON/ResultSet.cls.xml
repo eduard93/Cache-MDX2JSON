@@ -4,16 +4,15 @@
 <Super>%DeepSee.ResultSet</Super>
 <TimeCreated>63463,69237.325048</TimeCreated>
 
-<Method name="OutputJSON3">
-<FormalSpec>pPageSize:%Integer,pCurrPage:%Integer,pRowLabels:%List="",pMaxRows:%Integer=""</FormalSpec>
-<ReturnType>%String</ReturnType>
+<Method name="ToProxyObject">
+<ReturnType>%ZEN.proxyObject</ReturnType>
 <Implementation><![CDATA[
          
     set obj=##class(%ZEN.proxyObject).%New()
     
      if (..%Query.queryType = "DRILLTHROUGH") {
         set obj.Error = "DRILLTHROUGH queries are not supported"
-        return obj.%ToJSON()
+        return obj
     }
     
     set tQueryKey = ..%QueryKey
@@ -26,28 +25,13 @@
 	if (st < 100) {
 	    set obj.Error = $$$ZENJSSTR($System.Status.GetErrorText(st))_"}"
 	    return obj
-	}
-     
-    /* 
-    Set tMaxCols = 500
-    Set tStartRow = ((pCurrPage-1)*pPageSize)+1
-    Set tEndRow = tStartRow + pPageSize - 1
-    Set tRowCount = 0
-    Set tColCount = 0
-    // JMD1128 
-    Set tMaxJSONRows = $S(pMaxRows="":2000,1:+pMaxRows)
-    Set:tRowCount>tMaxJSONRows tRowCount = tMaxJSONRows
-    Set:tColCount>tMaxCols tColCount = tMaxCols
-
-    Set tStartRow = 1
-    Set tEndRow = tStartRow + tRowCount - 1
-    */                                           
+	}                                        
                                                     
     set obj.Info = ..InfoToJSON() //returns proxy object
     set obj.Cols = ..AxesToJSON()
     set obj.Data = ..DataToJSON()
     
-    return obj.%ToJSON()
+    return obj
 ]]></Implementation>
 </Method>
 
