@@ -10,12 +10,18 @@
          
     set obj=##class(%ZEN.proxyObject).%New()
     
-     if (..%Query.queryType = "DRILLTHROUGH") {
+    if (..%Query.queryType = "DRILLTHROUGH") {
         set obj.Error = "DRILLTHROUGH queries are not supported"
+        return obj
+    }
+      
+    if (..%GetAxisCount() > 2) {
+        set obj.Error = "Multidimensional (>2) queries are not supported"
         return obj
     }
     
     set tQueryKey = ..%QueryKey
+    
 	set st = ..%GetQueryStatus(..%Cube,tQueryKey)
 	if (st < 100) {
 	    hang 1
@@ -23,14 +29,18 @@
 	}
 
 	if (st < 100) {
-	    set obj.Error = $$$ZENJSSTR($System.Status.GetErrorText(st))_"}"
+	    set obj.Error = $$$ZENJSSTR($System.Status.GetErrorText(st))
 	    return obj
-	}                                        
-                                                    
-    set obj.Info = ..InfoToJSON() //returns proxy object
-    set obj.Cols = ..AxesToJSON()
-    set obj.Data = ..DataToJSON()
-    
+	}
+	
+	try {                                       
+	    set obj.Info = ..InfoToJSON() // basic info about cube and query
+	    set obj.Cols = ..AxesToJSON() // all axes
+	    set obj.Data = ..DataToJSON() // array of all cells, left-to-right, up-to-down
+	} catch ex {
+		set st=ex.AsStatus()
+		set obj.Error = $$$ZENJSSTR($System.Status.GetErrorText(st))
+	}
     return obj
 ]]></Implementation>
 </Method>
@@ -39,8 +49,8 @@
 <ReturnType>%ZEN.proxyObject</ReturnType>
 <Implementation><![CDATA[
 	set tCubeIndex = ..%CubeKey
-	set tCubeName = $$$UPPER(..%Cube)
 	set tQueryKey = ..%QueryKey
+	set tCubeName = $$$UPPER(..%Cube)
 
 	set tAxisCount = ..%GetAxisCount()
 	for a = 1:1:tAxisCount {
@@ -57,6 +67,7 @@
 																	
 																	
 	set info=##class(%ZEN.proxyObject).%New()
+	
 	set info.cubeName = tCubeName
 	set info.cubeClass = tCubeClass
 	set info.rowCount = tRowCount
@@ -75,7 +86,6 @@
 
     set axes=##class(%ListOfDataTypes).%New()
     
-
 	for a = 1:1:tAxisCount {
         set tAxisSize(a) = ..%GetAxisSize(a)
         set tAxisKeys(a) = $G($$$DeepSeeResultsGLVN(tCubeIndex,tQueryKey,"axis",a))
@@ -87,119 +97,118 @@
 </Method>
 
 <Method name="ProcessOneAxis">
+<Internal>1</Internal>
 <FormalSpec>CubeIndex,AxisKey,AxisNumber</FormalSpec>
 <ReturnType>%ZEN.proxyObject</ReturnType>
 <Implementation><![CDATA[
+	set tCubeName = $$$UPPER(..%Cube)
+    set tQueryKey = ..%QueryKey
+	
     set axis=##class(%ZEN.proxyObject).%New()
-    set axis.spec = $G($$$DeepSeeAxisGLVN(CubeIndex,AxisKey,"spec"))
-    set axis.tuples = ##class(%ListOfDataTypes).%New()
-    do axis.tuples.Insert(..ProcessOneAxisCell(CubeIndex,AxisKey,AxisNumber,1))
+    //d ##class(%DeepSee.Utils).%GetDimensionCaption(tCubeName,1, tHierNo,tLevelNo, .tAxisCaption)
     
-    Return axis
+    //set axis.caption = $zobjclassmethod($G($$$DeepSeeMetaGLVN("cubes",tCubeName)),"%GetMemberCaption",$$$UPPER(tDimName))
+    //set axis.spec = $G($$$DeepSeeAxisGLVN(CubeIndex,AxisKey,"spec"))
+    set axis.tuples = ##class(%ListOfDataTypes).%New()
+    do axis.tuples.Insert(..ProcessOneAxisCell(CubeIndex, AxisKey, tCubeName, tQueryKey, AxisNumber, 1))
+    
+    return axis
 ]]></Implementation>
 </Method>
 
 <Method name="ProcessOneAxisCell">
-<FormalSpec>CubeIndex,AxisKey,AxisNumber,Node</FormalSpec>
+<Internal>1</Internal>
+<FormalSpec>CubeIndex,AxisKey,CubeName,QueryKey,AxisNumber,Node</FormalSpec>
 <ReturnType>%ZEN.proxyObject</ReturnType>
 <Implementation><![CDATA[
-    set tCaption = ""
     set cell=##class(%ZEN.proxyObject).%New()
-    
-    Set tCubeName = $$$UPPER(..%Cube)
-    Set tQueryKey = ..%QueryKey
-    
+        
     set tNode = $G($$$DeepSeeAxisGLVN(CubeIndex,AxisKey,"axes",Node))
     
-    Set tCaption = $LG(tNode,5)
+    set tCaption = $LG(tNode,5)
+    
     /*
     Set tType = $LG(tNode,1)
     Set tParent = $LG(tNode,4)
     Set tMbrId = $LG(tNode,6)
-    Set tDimNo = +$LG(tNode,9)
-    Set tHierNo = +$LG(tNode,10)
-    Set tLevelNo = +$LG(tNode,11)
-    Set tFmt = $LG(tNode,12)*/
+    Set tFmt = $LG(tNode,12)
+    */
     
-    set tAxisCaption = ""
-    //do ##class(%DeepSee.Utils).%GetDimensionCaption(tCubeName,tDimNo, tHierNo,tLevelNo, .tAxisCaption)
-    set cell.caption = tCaption //$ZCVT(tCaption,"O","UTF8")
-    set cell.path = ##class(%DeepSee.Query.Engine).%GetSpecForAxisNode(tCubeName,tQueryKey, AxisNumber, Node)
+    Set tDimNo = $LG(tNode,9)
+    Set tHierNo = $LG(tNode,10)
+    Set tLevelNo = $LG(tNode,11)
+
+	do ##class(%DeepSee.Utils).%GetDimensionCaption(CubeName,tDimNo, tHierNo,tLevelNo, .tAxisCaption)
+	set cell.dimension = tAxisCaption
     
-    if ($D($$$DeepSeeAxisGLVN(CubeIndex,AxisKey,"axes",Node,"ch")) = 10)
-    {
+    set cell.caption = tCaption
+    set cell.path = ##class(%DeepSee.Query.Engine).%GetSpecForAxisNode(CubeName, QueryKey, AxisNumber, Node)
+    
+    if ($D($$$DeepSeeAxisGLVN(CubeIndex, AxisKey, "axes", Node, "ch")) = 10) {
         set cell.children = ##class(%ListOfDataTypes).%New()
-        set key = $O($$$DeepSeeAxisGLVN(CubeIndex,AxisKey,"axes",Node,"ch",""))
-        while (key'="")
-        {
-            do cell.children.Insert(..ProcessOneAxisCell(CubeIndex,AxisKey,AxisNumber,key))
-            set key = $O($$$DeepSeeAxisGLVN(CubeIndex,AxisKey,"axes",Node,"ch",key))
+        set key = $O($$$DeepSeeAxisGLVN(CubeIndex, AxisKey, "axes", Node, "ch", ""))
+        while (key'="") {
+            do cell.children.Insert(..ProcessOneAxisCell(CubeIndex, AxisKey, CubeName, QueryKey, AxisNumber, key))
+            set key = $O($$$DeepSeeAxisGLVN(CubeIndex, AxisKey, "axes", Node, "ch", key))
         }
+        
+        // To filter out invisible top-level сells
+        if (((cell.caption = "") || (cell.caption = 0)) && (cell.path = "")) {
+			return cell.children	
+		}
     } 
 
-    Return cell
+    return cell
 ]]></Implementation>
 </Method>
 
 <Method name="DataToJSON">
-<ReturnType>%ZEN.proxyObject</ReturnType>
+<ReturnType>%ListOfDataTypes</ReturnType>
 <Implementation><![CDATA[
 	set data = ##class(%ListOfDataTypes).%New()
 	
-	Set tCubeIndex = ..%CubeKey
-    Set tQueryKey = ..%QueryKey
-	Set tAxisCount = ..%GetAxisCount()
+	set tCubeIndex = ..%CubeKey
+    set tQueryKey = ..%QueryKey
+	set tAxisCount = ..%GetAxisCount()
 	
 	set tNodeNo = ""
 	
 	// Initial cell address
-	For a=1:1:tAxisCount {
+	for a=1:1:tAxisCount {
 		Set tItemNo(a) = $O($$$DeepSeeResultsGLVN(tCubeIndex,tQueryKey,"leaf",a,""),1,tNodeNo)
 		Set tAddr(a) = $G(tNodeNo)
 	}
 
 	set tNodeNo = ""
 	
-	If (tAxisCount = 1) {
-		Set tRowCount = 1
-		Set c = 0
-		While (tItemNo(1)'="") { //&&(c<tMaxCols))
-			d data.Insert(..%GetValue(tAddr(1)))
-			Set c = c + 1
-			Set tItemNo(1) = $O($$$DeepSeeResultsGLVN(tCubeIndex,tQueryKey,"leaf",1,tItemNo(1)),1,tNodeNo)
-			Set tAddr(1) = tNodeNo
+	if (tAxisCount = 1) {
+		set tRowCount = 1
+		set c = 0
+		while (tItemNo(1)'="") { //&&(c<tMaxCols))
+			do data.Insert(..%GetValue(tAddr(1)))
+			set c = c + 1
+			set tItemNo(1) = $O($$$DeepSeeResultsGLVN(tCubeIndex,tQueryKey,"leaf",1,tItemNo(1)),1,tNodeNo)
+			set tAddr(1) = tNodeNo
 		}
 	}
-	Else {
-		Set tCellCount = 0
-		Set row = 0 // actual row #
-		While(tItemNo(2)'="") { //&&(row<tEndRow))
-			Set row = row + 1
-			//If (row >= tStartRow) {
-				Set c = 0
-				Set tItemNo(1) = $O($$$DeepSeeResultsGLVN(tCubeIndex,tQueryKey,"leaf",1,""),1,tNodeNo)
-				Set tAddr(1) = tNodeNo
-				While (tItemNo(1)'="") { //&&(c<tMaxCols))
-					Set c = c + 1
-					Set tValue = $Case(tAxisCount,
+	else {
+		set tCellCount = 0
+		while(tItemNo(2)'="") {
+				set tItemNo(1) = $O($$$DeepSeeResultsGLVN(tCubeIndex,tQueryKey,"leaf",1,""),1,tNodeNo)
+				set tAddr(1) = tNodeNo
+				while (tItemNo(1)'="") {
+					set tValue = $Case(tAxisCount,
 						0:..%GetValue(),
 						1:..%GetValue(tAddr(1)),
 						2:..%GetValue(tAddr(1),tAddr(2)),
-						3:..%GetValue(tAddr(1),tAddr(2),tAddr(3)),
-						4:..%GetValue(tAddr(1),tAddr(2),tAddr(3),tAddr(4)),
-						5:..%GetValue(tAddr(1),tAddr(2),tAddr(3),tAddr(4),tAddr(5)),
-						6:..%GetValue(tAddr(1),tAddr(2),tAddr(3),tAddr(4),tAddr(5),tAddr(6)),
-						7:..%GetValue(tAddr(1),tAddr(2),tAddr(3),tAddr(4),tAddr(5),tAddr(6),tAddr(7)),
 						:"")
-					d data.Insert(tValue)
-					Set tCellCount = tCellCount + 1
+					do data.Insert(tValue)
 
-					Set tItemNo(1) = $O($$$DeepSeeResultsGLVN(tCubeIndex,tQueryKey,"leaf",1,tItemNo(1)),1,tNodeNo)
-					Set tAddr(1) = tNodeNo
+					set tItemNo(1) = $O($$$DeepSeeResultsGLVN(tCubeIndex,tQueryKey,"leaf",1,tItemNo(1)),1,tNodeNo)
+					set tAddr(1) = tNodeNo
 				}
-			//}
-			Set tItemNo(2) = $O($$$DeepSeeResultsGLVN(tCubeIndex,tQueryKey,"leaf",2,tItemNo(2)),1,tNodeNo)
-			Set tAddr(2) = tNodeNo
+			set tItemNo(2) = $O($$$DeepSeeResultsGLVN(tCubeIndex,tQueryKey,"leaf",2,tItemNo(2)),1,tNodeNo)
+			set tAddr(2) = tNodeNo
 		}
 	}
 

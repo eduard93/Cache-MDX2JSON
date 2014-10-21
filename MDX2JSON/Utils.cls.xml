@@ -4,6 +4,7 @@
 <Description><![CDATA[
 Utility class, wrapping processing of MDX queries.<br>
 Outputs JSON, JSONP and XML/A.]]></Description>
+<IncludeCode>%ZEN.Utils</IncludeCode>
 <Super>%RegisteredObject</Super>
 <TimeCreated>63165,65653.547419</TimeCreated>
 
@@ -50,23 +51,22 @@ Returns NULL if there is an error in MDX query.]]></Description>
 <ProcedureBlock>1</ProcedureBlock>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-    
-    s curNS = $namespace
+  	s curNS = $namespace
     zn ..#NAMESPACE
-    try {
-        set PageSize = 1000
-        set CurrPage = 1
-        set Params = ""
-        #dim st As %Status = $$$OK
-        set RS = ##class(MDX2JSON.ResultSet).%ExecuteDirect(pMDX,.Params,.st)
-        //h 4
-        set obj = RS.ToProxyObject()
-        w obj.%ToJSON()
-    } catch ex {
-        set st = ex.AsStatus()
+    set Params = ""
+    #dim st As %Status = $$$OK
+    set RS = ##class(MDX2JSON.ResultSet).%ExecuteDirect(pMDX,.Params,.st)
+       
+    if $$$ISERR(st) {
+	    write "{Error:"_$$$ZENJSSTR($System.Status.GetErrorText(st))_"}"
+	    return $$$OK
     }
+    
+    set obj = RS.ToProxyObject()
+    w $e(obj.%ToJSON(),1,*-1) // status
+    
     zn curNS
-    quit st
+    return $$$OK
 ]]></Implementation>
 </Method>
 

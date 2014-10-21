@@ -28,6 +28,10 @@ Example: send HTTP GET request to web application with Dispatch class <b>MDX2JSO
 <XData name="UrlMap">
 <Data><![CDATA[
 <Routes>
+
+	<!-- Settings -->
+	<Route Url="/Settings" Method="POST" Call="SetSettings"/>
+	
 	<!-- Send objects in this format: {"MDX":"QUERY"} HTTP method: POST	-->
    <Route Url="/MDX" Method="POST" Call="WriteJSONfromMDX"/>
    <Route Url="/MDX" Method="GET" Call="WriteJSONfromMDX"/>
@@ -64,34 +68,8 @@ Test method, outputs <b>%request</b> and <b>%response</b> objects. ]]></Descript
 	zw %request
 	&html<<br><br>>
 	zw %response
-	quit $$$OK
-]]></Implementation>
-</Method>
-
-<Method name="Test2">
-<Description><![CDATA[
-Test method, outputs <b>%request</b> and <b>%response</b> objects. ]]></Description>
-<ClassMethod>1</ClassMethod>
-<ReturnType>%Status</ReturnType>
-<Implementation><![CDATA[
-	
-	set a=##class(%ZEN.proxyObject).%New()
-	set a.caption = "Женский"
-	set a.children = ##class(%Library.ListOfDataTypes).%New()
-	set key = $O(^DeepSee.Cache.Axis("QUEUECUBE","ru2621201549","axes",""))
-	while (key'="")
-	{
-		set list = ^DeepSee.Cache.Axis("QUEUECUBE","ru2621201549","axes",key)
-		set b=##class(%ZEN.proxyObject).%New()
-		set b.caption = $LG(list,5,"Ничего нет")
-		do a.children.Insert(b)
-		set key = $O(^DeepSee.Cache.Axis("QUEUECUBE","ru2621201549","axes",key))
-	}
-
-
-	do a.children.Insert(b)
-	do a.children.Insert(b)
-	do a.%ToJSON()
+	&html<<br><br>>
+	zw %session
 	quit $$$OK
 ]]></Implementation>
 </Method>
@@ -111,23 +89,23 @@ Test method, outputs <b>%request</b> and <b>%response</b> objects. ]]></Descript
 <ReturnType>%String</ReturnType>
 <Implementation><![CDATA[
 	zn ..#NAMESPACE
-  s pMdx =""
- s st = $$$OK
-  try {
-   s tPivot = ##class(%DeepSee.UserLibrary.Utils).%OpenFolderItem(pPivotName,.st)
-   $$$TOE(st, st)
-   
-   s tPivotTable = ##class(%DeepSee.Component.pivotTable).%New()
-   $$$TOE(st, tPivot.%CopyToComponent(tPivotTable))
-   
-   s rs = tPivotTable.%CreateResultSet(.st,.tParms,.tFilterInfo,.tAdvancedFilters,.tQueryText)
-   $$$TOE(st, st)
-   
-   s pMdx = tQueryText
-  } catch ex {
-   s st = ex.AsStatus()
-  }
-  q pMdx
+  	s pMdx =""
+ 	s st = $$$OK
+  	try {
+	   s tPivot = ##class(%DeepSee.UserLibrary.Utils).%OpenFolderItem(pPivotName,.st)
+	   $$$TOE(st, st)
+	   
+	   s tPivotTable = ##class(%DeepSee.Component.pivotTable).%New()
+	   $$$TOE(st, tPivot.%CopyToComponent(tPivotTable))
+	   
+	   s rs = tPivotTable.%CreateResultSet(.st,.tParms,.tFilterInfo,.tAdvancedFilters,.tQueryText)
+	   $$$TOE(st, st)
+	   
+	   s pMdx = tQueryText
+  	} catch ex {
+   		s st = ex.AsStatus()
+  	}
+  	q pMdx
 ]]></Implementation>
 </Method>
 
@@ -136,8 +114,7 @@ Test method, outputs <b>%request</b> and <b>%response</b> objects. ]]></Descript
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
 	k dashList
-	//s curNS = $namespace
-	zn ..#NAMESPACE
+
 	s i=1
 	s st = $$$OK
 	try {
@@ -218,6 +195,22 @@ Test method, outputs <b>%request</b> and <b>%response</b> objects. ]]></Descript
 	}
 	//zn "MDX2JSON"
 	q st
+]]></Implementation>
+</Method>
+
+<Method name="SetSettings">
+<ClassMethod>1</ClassMethod>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	set st = $$$OK
+	set obj = ##class(%ZEN.proxyObject).%New()
+	set st = ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(%request.Content,,.obj,1)
+	quit:$$$ISERR(st) st
+  	set %session.Data("namespace1",1) = obj.namespace
+  	do %session.Set("rundir",obj.namespace)
+  	do %session.RunNamespaceSet("SAMPLES")
+  	w obj.namespace
+  	quit st
 ]]></Implementation>
 </Method>
 
@@ -353,7 +346,7 @@ Converts incoming request object and calls abovementioned method.</Description>
 		set st = ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(%request.Content,,.obj,1)
 		set tMDX = obj.MDX
 	}
-
+	set tMDX = $ZCVT(tMDX,"I","UTF8")
 	try {
 		set st = ##class(MDX2JSON.Utils).WriteJSONfromMDXTest(tMDX)
 	} catch ex {
@@ -404,7 +397,7 @@ Dispatch a REST request according to URL and Method</Description>
 <FormalSpec>pUrl:%String,pMethod:%String</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-	d %response.SetHeader("Access-Control-Allow-Origin","*")
+	//d %response.SetHeader("Access-Control-Allow-Origin","*")
     #dim tSC As %Status = $$$OK
     #dim e As %Exception.AbstractException
     
