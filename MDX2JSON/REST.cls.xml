@@ -47,8 +47,7 @@ Example: send HTTP GET request to web application with Dispatch class <b>MDX2JSO
    <Route Url="/MDXfilters/:query" Method="GET" Call="WriteFiltersForMDX"/>
 
    <!-- Test method-->
-   <Route Url="/test" Method="GET" Call="Test"/>
-   <Route Url="/test2" Method="GET" Call="Test2"/>
+   <Route Url="/Test" Method="GET" Call="Test"/>
  </Routes>
 ]]></Data>
 </XData>
@@ -59,7 +58,6 @@ Test method, outputs <b>%request</b> and <b>%response</b> objects. ]]></Descript
 <ClassMethod>1</ClassMethod>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-	
 	&html<<h1>Status: OK!</h1><br>>
 	zw %request
 	&html<<br><br>>
@@ -169,7 +167,9 @@ Converts incoming request object and calls abovementioned method.]]></Descriptio
 	set obj = ##class(%ZEN.proxyObject).%New()
 	set st = ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(%request.Content,,.obj,1)
 	quit:$$$ISERR(st) st
-  	set st = ##class(MDX2JSON.Utils).WriteDrillthroughJSON(obj.MDX)
+	set tMDX = obj.MDX
+	set tMDX = $ZCVT(tMDX,"I","UTF8")
+  	set st = ##class(MDX2JSON.Utils).WriteDrillthroughJSON(tMDX)
   	quit st
 ]]></Implementation>
 </Method>
@@ -239,57 +239,16 @@ Converts incoming request object and calls abovementioned method.</Description>
 <ProcedureBlock>0</ProcedureBlock>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-		//Do $System.OBJ.Dump(%request)
-   //q $$$OK
-
-   // This actually acquires MDX from POST request
-   	set tMDX = $get(%request.Data("MDX",1))
 	set callback=$get(%request.Data("callback",1),"")
 	if callback'="" w callback_"("
-	set st = $$$OK
-	//set obj = ##class(%ZEN.proxyObject).%New()
-	//d %request.Content.OutputToDevice()
-	if (tMDX = "")
-	{
-		set st = ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(%request.Content,,.obj,1)
-		set tMDX = obj.MDX
-		//w $ZCVT(tMDX,"I","UTF8")
-	}
-	//quit:$$$ISERR(st) st
-	try {
-		  	set st = ##class(MDX2JSON.Utils).WriteJSONfromMDX(tMDX)
-	} catch ex {
-		//zw obj
-		set st=ex.AsStatus()
-	}
-
-  	if callback'="" w ")"
-  	quit st
-]]></Implementation>
-</Method>
-
-<Method name="WriteJSONfromMDXTest">
-<Description>
-Wrapper for ##class(MDX2JSON.Utils).WriteJSONPfromMDX(pMDX)
-Converts incoming request object and calls abovementioned method.</Description>
-<ClassMethod>1</ClassMethod>
-<ProcedureBlock>0</ProcedureBlock>
-<ReturnType>%Status</ReturnType>
-<Implementation><![CDATA[
-   // This actually acquires MDX from POST request
-   	set tMDX = $get(%request.Data("MDX",1))
-	set callback=$get(%request.Data("callback",1),"")
-	if callback'="" w callback_"("
-	set st = $$$OK
-	if (tMDX = "")
-	{
-		set st = ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(%request.Content,,.obj,1)
-		set tMDX = obj.MDX
-	}
+	set st = ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(%request.Content,,.obj,1)
+	quit:$$$ISERR(st) st
+	set tMDX = obj.MDX
 	set tMDX = $ZCVT(tMDX,"I","UTF8")
 	try {
-		set st = ##class(MDX2JSON.Utils).WriteJSONfromMDXTest(tMDX)
+		set st = ##class(MDX2JSON.Utils).WriteJSONfromMDX(tMDX)
 	} catch ex {
+		//zw obj
 		set st=ex.AsStatus()
 	}
 
