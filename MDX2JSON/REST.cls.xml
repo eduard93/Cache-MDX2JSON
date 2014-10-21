@@ -18,6 +18,7 @@ To get information about possible Cube's filters and filter's values:<br><ul>
 		<li>webapplication/FilterValues/:cube/:filter - to get all values for Filter for DeepSee Cube in JSON format.</li></ul> 
 Example: send HTTP GET request to web application with Dispatch class <b>MDX2JSON.REST</b> and URL:<br>
 /FilterValues/HoleFoods/[DateOfSale].[Actual].[MonthSold] -  to get information about possible values of [DateOfSale].[Actual].[MonthSold] in HoleFoods Cube.]]></Description>
+<IncludeCode>%ZEN.Utils,%occErrors</IncludeCode>
 <Super>%CSP.REST</Super>
 <TimeCreated>63165,65257.8179</TimeCreated>
 
@@ -28,13 +29,8 @@ Example: send HTTP GET request to web application with Dispatch class <b>MDX2JSO
 <XData name="UrlMap">
 <Data><![CDATA[
 <Routes>
-
-	<!-- Settings -->
-	<Route Url="/Settings" Method="POST" Call="SetSettings"/>
-	
 	<!-- Send objects in this format: {"MDX":"QUERY"} HTTP method: POST	-->
    <Route Url="/MDX" Method="POST" Call="WriteJSONfromMDX"/>
-   <Route Url="/MDX" Method="GET" Call="WriteJSONfromMDX"/>
    <Route Url="/MDX2JSONP" Method="POST" Call="WriteJSONPfromMDX"/>  
    <Route Url="/MDXDrillthrough" Method="POST" Call="WriteDrillthroughJSON"/>
    <Route Url="/MDX2XMLA" Method="POST" Call="WriteXMLAfromMDX"/>  
@@ -53,7 +49,6 @@ Example: send HTTP GET request to web application with Dispatch class <b>MDX2JSO
    <!-- Test method-->
    <Route Url="/test" Method="GET" Call="Test"/>
    <Route Url="/test2" Method="GET" Call="Test2"/>
-    <Route Url="/MDXTest" Method="POST" Call="WriteJSONfromMDXTest"/>
  </Routes>
 ]]></Data>
 </XData>
@@ -64,6 +59,7 @@ Test method, outputs <b>%request</b> and <b>%response</b> objects. ]]></Descript
 <ClassMethod>1</ClassMethod>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
+	
 	&html<<h1>Status: OK!</h1><br>>
 	zw %request
 	&html<<br><br>>
@@ -113,36 +109,13 @@ Test method, outputs <b>%request</b> and <b>%response</b> objects. ]]></Descript
 <ClassMethod>1</ClassMethod>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-	k dashList
-
-	s i=1
-	s st = $$$OK
 	try {
-		
-		
-		 &sql( DECLARE C1 CURSOR FOR
-         SELECT fullName, title  into :dashName, :dashTitle FROM %DeepSee_Dashboard.Definition
-         WHERE folderName = 'Mobile')
-     
-     &sql(OPEN C1)
-      &sql(FETCH C1)
-
-      while (SQLCODE = 0) { 
-          s dashList(i) = $lb(dashTitle, dashName)
-          s i=i+1 
-         &sql(FETCH C1)
-      }    
-      &sql(CLOSE C1)
-      
-      //zw dashList
-     // s dashList(0) = i
-		do ##class(%ZEN.Auxiliary.jsonProvider).%ArrayToJSON($lb("title", "path"),.dashList)
-		
+		set sql = "SELECT title, fullName As path FROM %DeepSee_Dashboard.Definition WHERE folderName = 'Mobile'"
+		do ##class(%ZEN.Auxiliary.jsonSQLProvider).%WriteJSONFromSQL(,sql)
+	} catch ex {
+		w $$$ZENJSSTR($System.Status.GetErrorText(ex.AsStatus()))
 	}
-	catch ex{
-			s st = ex.AsStatus()
-		}
-		q st
+	return $$$OK
 ]]></Implementation>
 </Method>
 
@@ -152,7 +125,7 @@ Test method, outputs <b>%request</b> and <b>%response</b> objects. ]]></Descript
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
 	zn ..#NAMESPACE
-	s st = $$$OK
+	set st = $$$OK
 	try {
 		
 		&sql(
@@ -160,57 +133,27 @@ Test method, outputs <b>%request</b> and <b>%response</b> objects. ]]></Descript
 			FROM %DeepSee_Dashboard.Definition
 			WHERE fullName=:pDashName
 		)
-		i (SQLCODE < 0) 	$$$ThrowStatus($$$ERR(SQLCODE_" "_%msg))
-		i (SQLCODE = 100) 	quit
-		//w tDashId
-		//zn "%SYS"
-		s dash = ##class(%DeepSee.Dashboard.Definition).%OpenId(tDashId,,.st)
-		//zw dash
-		$$$TOE(st,st) 
+		return:(SQLCODE'=0) $$$ERROR($$$SQLError, SQLCODE)
+
+		set dash = ##class(%DeepSee.Dashboard.Definition).%OpenId(tDashId,,.st)
+
+		return:($$$ISERR(st)) st
 		s widgets = dash.widgets.%ConstructClone("true")
 		//Widget : {type,  title, mdx}
-		s i=1
-		s t = widgets.GetAt(1)
 
-	
+		set widget = widgets.GetNext(.key)
 		
-		while(t){
-			s j=1
-			s control = t.controls.GetAt(j)
-			while(control){
-					s out(i,j) = $lb(,,,control.targetProperty,control.label,control.value)
-					s j = j+1
-					s control = t.controls.GetAt(j)
-				}
-				//zw t
-			s out(i) =$lb(t.subtype, t.title, ..GetMdx(t.dataSource))
-			s i = i+1
-			s t=widgets.GetAt(i)
-			}
-			//zw out
-			do ##class(%ZEN.Auxiliary.jsonProvider).%ArrayToJSON($lb("type","title","mdx","path", "label","value" ),.out)
+		do {
+			s out(key) =$lb(widget.subtype, widget.title, widget.dataSource) //..GetMdx(widget.dataSource))
+			s widget = widgets.GetNext(.key)
+		} while (key'="")
+
+		do ##class(%ZEN.Auxiliary.jsonProvider).%ArrayToJSON($lb("type","title","mdx"),.out)
 		
 	} catch ex {
-		s st = ex.AsStatus()
+		set st = ex.AsStatus()
 	}
-	//zn "MDX2JSON"
-	q st
-]]></Implementation>
-</Method>
-
-<Method name="SetSettings">
-<ClassMethod>1</ClassMethod>
-<ReturnType>%Status</ReturnType>
-<Implementation><![CDATA[
-	set st = $$$OK
-	set obj = ##class(%ZEN.proxyObject).%New()
-	set st = ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(%request.Content,,.obj,1)
-	quit:$$$ISERR(st) st
-  	set %session.Data("namespace1",1) = obj.namespace
-  	do %session.Set("rundir",obj.namespace)
-  	do %session.RunNamespaceSet("SAMPLES")
-  	w obj.namespace
-  	quit st
+	return st
 ]]></Implementation>
 </Method>
 
@@ -240,10 +183,7 @@ Do not use.</Description>
 <FormalSpec>MDX:%String</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-	//w MDX
-	//w "<br>"
   set MDX = $ZCONVERT($ZCONVERT(MDX ,"I","URL") ,"I","UTF8")
-  //w MDX
   set st = ##class(MDX2JSON.Utils).WriteJSONfromMDX(MDX)
   quit st
 ]]></Implementation>
