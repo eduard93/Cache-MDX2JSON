@@ -9,7 +9,7 @@ Installation
 1. Download zip and unpack it.
 2. Run in terminal (any namespace): 
 
-         do  ##class(%Installer.Installer).InstallFromCommandLine("{SourceDir}\Installer.cls.xml","Namespace={Namespace},SourceDir={SourceDir}",0)
+        do  ##class(%Installer.Installer).InstallFromCommandLine("{SourceDir}\Installer.cls.xml","Namespace={Namespace},SourceDir={SourceDir}",0)
 
   where: 
   
