@@ -7,7 +7,7 @@
 <XMLNamespace>INSTALLER</XMLNamespace>
 <Data><![CDATA[
 <Manifest>
-<If Condition='(##class(%SYS.Namespace).Exists("${Namespace}")=0)'>
+<If Condition='(##class(Config.Namespaces).Exists("${Namespace}")=0)'>
 <Log Text="Creating namespace ${Namespace}" Level="0"/>
 <Namespace Name="${Namespace}" Create="yes" Code="${Namespace}" Data="${Namespace}">
 <Configuration>
@@ -19,12 +19,12 @@
 
 <Namespace Name="${Namespace}" Create="no">
 <Import File="${SourceDir}"/>
-<Log Text="Creating webapplication /broker/${Namespace}" Level="0"/>
+<Log Text="Creating web application /broker/${Namespace}" Level="0"/>
 <CSPApplication Url="/broker/${Namespace}" Directory="${CSPDIR}/${Namespace}" AuthenticationMethods="64" IsNamespaceDefault="false" />
 <RunInstall Class="MDX2JSON.Installer" Method="SetDispatchClass"/>
 </Namespace>
 
-<If Condition='..DetermineAllNamespace()'>
+<If Condition='(##class(Config.Namespaces).Exists("%All")=0)'>
 <Log Text="Creating namespace %All" Level="0"/>
 <Namespace Name="%All" Create="yes" Code="All" Data="All">
 <Configuration>
