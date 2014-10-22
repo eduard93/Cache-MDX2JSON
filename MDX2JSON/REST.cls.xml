@@ -22,10 +22,6 @@ Example: send HTTP GET request to web application with Dispatch class <b>MDX2JSO
 <Super>%CSP.REST</Super>
 <TimeCreated>63165,65257.8179</TimeCreated>
 
-<Parameter name="NAMESPACE">
-<Default>TFOMS</Default>
-</Parameter>
-
 <XData name="UrlMap">
 <Data><![CDATA[
 <Routes>
@@ -39,8 +35,10 @@ Example: send HTTP GET request to web application with Dispatch class <b>MDX2JSO
    <Route Url="/FilterValues/:cube" Method="GET" Call="WriteFiltersForCube"/>
    <Route Url="/FilterValues/:cube/:filter" Method="GET" Call="WriteFilterValues"/> 
    
-    <Route Url="/widgets/" Method="GET" Call="GetWidgets"/>    
+    <Route Url="/widgets/" Method="GET" Call="GetWidgets"/> 
+      
     <Route Url="/dashboards/" Method="GET" Call="GetDashboardsList"/> 
+    <Route Url="/widgets/" Method="POST" Call="GetDashboardWidgets"/>   
      
    <!-- Valid but illicit, do not use-->
    <Route Url="/MDX/:query" Method="GET" Call="WriteJSONfromMDXURL"/>  
@@ -64,42 +62,22 @@ Test method, outputs <b>%request</b> and <b>%response</b> objects. ]]></Descript
 	zw %response
 	&html<<br><br>>
 	zw %session
-	quit $$$OK
+	return $$$OK
 ]]></Implementation>
 </Method>
 
-<Method name="GetWidgets">
+<Method name="GetDashboardWidgets">
 <ClassMethod>1</ClassMethod>
 <Implementation><![CDATA[
 	#define get(%name) $get(%request.Data(%name,1))
-	s wName = $$$get("w")
-	q ..GetWidgetsList(wName)
-]]></Implementation>
-</Method>
-
-<Method name="GetMdx">
-<ClassMethod>1</ClassMethod>
-<FormalSpec>pPivotName:%String</FormalSpec>
-<ReturnType>%String</ReturnType>
-<Implementation><![CDATA[
-	zn ..#NAMESPACE
-  	s pMdx =""
- 	s st = $$$OK
-  	try {
-	   s tPivot = ##class(%DeepSee.UserLibrary.Utils).%OpenFolderItem(pPivotName,.st)
-	   $$$TOE(st, st)
-	   
-	   s tPivotTable = ##class(%DeepSee.Component.pivotTable).%New()
-	   $$$TOE(st, tPivot.%CopyToComponent(tPivotTable))
-	   
-	   s rs = tPivotTable.%CreateResultSet(.st,.tParms,.tFilterInfo,.tAdvancedFilters,.tQueryText)
-	   $$$TOE(st, st)
-	   
-	   s pMdx = tQueryText
-  	} catch ex {
-   		s st = ex.AsStatus()
-  	}
-  	q pMdx
+	set dashboard = $$$get("w")
+	if (dashboard = "") {
+		set st = ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(%request.Content,,.obj,1)
+		return:$$$ISERR(st) st
+		set dashboard = obj.Dashboard
+		set dashboard = $ZCVT(dashboard,"I","UTF8")
+	}
+	return ##class(MDX2JSON.Utils).GetWidgetsList(dashboard)
 ]]></Implementation>
 </Method>
 
@@ -107,51 +85,14 @@ Test method, outputs <b>%request</b> and <b>%response</b> objects. ]]></Descript
 <ClassMethod>1</ClassMethod>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
+	set sql = "SELECT title, fullName As path FROM %DeepSee_Dashboard.Definition WHERE folderName = 'Mobile'"
 	try {
-		set sql = "SELECT title, fullName As path FROM %DeepSee_Dashboard.Definition WHERE folderName = 'Mobile'"
+		
 		do ##class(%ZEN.Auxiliary.jsonSQLProvider).%WriteJSONFromSQL(,sql)
 	} catch ex {
-		w $$$ZENJSSTR($System.Status.GetErrorText(ex.AsStatus()))
+		write $$$ZENJSSTR($System.Status.GetErrorText(ex.AsStatus()))
 	}
 	return $$$OK
-]]></Implementation>
-</Method>
-
-<Method name="GetWidgetsList">
-<ClassMethod>1</ClassMethod>
-<FormalSpec>pDashName:%String</FormalSpec>
-<ReturnType>%Status</ReturnType>
-<Implementation><![CDATA[
-	zn ..#NAMESPACE
-	set st = $$$OK
-	try {
-		
-		&sql(
-			SELECT TOP 1 ID into :tDashId
-			FROM %DeepSee_Dashboard.Definition
-			WHERE fullName=:pDashName
-		)
-		return:(SQLCODE'=0) $$$ERROR($$$SQLError, SQLCODE)
-
-		set dash = ##class(%DeepSee.Dashboard.Definition).%OpenId(tDashId,,.st)
-
-		return:($$$ISERR(st)) st
-		s widgets = dash.widgets.%ConstructClone("true")
-		//Widget : {type,  title, mdx}
-
-		set widget = widgets.GetNext(.key)
-		
-		do {
-			s out(key) =$lb(widget.subtype, widget.title, widget.dataSource) //..GetMdx(widget.dataSource))
-			s widget = widgets.GetNext(.key)
-		} while (key'="")
-
-		do ##class(%ZEN.Auxiliary.jsonProvider).%ArrayToJSON($lb("type","title","mdx"),.out)
-		
-	} catch ex {
-		set st = ex.AsStatus()
-	}
-	return st
 ]]></Implementation>
 </Method>
 
@@ -162,15 +103,14 @@ Converts incoming request object and calls abovementioned method.]]></Descriptio
 <ClassMethod>1</ClassMethod>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-	zn ..#NAMESPACE
 	set st = $$$OK
 	set obj = ##class(%ZEN.proxyObject).%New()
 	set st = ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(%request.Content,,.obj,1)
-	quit:$$$ISERR(st) st
+	return:$$$ISERR(st) st
 	set tMDX = obj.MDX
 	set tMDX = $ZCVT(tMDX,"I","UTF8")
   	set st = ##class(MDX2JSON.Utils).WriteDrillthroughJSON(tMDX)
-  	quit st
+  	return st
 ]]></Implementation>
 </Method>
 
@@ -242,7 +182,7 @@ Converts incoming request object and calls abovementioned method.</Description>
 	set callback=$get(%request.Data("callback",1),"")
 	if callback'="" w callback_"("
 	set st = ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(%request.Content,,.obj,1)
-	quit:$$$ISERR(st) st
+	return:$$$ISERR(st) st
 	set tMDX = obj.MDX
 	set tMDX = $ZCVT(tMDX,"I","UTF8")
 	try {
@@ -370,7 +310,16 @@ Dispatch a REST request according to URL and Method</Description>
                 If tTarget[":" Set tClass=$Piece(tTarget,":"),tTarget=$Piece(tTarget,":",2)
                 
                 #; Dispatch
-                Set tSC=$zobjclassmethod(tClass,tTarget,tArgs...)
+                set Namespace = $get(%request.Data("Namespace",1))
+                
+                if ((Namespace'="") && ##class(%SYS.Namespace).Exists(Namespace)) {
+                	set oldNS = $Namespace
+                	zn Namespace
+                	Set tSC=$zobjclassmethod(tClass,tTarget,tArgs...)
+                	zn oldNS
+                } else {
+	                Set tSC=$zobjclassmethod(tClass,tTarget,tArgs...)                	
+                }
                 If $$$ISERR(tSC) Do ..Http500(##class(%Exception.StatusException).CreateFromStatus(tSC))
                 
                 #; Don't want multiple matches
