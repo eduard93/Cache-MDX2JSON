@@ -3,7 +3,8 @@ Cache-MDX2JSON
 
 RESTful web api for MDX2JSON transformation (also JSONP and XML/A).
 
-Installation.
+Installation
+-----------
 
 1. Download zip and unpack it.
 2. Run in terminal (any namespace): 
