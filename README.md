@@ -21,3 +21,32 @@ On this step installer would create (if needed) {Namespace}, import source code 
 
 
 For information on how to work with this RESTful web API please refer to included documentation.
+
+Requests
+-----------
+
+These are the possible requests to web application (add param ?Namespace={Desired Namespace} to query another namespace cubes
+
+| URL                         | Type | Body (JSON)                 | Response  | Description                    |
+|-----------------------------|------|-----------------------------|-----------|--------------------------------|
+| MDX                         | POST | { "MDX":"QUERY" }           | JSON      | Results of MDX execution       |
+| MDX2JSONP                   | POST | { "MDX":"QUERY" }           | JSONP     | Results of MDX execution       |
+| MDXDrillthrough             | POST | { "MDX":"QUERY" }           | JSON      | Results of MDX execution       |
+| MDX2XMLA                    | POST | { "MDX":"QUERY" }           | XMLA      | Results of MDX execution       |
+| Dashboards                  | GET  |                             | JSON      | All dashboards                 |
+| Widgets                     | POST | {Dashboard:"DashboardName"} | JSON      | All widgets in a dashboard     |
+| /FilterValues/:cube         | GET  |                             | JSON      | All filters for DeepSee Cube   |
+| /FilterValues/:cube/:filter | GET  |                             | JSON      | All possible values for filter |
+| Test                        | GET  |                             | plaintext | Test info                      |
+
+Example
+-----------
+
+Request Url: http://localhost:57772/MDX2JSON/MDX?Namespace=Samples
+
+Request type: POST
+Request body:
+
+    {"MDX": "SELECT NON EMPTY [Product].[P1].[Product Category].Members ON 0,NON EMPTY [Outlet].[H1].[Region].Members ON 1 FROM [HoleFoods]"} 
+    
+Result: 
