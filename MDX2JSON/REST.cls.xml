@@ -18,6 +18,7 @@ To get information about possible Cube's filters and filter's values:<br><ul>
 		<li>webapplication/FilterValues/:cube/:filter - to get all values for Filter for DeepSee Cube in JSON format.</li></ul> 
 Example: send HTTP GET request to web application with Dispatch class <b>MDX2JSON.REST</b> and URL:<br>
 /FilterValues/HoleFoods/[DateOfSale].[Actual].[MonthSold] -  to get information about possible values of [DateOfSale].[Actual].[MonthSold] in HoleFoods Cube.]]></Description>
+<IncludeCode>%ZEN.Utils,%occErrors</IncludeCode>
 <Super>%CSP.REST</Super>
 <TimeCreated>63165,65257.8179</TimeCreated>
 
@@ -33,13 +34,18 @@ Example: send HTTP GET request to web application with Dispatch class <b>MDX2JSO
    <!-- Get info about availible filters and their values -->
    <Route Url="/FilterValues/:cube" Method="GET" Call="WriteFiltersForCube"/>
    <Route Url="/FilterValues/:cube/:filter" Method="GET" Call="WriteFilterValues"/> 
+   
+    <Route Url="/widgets/" Method="GET" Call="GetWidgets"/> 
       
+    <Route Url="/dashboards/" Method="GET" Call="GetDashboardsList"/> 
+    <Route Url="/widgets/" Method="POST" Call="GetDashboardWidgets"/>   
+     
    <!-- Valid but illicit, do not use-->
    <Route Url="/MDX/:query" Method="GET" Call="WriteJSONfromMDXURL"/>  
    <Route Url="/MDXfilters/:query" Method="GET" Call="WriteFiltersForMDX"/>
 
    <!-- Test method-->
-   <Route Url="/test" Method="GET" Call="Test"/>
+   <Route Url="/Test" Method="GET" Call="Test"/>
  </Routes>
 ]]></Data>
 </XData>
@@ -53,9 +59,40 @@ Test method, outputs <b>%request</b> and <b>%response</b> objects. ]]></Descript
 	&html<<h1>Status: OK!</h1><br>>
 	zw %request
 	&html<<br><br>>
-	d %response.SetHeader("Access-Control-Allow-Origin","*")
 	zw %response
-	quit $$$OK
+	&html<<br><br>>
+	zw %session
+	return $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="GetDashboardWidgets">
+<ClassMethod>1</ClassMethod>
+<Implementation><![CDATA[
+	#define get(%name) $get(%request.Data(%name,1))
+	set dashboard = $$$get("w")
+	if (dashboard = "") {
+		set st = ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(%request.Content,,.obj,1)
+		return:$$$ISERR(st) st
+		set dashboard = obj.Dashboard
+		set dashboard = $ZCVT(dashboard,"I","UTF8")
+	}
+	return ##class(MDX2JSON.Utils).GetWidgetsList(dashboard)
+]]></Implementation>
+</Method>
+
+<Method name="GetDashboardsList">
+<ClassMethod>1</ClassMethod>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	set sql = "SELECT title, fullName As path FROM %DeepSee_Dashboard.Definition WHERE folderName = 'Mobile'"
+	try {
+		
+		do ##class(%ZEN.Auxiliary.jsonSQLProvider).%WriteJSONFromSQL(,sql)
+	} catch ex {
+		write $$$ZENJSSTR($System.Status.GetErrorText(ex.AsStatus()))
+	}
+	return $$$OK
 ]]></Implementation>
 </Method>
 
@@ -69,9 +106,11 @@ Converts incoming request object and calls abovementioned method.]]></Descriptio
 	set st = $$$OK
 	set obj = ##class(%ZEN.proxyObject).%New()
 	set st = ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(%request.Content,,.obj,1)
-	quit:$$$ISERR(st) st
-  	set st = ##class(MDX2JSON.Utils).WriteDrillthroughJSON(obj.MDX)
-  	quit st
+	return:$$$ISERR(st) st
+	set tMDX = obj.MDX
+	set tMDX = $ZCVT(tMDX,"I","UTF8")
+  	set st = ##class(MDX2JSON.Utils).WriteDrillthroughJSON(tMDX)
+  	return st
 ]]></Implementation>
 </Method>
 
@@ -137,14 +176,23 @@ Wrapper for ##class(MDX2JSON.Utils).WriteFilterValues(pCupe, pFilter)</Descripti
 Wrapper for ##class(MDX2JSON.Utils).WriteJSONPfromMDX(pMDX)
 Converts incoming request object and calls abovementioned method.</Description>
 <ClassMethod>1</ClassMethod>
+<ProcedureBlock>0</ProcedureBlock>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-	d %response.SetHeader("Access-Control-Allow-Origin","*")
-	set st = $$$OK
-	set obj = ##class(%ZEN.proxyObject).%New()
+	set callback=$get(%request.Data("callback",1),"")
+	if callback'="" w callback_"("
 	set st = ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(%request.Content,,.obj,1)
-	quit:$$$ISERR(st) st
-  	set st = ##class(MDX2JSON.Utils).WriteJSONfromMDX(obj.MDX)
+	return:$$$ISERR(st) st
+	set tMDX = obj.MDX
+	set tMDX = $ZCVT(tMDX,"I","UTF8")
+	try {
+		set st = ##class(MDX2JSON.Utils).WriteJSONfromMDX(tMDX)
+	} catch ex {
+		//zw obj
+		set st=ex.AsStatus()
+	}
+
+  	if callback'="" w ")"
   	quit st
 ]]></Implementation>
 </Method>
@@ -156,7 +204,6 @@ Converts incoming request object and calls abovementioned method.</Description>
 <ClassMethod>1</ClassMethod>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-	d %response.SetHeader("Access-Control-Allow-Origin","*")
 	set st = $$$OK
 	set obj = ##class(%ZEN.proxyObject).%New()
 	set st = ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(%request.Content,,.obj,1)
@@ -179,6 +226,122 @@ Converts incoming request object and calls abovementioned method.</Description>
 	quit:$$$ISERR(st) st
   	set st = ##class(MDX2JSON.Utils).WriteXMLAfromMDX(obj.MDX)
   	quit st
+]]></Implementation>
+</Method>
+
+<Method name="DispatchRequest">
+<Description>
+Dispatch a REST request according to URL and Method</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>pUrl:%String,pMethod:%String</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	//d %response.SetHeader("Access-Control-Allow-Origin","*")
+    #dim tSC As %Status = $$$OK
+    #dim e As %Exception.AbstractException
+    
+    #dim tMatcher As %Regex.Matcher
+    
+    #dim tArgs,tClass,tMatchUrl,tMapEntry,tRegEx,tTarget,tAccess As %String
+    #dim tI,tIndex As %Integer
+    #dim tResourceMatched As %Boolean
+    #dim tMethodMatched As %Boolean
+    
+    Try {
+        #; Check that the effective user ( could be unknown user ) can access this resource
+        Set tAccess=$SYSTEM.Security.Check($Piece($zu(90,21,$namespace),"^",4))
+        If tAccess'["READ,WRITE"
+        {
+            #; Don't want the session token
+            Set %response.OutputSessionToken=0
+            
+            #; Set the Http Status
+            Set %response.Status="401 Unauthorized"
+        
+            #; Write out the header
+            Do %response.WriteHTTPHeader()
+            
+            #; Done
+            Quit
+        }
+        
+        Set (tResourceMatched,tMethodMatched)=0
+        
+        #; Walk the dispatch map in collation order of defintion
+        For tIndex=1:1 {
+            
+            #; Get the next map entry
+            Set tMapEntry=..DispatchMap(tIndex) If tMapEntry="" Quit
+             
+            #; Pick out the RegEx
+            Set tRegEx=$List(tMapEntry,1)
+            
+            #; Create a matcher
+            Set tMatcher=##class(%Regex.Matcher).%New(tRegEx)
+        
+            #; Extract the match url from the application name
+            Set tMatchUrl="/"_$Extract(pUrl,$Length(%request.Application)+1,*)
+            
+            #; Test each regular expression in turn, extracting the arguments,
+            #; dispatching to the named method  
+            If tMatcher.Match(tMatchUrl) {
+                
+                #; We have matched the resource
+                Set tResourceMatched=1
+                
+                #; Now check method name
+                If pMethod'=$List(tMapEntry,2) Continue
+                
+                Set tTarget=$List(tMapEntry,3)
+                
+                #; We have matched a method
+                Set tMethodMatched=1
+                
+                #; Got a match, marshall the arguments
+                If tMatcher.GroupCount {
+                    For tI=1:1:tMatcher.GroupCount Set tArgs(tI)=tMatcher.Group(tI)
+                    Set tArgs=tI
+                } else {
+                    Set tArgs=0
+                }
+                
+                #; Check for optional ClassName prefix
+                Set tClass=$classname()
+                If tTarget[":" Set tClass=$Piece(tTarget,":"),tTarget=$Piece(tTarget,":",2)
+                
+                #; Dispatch
+                set Namespace = $get(%request.Data("Namespace",1))
+                
+                if ((Namespace'="") && ##class(%SYS.Namespace).Exists(Namespace)) {
+                	set oldNS = $Namespace
+                	zn Namespace
+                	Set tSC=$zobjclassmethod(tClass,tTarget,tArgs...)
+                	zn oldNS
+                } else {
+	                Set tSC=$zobjclassmethod(tClass,tTarget,tArgs...)                	
+                }
+                If $$$ISERR(tSC) Do ..Http500(##class(%Exception.StatusException).CreateFromStatus(tSC))
+                
+                #; Don't want multiple matches
+                Quit
+            }
+        }
+        
+        #; Didn't have a match for the resource, report not found
+        If tResourceMatched=0 Set tSC=..Http404() Quit
+        
+        #; Had a match for resource but method not matched
+        If tMethodMatched=0 Set tSC=..Http405() Quit
+            
+    } Catch (e) {
+        
+        #; Issue a '500'
+        Do ..Http500(e)
+    }
+    
+    If ..#UseSession=0 Set %session.EndSession=1
+    
+    Quit tSC
 ]]></Implementation>
 </Method>
 </Class>
