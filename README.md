@@ -35,8 +35,8 @@ These are the possible requests to web application (add param ?Namespace={Desire
 | MDX2XMLA                    | POST | { "MDX":"QUERY" }           | XMLA      | Results of MDX execution       |
 | Dashboards                  | GET  |                             | JSON      | All dashboards                 |
 | Widgets                     | POST | {Dashboard:"DashboardName"} | JSON      | All widgets in a dashboard     |
-| /FilterValues/:cube         | GET  |                             | JSON      | All filters for DeepSee Cube   |
-| /FilterValues/:cube/:filter | GET  |                             | JSON      | All possible values for filter |
+| FilterValues/:cube         | GET  |                             | JSON      | All filters for DeepSee Cube   |
+| FilterValues/:cube/:filter | GET  |                             | JSON      | All possible values for filter |
 | Test                        | GET  |                             | plaintext | Test info                      |
 
 Example
