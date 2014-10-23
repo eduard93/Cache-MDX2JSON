@@ -9,16 +9,19 @@ with body: { "MDX":"QUERY" }, where QUERY is a correct MDX statement, ex:  <br>
 		"MDX": "SELECT NON EMPTY [Product].[P1].[Product Category].Members ON 0,NON EMPTY [Outlet].[H1].[Region].Members ON 1 FROM [HoleFoods]"<br>
 } <br>
 You can send requests to:<br> <ul>
-	<li>webapplication/test - to get test info, %request, %response</li> 
-	<li>webapplication/MDX - to get result in JSONP format for MDX query</li>
+	<li>webapplication/test - to get test info, %request, %response and %session</li> 
+	<li>webapplication/MDX - to get result in JSON format for MDX query</li>
 	<li>webapplication/MDXDrillthrough - to get resulting listing in JSON format for MDX Drillthrough query</li>
 	<li>webapplication/MDX2XMLA - to get result in XML/A format for MDX query</li></ul> 
 To get information about possible Cube's filters and filter's values:<br><ul>
 		<li>webapplication/FilterValues/:cube - to get all filters for DeepSee Cube in JSON format.</li> 
 		<li>webapplication/FilterValues/:cube/:filter - to get all values for Filter for DeepSee Cube in JSON format.</li></ul> 
 Example: send HTTP GET request to web application with Dispatch class <b>MDX2JSON.REST</b> and URL:<br>
-/FilterValues/HoleFoods/[DateOfSale].[Actual].[MonthSold] -  to get information about possible values of [DateOfSale].[Actual].[MonthSold] in HoleFoods Cube.]]></Description>
-<IncludeCode>%ZEN.Utils,%occErrors</IncludeCode>
+/FilterValues/HoleFoods/[DateOfSale].[Actual].[MonthSold] -  to get information about possible values of [DateOfSale].[Actual].[MonthSold] in HoleFoods Cube.<br>
+You can add a param Namespace to request to execute MDX in desired namespace (MDX2JSON package must be mapped to that namespace):<br>
+webapplication/MDX?Namespace=Samples
+]]></Description>
+<IncludeCode>MDX2JSON.MDX2JSON</IncludeCode>
 <Super>%CSP.REST</Super>
 <TimeCreated>63165,65257.8179</TimeCreated>
 
@@ -69,7 +72,6 @@ Test method, outputs <b>%request</b> and <b>%response</b> objects. ]]></Descript
 <Method name="GetDashboardWidgets">
 <ClassMethod>1</ClassMethod>
 <Implementation><![CDATA[
-	#define get(%name) $get(%request.Data(%name,1))
 	set dashboard = $$$get("w")
 	if (dashboard = "") {
 		set st = ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(%request.Content,,.obj,1)
@@ -231,7 +233,9 @@ Converts incoming request object and calls abovementioned method.</Description>
 
 <Method name="DispatchRequest">
 <Description>
-Dispatch a REST request according to URL and Method</Description>
+Dispatch a REST request according to URL and Method.
+Add a param Namespace to request to execute MDX in desired namespace.</Description>
+<Internal>1</Internal>
 <ClassMethod>1</ClassMethod>
 <FormalSpec>pUrl:%String,pMethod:%String</FormalSpec>
 <ReturnType>%Status</ReturnType>
@@ -320,7 +324,7 @@ Dispatch a REST request according to URL and Method</Description>
                 } else {
 	                Set tSC=$zobjclassmethod(tClass,tTarget,tArgs...)                	
                 }
-                If $$$ISERR(tSC) Do ..Http500(##class(%Exception.StatusException).CreateFromStatus(tSC))
+                If $$$ISERR(tSC) Do ..Http500(tSC)
                 
                 #; Don't want multiple matches
                 Quit
@@ -342,6 +346,21 @@ Dispatch a REST request according to URL and Method</Description>
     If ..#UseSession=0 Set %session.EndSession=1
     
     Quit tSC
+]]></Implementation>
+</Method>
+
+<Method name="Http500">
+<Description>
+Issue an '500' error and give some indication as to what occurred</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>e:%Exception.AbstractException</FormalSpec>
+<Implementation><![CDATA[
+	// we are expecting status
+    #; Set the response Http status
+    Set %response.Status="500 Internal Server Error"
+    
+    #; Return a helpful error string
+    Write "{Error:"_$$$ZENJSSTR($System.Status.GetErrorText(e))_"}"
 ]]></Implementation>
 </Method>
 </Class>

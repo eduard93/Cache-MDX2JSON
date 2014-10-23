@@ -4,13 +4,21 @@
 <Description><![CDATA[
 Utility class, wrapping processing of MDX queries.<br>
 Outputs JSON, JSONP and XML/A.]]></Description>
-<IncludeCode>%ZEN.Utils</IncludeCode>
+<IncludeCode>MDX2JSON.MDX2JSON</IncludeCode>
 <Super>%RegisteredObject</Super>
 <TimeCreated>63165,65653.547419</TimeCreated>
 
-<Parameter name="NAMESPACE">
-<Default>TFOMS</Default>
-</Parameter>
+<Method name="GetResultSet">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>pMDX:%String,*st</FormalSpec>
+<ReturnType>MDX2JSON.ResultSet</ReturnType>
+<Implementation><![CDATA[
+	set Params = ""
+    set st = $$$OK
+    set RS = ##class(MDX2JSON.ResultSet).%ExecuteDirect(pMDX,.Params,.st)
+    return RS
+]]></Implementation>
+</Method>
 
 <Method name="WriteJSONfromMDX">
 <Description><![CDATA[
@@ -22,17 +30,13 @@ Returns NULL if there is an error in MDX query.]]></Description>
 <ProcedureBlock>1</ProcedureBlock>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-    set Params = ""
-    #dim st As %Status = $$$OK
-    set RS = ##class(MDX2JSON.ResultSet).%ExecuteDirect(pMDX,.Params,.st)
-       
-    if $$$ISERR(st) {
-	    write "{Error:"_$$$ZENJSSTR($System.Status.GetErrorText(st))_"}"
-	    return $$$OK
-    }
-    
-    set obj = RS.ToProxyObject()
-    w $e(obj.%ToJSON(),1,*-1) // status
+	#dim RS As MDX2JSON.ResultSet
+    set RS = ..GetResultSet(pMDX,.st)      
+    return:$$$ISERR(st) st
+        
+    set obj = RS.ToProxyObject(.st)
+    return:$$$ISERR(st) st
+    write $e(obj.%ToJSON(),1,*-1) // status
     
     return $$$OK
 ]]></Implementation>
@@ -47,19 +51,13 @@ Returns NULL if there is an error in MDX query.]]></Description>
 <FormalSpec>pMDX:%String</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-    zn ..#NAMESPACE
-    try {
-        set PageSize = 1000
-        set CurrPage = 1
-        set Params = ""
-        set RS = ##class(%DeepSee.ResultSet).%New()
-        #dim st As %Status = $$$OK
-        set RS = ##class(%DeepSee.ResultSet).%ExecuteDirect(pMDX,.Params,st)
-        do RS.%OutputJSON(PageSize,CurrPage,,PageSize)
-    } catch ex {
-        set st = ex.AsStatus()
-    }
-    quit st
+	set RS = ..GetResultSet(pMDX,.st)
+	return:$$$ISERR(st) st
+	
+	set PageSize = 1000
+	set CurrPage = 1
+	set st = RS.%OutputJSON(PageSize,CurrPage,,PageSize)
+	return st
 ]]></Implementation>
 </Method>
 
@@ -72,17 +70,13 @@ Returns NULL if there is an error in MDX query.]]></Description>
 <FormalSpec>pMDX:%String</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-    try {
-        set Params = ""
-        set RS = ##class(%DeepSee.ResultSet).%New()
-        #dim st As %Status = $$$OK
-        set RS = ##class(%DeepSee.ResultSet).%ExecuteDirect(pMDX,.Params,st)
-        set SQL = RS.%GetListingSQL()
-        do ##class(%ZEN.Auxiliary.jsonSQLProvider).%WriteJSONFromSQL(,SQL,,$$$MaxCacheInt)
-    } catch ex {
-        set st = ex.AsStatus()
-    }
-    quit st
+	set RS = ..GetResultSet(pMDX,.st)
+	return:$$$ISERR(st) st
+	
+    set SQL = RS.%GetListingSQL()
+    do ##class(%ZEN.Auxiliary.jsonSQLProvider).%WriteJSONFromSQL(,SQL,,$$$MaxCacheInt)
+
+    return $$$OK
 ]]></Implementation>
 </Method>
 
@@ -95,16 +89,12 @@ Returns NULL if there is an error in MDX query.]]></Description>
 <FormalSpec>pMDX:%String</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-    try {
-        set Params = ""
-        set RS = ##class(%DeepSee.ResultSet).%New()
-        #dim st As %Status = $$$OK
-        set RS = ##class(%DeepSee.ResultSet).%ExecuteDirect(pMDX,.Params,st)
-        set st = RS.%OutputXMLA()
-    } catch ex {
-        set st = ex.AsStatus()
-    }
-    quit st
+	set RS = ..GetResultSet(pMDX,.st)
+	return:$$$ISERR(st) st        
+	
+	set st = RS.%OutputXMLA()
+
+    return st
 ]]></Implementation>
 </Method>
 
@@ -116,20 +106,12 @@ Gets filters for MDX expression.<br>
 <FormalSpec>pMDX:%String</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-    zn ..#NAMESPACE
-    try {
-        set Params = ""
-        set filters= ""
-        set measure=""
-        set RS = ##class(%DeepSee.ResultSet).%New()
-        #dim st As %Status = $$$OK
-        set RS = ##class(%DeepSee.ResultSet).%ExecuteDirect(pMDX,.Params,st)
-        set st1=RS.%GetFiltersForCellRange(.filters,0,0,RS.%GetAxisSize(2),RS.%GetAxisSize(1),.measure)
-        zw filters
-    } catch ex {
-        set st = ex.AsStatus()
-    }
-    quit st
+	set RS = ..GetResultSet(pMDX,.st)
+	return:$$$ISERR(st) st 
+    
+    set st=RS.%GetFiltersForCellRange(.filters,0,0,RS.%GetAxisSize(2),RS.%GetAxisSize(1),.measure)
+
+    return st
 ]]></Implementation>
 </Method>
 
@@ -141,14 +123,10 @@ Get all filters for DeepSee Cube in JSON format.<br>
 <FormalSpec>pCube:%String</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-    zn ..#NAMESPACE
-    try {
-        #dim st As %Status = $$$OK
-        set st = ##class(%DeepSee.Dashboard.Utils).%GetFiltersForDataSource(pCube_".cube",.tFilters)
-        do ##class(%ZEN.Auxiliary.jsonProvider).%ArrayToJSON($lb("name","path","info"),.tFilters)
-    } catch ex {
-        set st = ex.AsStatus()
-    }
+    set st = ##class(%DeepSee.Dashboard.Utils).%GetFiltersForDataSource(pCube_".cube",.tFilters)
+    return:$$$ISERR(st) st 
+    
+    set st = ##class(%ZEN.Auxiliary.jsonProvider).%ArrayToJSON($lb("name","path","info"),.tFilters)
     quit st
 ]]></Implementation>
 </Method>
@@ -162,13 +140,11 @@ Get all values for Filter for DeepSee Cube in JSON format.<br>
 <FormalSpec>pCube:%String,pFilter:%String</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-    try {
-        #dim st As %Status = $$$OK
-        set st = ##class(%DeepSee.Dashboard.Utils).%GetMembersForFilter(pCube,pFilter,.tFilters,.tDefaultFilterValue,,.tRelatedFilters,0,,.tValueList)
-        do ##class(%ZEN.Auxiliary.jsonProvider).%ArrayToJSON($lb("name","value"),.tFilters)
-    } catch ex {
-        set st = ex.AsStatus()
-    }
+	set st = ##class(%DeepSee.Dashboard.Utils).%GetMembersForFilter(pCube,pFilter,.tFilters,.tDefaultFilterValue,,.tRelatedFilters,0,,.tValueList)
+    return:$$$ISERR(st) st 
+    
+    set st = ##class(%ZEN.Auxiliary.jsonProvider).%ArrayToJSON($lb("name","value"),.tFilters)
+
     return st
 ]]></Implementation>
 </Method>
@@ -178,24 +154,17 @@ Get all values for Filter for DeepSee Cube in JSON format.<br>
 <FormalSpec>pPivotName:%String</FormalSpec>
 <ReturnType>%String</ReturnType>
 <Implementation><![CDATA[
-  	set pMdx =""
- 	set st = $$$OK
-  	try {
-	   set tPivot = ##class(%DeepSee.UserLibrary.Utils).%OpenFolderItem(pPivotName,.st)
-	   return:$$$ISERR(st) st
-	   
-	   set tPivotTable = ##class(%DeepSee.Component.pivotTable).%New()
-	   set st = tPivot.%CopyToComponent(tPivotTable)
-	   return:$$$ISERR(st) st
-	   
-	   set rs = tPivotTable.%CreateResultSet(.st,.tParms,.tFilterInfo,.tAdvancedFilters,.tQueryText)
-	   return:$$$ISERR(st) st
-	   
-	   set pMdx = tQueryText
-  	} catch ex {
-   		set st = ex.AsStatus()
-  	}
-  	return pMdx
+	set tPivot = ##class(%DeepSee.UserLibrary.Utils).%OpenFolderItem(pPivotName,.st)
+	return:$$$ISERR(st) st
+
+	set tPivotTable = ##class(%DeepSee.Component.pivotTable).%New()
+	set st = tPivot.%CopyToComponent(tPivotTable)
+	return:$$$ISERR(st) st
+
+	set rs = tPivotTable.%CreateResultSet(.st,.tParms,.tFilterInfo,.tAdvancedFilters,.tQueryText)
+	return:$$$ISERR(st) st
+
+  	return tQueryText
 ]]></Implementation>
 </Method>
 
@@ -244,9 +213,10 @@ do ##class(MDX2JSON.Utils).Export()</Description>
 <ClassMethod>1</ClassMethod>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-    
-    Set st=$system.OBJ.Export("MDX2JSON.ResultSet.cls,MDX2JSON.REST.cls,MDX2JSON.Utils.cls,","/InterSystems/Cache2014/csp/sys/mdx2json "_$ZSTRIP($ZDT($NOW(),3,2),"*",":-")_".xml")
-    Return st
+    set list = "MDX2JSON.ResultSet.cls,MDX2JSON.REST.cls,MDX2JSON.Utils.cls,MDX2JSON.MDX2JSON.inc"
+    set path = "/InterSystems/Cache2014/csp/sys/mdx2json "_$ZSTRIP($ZDT($NOW(),3,2),"*",":-")_".xml"
+    set st=$system.OBJ.Export(list,path)
+    return st
 ]]></Implementation>
 </Method>
 </Class>

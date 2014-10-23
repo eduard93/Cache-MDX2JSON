@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Export generator="Cache" version="25">
 <Class name="MDX2JSON.ResultSet">
-<IncludeCode>%occErrors</IncludeCode>
+<IncludeCode>MDX2JSON.MDX2JSON</IncludeCode>
 <Super>%DeepSee.ResultSet</Super>
 <TimeCreated>63463,69237.325048</TimeCreated>
 
