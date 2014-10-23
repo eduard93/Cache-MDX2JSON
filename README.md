@@ -1,7 +1,7 @@
 Cache-MDX2JSON
 ==============
 
-RESTful web api for MDX2JSON transformation (also JSONP and XML/A).
+RESTful web api for MDX2JSON transformation (also JSONP and XML/A). Also supports requests about Dashboards and Wingets.
 
 Installation
 -----------
@@ -49,4 +49,4 @@ Request body:
 
     {"MDX": "SELECT NON EMPTY [Product].[P1].[Product Category].Members ON 0,NON EMPTY [Outlet].[H1].[Region].Members ON 1 FROM [HoleFoods]"} 
     
-Result: 
+Result: http://pastebin.com/XddMUPHX
