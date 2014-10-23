@@ -45,6 +45,7 @@ Example
 Request Url: http://localhost:57772/MDX2JSON/MDX?Namespace=Samples
 
 Request type: POST
+
 Request body:
 
     {"MDX": "SELECT NON EMPTY [Product].[P1].[Product Category].Members ON 0,NON EMPTY [Outlet].[H1].[Region].Members ON 1 FROM [HoleFoods]"} 
