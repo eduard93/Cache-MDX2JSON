@@ -1,12 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Export generator="Cache" version="25">
 <Class name="MDX2JSON.ResultSet">
+<Description><![CDATA[
+This class provides an API for executing queries against DeepSee cubes 
+and viewing the results.<br/>]]></Description>
 <IncludeCode>MDX2JSON.MDX2JSON</IncludeCode>
 <Super>%DeepSee.ResultSet</Super>
 <TimeCreated>63463,69237.325048</TimeCreated>
 
 <Method name="ToProxyObject">
-<FormalSpec>*status:%Status</FormalSpec>
+<Description><![CDATA[
+Converts ResultSet to %ZEN.proxyObject.<br>
+<b>pStatus</b> - Status of execution.<br>]]></Description>
+<FormalSpec>*pStatus:%Status</FormalSpec>
 <ReturnType>%ZEN.proxyObject</ReturnType>
 <Implementation><![CDATA[
     set status = $$$ERROR($$$GeneralError,"Error occured while executing ##class(MDX2JSON.ResultSet).ToProxyObject() method")
@@ -14,12 +20,12 @@
     set obj=##class(%ZEN.proxyObject).%New()
     
     if (..%Query.queryType = "DRILLTHROUGH") {
-        set status = $$$ERROR($$$GeneralError, "DRILLTHROUGH queries are not supported")
+        set pStatus = $$$ERROR($$$GeneralError, "DRILLTHROUGH queries are not supported")
         return ""
     }
       
     if (..%GetAxisCount() > 2) {
-        set status  = "Multidimensional (>2) queries are not supported"
+        set pStatus  = "Multidimensional (>2) queries are not supported"
         return ""
     }
     
@@ -32,7 +38,7 @@
 	}
 
 	if (st < 100) {
-	    set status = st
+	    set pStatus = st
 	    return ""
 	}
 	
@@ -41,15 +47,17 @@
 	    set obj.Cols = ..AxesToJSON() // all axes
 	    set obj.Data = ..DataToJSON() // array of all cells, left-to-right, up-to-down
 	} catch ex {
-		set status = ex.AsStatus()
+		set pStatus = ex.AsStatus()
 		return ""
 	}
-	set status = $$$OK
+	set pStatus = $$$OK
     return obj
 ]]></Implementation>
 </Method>
 
 <Method name="InfoToJSON">
+<Description>
+Returns meta-information about ResultSet.</Description>
 <ReturnType>%ZEN.proxyObject</ReturnType>
 <Implementation><![CDATA[
 	set tCubeIndex = ..%CubeKey
@@ -82,6 +90,8 @@
 </Method>
 
 <Method name="AxesToJSON">
+<Description>
+Returns array of Axes</Description>
 <ReturnType>%ListOfDataTypes</ReturnType>
 <Implementation><![CDATA[
     set tCubeIndex = ..%CubeKey
@@ -167,6 +177,8 @@
 </Method>
 
 <Method name="DataToJSON">
+<Description>
+Returns array of cells (left-to-right, up-to-down)</Description>
 <ReturnType>%ListOfDataTypes</ReturnType>
 <Implementation><![CDATA[
 	set data = ##class(%ListOfDataTypes).%New()

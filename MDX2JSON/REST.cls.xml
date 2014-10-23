@@ -39,8 +39,9 @@ webapplication/MDX?Namespace=Samples
    <Route Url="/FilterValues/:cube/:filter" Method="GET" Call="WriteFilterValues"/> 
    
     <Route Url="/widgets/" Method="GET" Call="GetWidgets"/> 
-      
     <Route Url="/dashboards/" Method="GET" Call="GetDashboardsList"/> 
+    
+    <!-- Send objects in this format: {"Dashboard":"Dashboard Full Name"} --> 
     <Route Url="/widgets/" Method="POST" Call="GetDashboardWidgets"/>   
      
    <!-- Valid but illicit, do not use-->
