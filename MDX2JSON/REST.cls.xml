@@ -9,11 +9,18 @@ with body: { "MDX":"QUERY" }, where QUERY is a correct MDX statement, ex:  <br>
 		"MDX": "SELECT NON EMPTY [Product].[P1].[Product Category].Members ON 0,NON EMPTY [Outlet].[H1].[Region].Members ON 1 FROM [HoleFoods]"<br>
 } <br>
 You can send requests to:<br> <ul>
-	<li>webapplication/test - to get test info, %request, %response and %session</li> 
+	<li>webapplication/Test - to get test info, %request, %response and %session</li> 
 	<li>webapplication/MDX - to get result in JSON format for MDX query</li>
 	<li>webapplication/MDXDrillthrough - to get resulting listing in JSON format for MDX Drillthrough query</li>
-	<li>webapplication/MDX2XMLA - to get result in XML/A format for MDX query</li></ul> 
-To get information about possible Cube's filters and filter's values:<br><ul>
+	<li>webapplication/MDX2XMLA - to get result in XML/A format for MDX query</li>
+</ul>
+
+Dashboard related requests are:
+ <ul>
+ 	<li>webapplication/Dashboards - get all dashboards in a namespace (GET request).</li>
+	<li>webapplication/Widgets - get all dashboard widgets (POST request with {Dashboard:"DashboardName"} body).</li>
+</ul>
+To get information about possible Cube's filters and filters' values:<br><ul>
 		<li>webapplication/FilterValues/:cube - to get all filters for DeepSee Cube in JSON format.</li> 
 		<li>webapplication/FilterValues/:cube/:filter - to get all values for Filter for DeepSee Cube in JSON format.</li></ul> 
 Example: send HTTP GET request to web application with Dispatch class <b>MDX2JSON.REST</b> and URL:<br>
@@ -38,11 +45,10 @@ webapplication/MDX?Namespace=Samples
    <Route Url="/FilterValues/:cube" Method="GET" Call="WriteFiltersForCube"/>
    <Route Url="/FilterValues/:cube/:filter" Method="GET" Call="WriteFilterValues"/> 
    
-    <Route Url="/widgets/" Method="GET" Call="GetWidgets"/> 
-    <Route Url="/dashboards/" Method="GET" Call="GetDashboardsList"/> 
-    
-    <!-- Send objects in this format: {"Dashboard":"Dashboard Full Name"} --> 
-    <Route Url="/widgets/" Method="POST" Call="GetDashboardWidgets"/>   
+    <Route Url="/Widgets" Method="GET" Call="GetWidgets"/> 
+      
+    <Route Url="/Dashboards" Method="GET" Call="GetDashboardsList"/> 
+    <Route Url="/Widgets" Method="POST" Call="GetWidgetsList"/>   
      
    <!-- Valid but illicit, do not use-->
    <Route Url="/MDX/:query" Method="GET" Call="WriteJSONfromMDXURL"/>  
@@ -56,7 +62,7 @@ webapplication/MDX?Namespace=Samples
 
 <Method name="Test">
 <Description><![CDATA[
-Test method, outputs <b>%request</b> and <b>%response</b> objects. ]]></Description>
+Test method, outputs <b>%request</b>, <b>%response</b> and <b>%session</b> objects. ]]></Description>
 <ClassMethod>1</ClassMethod>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
@@ -70,7 +76,10 @@ Test method, outputs <b>%request</b> and <b>%response</b> objects. ]]></Descript
 ]]></Implementation>
 </Method>
 
-<Method name="GetDashboardWidgets">
+<Method name="GetWidgetsList">
+<Description><![CDATA[
+Wrapper for ##class(MDX2JSON.Utils).GetWidgetsList()<br>
+Converts incoming request object (JSON: {Dashboard:"Dashboard Full Name"} and calls abovementioned method.]]></Description>
 <ClassMethod>1</ClassMethod>
 <Implementation><![CDATA[
 	set dashboard = $$$get("w")
@@ -85,6 +94,8 @@ Test method, outputs <b>%request</b> and <b>%response</b> objects. ]]></Descript
 </Method>
 
 <Method name="GetDashboardsList">
+<Description>
+Returns JSON array of (title, path) for all dashboards in namespace (accessible to current user).</Description>
 <ClassMethod>1</ClassMethod>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
@@ -175,9 +186,9 @@ Wrapper for ##class(MDX2JSON.Utils).WriteFilterValues(pCupe, pFilter)</Descripti
 </Method>
 
 <Method name="WriteJSONfromMDX">
-<Description>
-Wrapper for ##class(MDX2JSON.Utils).WriteJSONPfromMDX(pMDX)
-Converts incoming request object and calls abovementioned method.</Description>
+<Description><![CDATA[
+Wrapper for ##class(MDX2JSON.Utils).WriteJSONPfromMDX(pMDX)<br>
+Converts incoming request object and calls abovementioned method.]]></Description>
 <ClassMethod>1</ClassMethod>
 <ProcedureBlock>0</ProcedureBlock>
 <ReturnType>%Status</ReturnType>
@@ -201,9 +212,9 @@ Converts incoming request object and calls abovementioned method.</Description>
 </Method>
 
 <Method name="WriteJSONPfromMDX">
-<Description>
-Wrapper for ##class(MDX2JSON.Utils).WriteJSONPfromMDX(pMDX)
-Converts incoming request object and calls abovementioned method.</Description>
+<Description><![CDATA[
+Wrapper for ##class(MDX2JSON.Utils).WriteJSONPfromMDX(pMDX)<br>
+Converts incoming request object and calls abovementioned method.]]></Description>
 <ClassMethod>1</ClassMethod>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
@@ -217,9 +228,9 @@ Converts incoming request object and calls abovementioned method.</Description>
 </Method>
 
 <Method name="WriteXMLAfromMDX">
-<Description>
-Wrapper for ##class(MDX2JSON.Utils).WriteXMLAfromMDX(pMDX)
-Converts incoming request object and calls abovementioned method.</Description>
+<Description><![CDATA[
+Wrapper for ##class(MDX2JSON.Utils).WriteXMLAfromMDX(pMDX)<br>
+Converts incoming request object and calls abovementioned method.]]></Description>
 <ClassMethod>1</ClassMethod>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
@@ -233,9 +244,9 @@ Converts incoming request object and calls abovementioned method.</Description>
 </Method>
 
 <Method name="DispatchRequest">
-<Description>
-Dispatch a REST request according to URL and Method.
-Add a param Namespace to request to execute MDX in desired namespace.</Description>
+<Description><![CDATA[
+Dispatch a REST request according to URL and Method.<br>
+Add param Namespace to a request to execute MDX in desired namespace.]]></Description>
 <Internal>1</Internal>
 <ClassMethod>1</ClassMethod>
 <FormalSpec>pUrl:%String,pMethod:%String</FormalSpec>
@@ -351,17 +362,18 @@ Add a param Namespace to request to execute MDX in desired namespace.</Descripti
 </Method>
 
 <Method name="Http500">
-<Description>
-Issue an '500' error and give some indication as to what occurred</Description>
+<Description><![CDATA[
+Issue an '500' error and give some indication as to what occurred.<br>
+<b>pStatus</b> - %status, not %Exception.AbstractException.]]></Description>
 <ClassMethod>1</ClassMethod>
-<FormalSpec>e:%Exception.AbstractException</FormalSpec>
+<FormalSpec>pStatus:%Exception.AbstractException</FormalSpec>
 <Implementation><![CDATA[
 	// we are expecting status
     #; Set the response Http status
     Set %response.Status="500 Internal Server Error"
     
     #; Return a helpful error string
-    Write "{Error:"_$$$ZENJSSTR($System.Status.GetErrorText(e))_"}"
+    Write "{Error:"_$$$ZENJSSTR($System.Status.GetErrorText(pStatus))_"}"
 ]]></Implementation>
 </Method>
 </Class>
