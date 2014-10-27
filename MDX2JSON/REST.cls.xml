@@ -252,7 +252,9 @@ Add param Namespace to a request to execute MDX in desired namespace.]]></Descri
 <FormalSpec>pUrl:%String,pMethod:%String</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-	//d %response.SetHeader("Access-Control-Allow-Origin","*")
+	do %response.SetHeader("Access-Control-Allow-Origin","*")
+	do %response.SetHeader("Access-Control-Allow-Headers","Authorization")
+	
     #dim tSC As %Status = $$$OK
     #dim e As %Exception.AbstractException
     
@@ -280,6 +282,8 @@ Add param Namespace to a request to execute MDX in desired namespace.]]></Descri
             #; Done
             Quit
         }
+        
+        return:($ZCVT(pMethod,"U") = "OPTIONS") $$$OK
         
         Set (tResourceMatched,tMethodMatched)=0
         
