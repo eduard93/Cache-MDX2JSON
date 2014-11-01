@@ -2,20 +2,24 @@
 <Export generator="Cache" version="25">
 <Class name="MDX2JSON.Utils">
 <Description><![CDATA[
-Utility class, wrapping processing of MDX queries.<br>
-Outputs JSON, JSONP and XML/A.]]></Description>
+Utility class, wrappers for processing of MDX queries in <b>MDX2JSON.ResultSet</b>.
+Outputs JSON, JSONP and XML/A.<br>
+Also has functionality for getting information about cubes, dashboards and widgets.]]></Description>
 <IncludeCode>MDX2JSON.MDX2JSON</IncludeCode>
-<Super>%RegisteredObject</Super>
 <TimeCreated>63165,65653.547419</TimeCreated>
 
 <Method name="GetResultSet">
+<Description><![CDATA[
+Transforms MDX query into executed <b>MDX2JSON.ResultSet</b>.<br>
+<b>pMDX</b> - String containing MDX query.<br>
+<b>pStatus</b> - Status of query execution.<br>]]></Description>
 <ClassMethod>1</ClassMethod>
-<FormalSpec>pMDX:%String,*st</FormalSpec>
+<FormalSpec>pMDX:%String,*pStatus</FormalSpec>
 <ReturnType>MDX2JSON.ResultSet</ReturnType>
 <Implementation><![CDATA[
 	set Params = ""
-    set st = $$$OK
-    set RS = ##class(MDX2JSON.ResultSet).%ExecuteDirect(pMDX,.Params,.st)
+    set pStatus = $$$OK
+    set RS = ##class(MDX2JSON.ResultSet).%ExecuteDirect(pMDX,.Params,.pStatus)
     return RS
 ]]></Implementation>
 </Method>
@@ -23,11 +27,9 @@ Outputs JSON, JSONP and XML/A.]]></Description>
 <Method name="WriteJSONfromMDX">
 <Description><![CDATA[
 Automatic processing of MDX query and outputting resulting JSON.<br>
-<b>pMDX</b> - String containing MDX query.<br>
-Returns NULL if there is an error in MDX query.]]></Description>
+<b>pMDX</b> - String containing MDX query.<br>]]></Description>
 <ClassMethod>1</ClassMethod>
 <FormalSpec>pMDX:%String</FormalSpec>
-<ProcedureBlock>1</ProcedureBlock>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
 	#dim RS As MDX2JSON.ResultSet
@@ -45,8 +47,7 @@ Returns NULL if there is an error in MDX query.]]></Description>
 <Method name="WriteJSONPfromMDX">
 <Description><![CDATA[
 Automatic processing of MDX query and outputting resulting JSONP.<br>
-<b>pMDX</b> - String containing MDX query.<br>
-Returns NULL if there is an error in MDX query.]]></Description>
+<b>pMDX</b> - String containing MDX query.<br>]]></Description>
 <ClassMethod>1</ClassMethod>
 <FormalSpec>pMDX:%String</FormalSpec>
 <ReturnType>%Status</ReturnType>
@@ -64,8 +65,7 @@ Returns NULL if there is an error in MDX query.]]></Description>
 <Method name="WriteDrillthroughJSON">
 <Description><![CDATA[
 Automatic processing of MDX Drillthrough query and outputting resulting listing as JSON.<br>
-<b>pMDX</b> - String containing MDX Drillthrough query.<br>
-Returns NULL if there is an error in MDX query.]]></Description>
+<b>pMDX</b> - String containing MDX Drillthrough query.<br>]]></Description>
 <ClassMethod>1</ClassMethod>
 <FormalSpec>pMDX:%String</FormalSpec>
 <ReturnType>%Status</ReturnType>
@@ -83,8 +83,7 @@ Returns NULL if there is an error in MDX query.]]></Description>
 <Method name="WriteXMLAfromMDX">
 <Description><![CDATA[
 Automatic processing of MDX query and outputting resulting XML/A.<br>
-<b>pMDX</b> - String containing MDX query.<br>
-Returns NULL if there is an error in MDX query.]]></Description>
+<b>pMDX</b> - String containing MDX query.<br>]]></Description>
 <ClassMethod>1</ClassMethod>
 <FormalSpec>pMDX:%String</FormalSpec>
 <ReturnType>%Status</ReturnType>
@@ -125,9 +124,9 @@ Get all filters for DeepSee Cube in JSON format.<br>
 <Implementation><![CDATA[
     set st = ##class(%DeepSee.Dashboard.Utils).%GetFiltersForDataSource(pCube_".cube",.tFilters)
     return:$$$ISERR(st) st 
-    
+    return:($d(tFilters)=0) $$$ERROR($$$GeneralError,"Empty Filter values array. Cube does not exist?")
     set st = ##class(%ZEN.Auxiliary.jsonProvider).%ArrayToJSON($lb("name","path","info"),.tFilters)
-    quit st
+    return st
 ]]></Implementation>
 </Method>
 
@@ -150,25 +149,35 @@ Get all values for Filter for DeepSee Cube in JSON format.<br>
 </Method>
 
 <Method name="GetMdx">
+<Description><![CDATA[
+Returns MDX string used to create pivot.<br>
+<b>pPivotName</b> - fullname of pivot. Eg: "KPIs & Plugins/HoleFoods.pivot". Case insensitive.<br>
+<b>pStatus</b> - Status of query execution.<br>]]></Description>
 <ClassMethod>1</ClassMethod>
-<FormalSpec>pPivotName:%String</FormalSpec>
+<FormalSpec>pPivotName:%String,*pStatus:%Status=$$$OK</FormalSpec>
 <ReturnType>%String</ReturnType>
 <Implementation><![CDATA[
-	set tPivot = ##class(%DeepSee.UserLibrary.Utils).%OpenFolderItem(pPivotName,.st)
-	return:$$$ISERR(st) st
+	set tPivot = ##class(%DeepSee.UserLibrary.Utils).%OpenFolderItem(pPivotName,.pStatus)
+	return:$$$ISERR(pStatus) $System.Status.GetErrorText(pStatus)
 
 	set tPivotTable = ##class(%DeepSee.Component.pivotTable).%New()
 	set st = tPivot.%CopyToComponent(tPivotTable)
-	return:$$$ISERR(st) st
+	return:$$$ISERR(pStatus) $System.Status.GetErrorText(pStatus)
 
 	set rs = tPivotTable.%CreateResultSet(.st,.tParms,.tFilterInfo,.tAdvancedFilters,.tQueryText)
-	return:$$$ISERR(st) st
-
-  	return tQueryText
+	return:$$$ISERR(pStatus) $System.Status.GetErrorText(pStatus)
+	
+	set pMDX = tQueryText
+	set pStatus = $$$OK
+		
+  	return pMDX
 ]]></Implementation>
 </Method>
 
 <Method name="GetWidgetsList">
+<Description><![CDATA[
+Using dashboard name get JSON representation (array of ("type","title","mdx")) of all its' widgets.<br>
+<b>pDashName</b> - fullname of dashboard. Eg: "KPIs & Plugins/KPI with Listing.dashboard". Case insensitive.]]></Description>
 <ClassMethod>1</ClassMethod>
 <FormalSpec>pDashName:%String</FormalSpec>
 <ReturnType>%Status</ReturnType>
@@ -216,6 +225,7 @@ do ##class(MDX2JSON.Utils).Export()</Description>
     set list = "MDX2JSON.ResultSet.cls,MDX2JSON.REST.cls,MDX2JSON.Utils.cls,MDX2JSON.MDX2JSON.inc"
     set path = "/InterSystems/Cache2014/csp/sys/mdx2json "_$ZSTRIP($ZDT($NOW(),3,2),"*",":-")_".xml"
     set st=$system.OBJ.Export(list,path)
+    w $System.Status.GetErrorText(st)
     return st
 ]]></Implementation>
 </Method>
