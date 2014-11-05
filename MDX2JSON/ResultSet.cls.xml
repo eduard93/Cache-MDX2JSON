@@ -92,13 +92,13 @@ Returns meta-information about ResultSet.</Description>
 <Method name="AxesToJSON">
 <Description>
 Returns array of Axes</Description>
-<ReturnType>%ListOfDataTypes</ReturnType>
+<ReturnType>%ListOfObjects</ReturnType>
 <Implementation><![CDATA[
     set tCubeIndex = ..%CubeKey
     set tQueryKey = ..%QueryKey
     set tAxisCount = ..%GetAxisCount()
 
-    set axes=##class(%ListOfDataTypes).%New()
+    set axes=##class(%ListOfObjects).%New()
     
 	for a = 1:1:tAxisCount {
         set tAxisSize(a) = ..%GetAxisSize(a)
@@ -123,9 +123,9 @@ Returns array of Axes</Description>
     
     //set axis.caption = $zobjclassmethod($G($$$DeepSeeMetaGLVN("cubes",tCubeName)),"%GetMemberCaption",$$$UPPER(tDimName))
     //set axis.spec = $G($$$DeepSeeAxisGLVN(CubeIndex,AxisKey,"spec"))
-    set axis.tuples = ##class(%ListOfDataTypes).%New()
-    do axis.tuples.Insert(..ProcessOneAxisCell(CubeIndex, AxisKey, tCubeName, tQueryKey, AxisNumber, 1))
     
+    set axis.tuples = ..ProcessOneAxisCell(CubeIndex, AxisKey, tCubeName, tQueryKey, AxisNumber, 1)
+       
     return axis
 ]]></Implementation>
 </Method>
@@ -159,20 +159,44 @@ Returns array of Axes</Description>
     set cell.path = ##class(%DeepSee.Query.Engine).%GetSpecForAxisNode(CubeName, QueryKey, AxisNumber, Node)
     
     if ($D($$$DeepSeeAxisGLVN(CubeIndex, AxisKey, "axes", Node, "ch")) = 10) {
-        set cell.children = ##class(%ListOfDataTypes).%New()
+        set cell.children = ##class(%ListOfObjects).%New()
         set key = $O($$$DeepSeeAxisGLVN(CubeIndex, AxisKey, "axes", Node, "ch", ""))
         while (key'="") {
-            do cell.children.Insert(..ProcessOneAxisCell(CubeIndex, AxisKey, CubeName, QueryKey, AxisNumber, key))
+	        set children = ..ProcessOneAxisCell(CubeIndex, AxisKey, CubeName, QueryKey, AxisNumber, key)
+	        // Append children to cell
+	        if (children.%IsA("%ZEN.proxyObject")) {
+            	do cell.children.Insert(children)
+	        } elseif (children.%IsA("%Collection.AbstractList")) {
+		        for i=1:1:children.Count() {
+			        
+			        do cell.children.Insert(children.GetAt(i))
+		        }
+	        }
+	        
             set key = $O($$$DeepSeeAxisGLVN(CubeIndex, AxisKey, "axes", Node, "ch", key))
         }
         
+
         // To filter out invisible top-level сells
-        if (((cell.caption = "") || (cell.caption = 0)) && (cell.path = "")) {
+        if (..IsCellNull(cell.caption, cell.path)=1) {
 			return cell.children	
 		}
     } 
 
     return cell
+]]></Implementation>
+</Method>
+
+<Method name="IsCellNull">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>caption,path</FormalSpec>
+<ReturnType>%Boolean</ReturnType>
+<Implementation><![CDATA[
+	return:(path="") 1
+	return:(caption="") 1
+	return:(caption=0) 1
+	return:(caption=1) 1
+	return 0
 ]]></Implementation>
 </Method>
 
