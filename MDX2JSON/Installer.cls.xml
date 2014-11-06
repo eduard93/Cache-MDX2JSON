@@ -22,8 +22,9 @@ See generated code in zsetup+1^MDX2JSON.Installer.1</Description>
 <Namespace Name="${Namespace}" Create="no">
 <Import File="${SourceDir}"/>
 <Log Text="Creating web application /${Namespace}" Level="0"/>
-<CSPApplication Url="/${Namespace}" Directory="${CSPDIR}/${Namespace}" AuthenticationMethods="64" IsNamespaceDefault="false" />
-<RunInstall Class="MDX2JSON.Installer" Method="SetDispatchClass"/>
+<!-- This method creates conflits with web-server. Kept for reference purposes. See ##class(%EnsembleMgr).createPortalApp()
+<CSPApplication Url="/${Namespace}" Directory="" AuthenticationMethods="64" IsNamespaceDefault="false" />-->
+<RunInstall Class="MDX2JSON.Installer" Method="CreateWebApp"/>
 </Namespace>
 
 <If Condition='(##class(Config.Namespaces).Exists("%All")=0)'>
@@ -63,15 +64,18 @@ do ##class(MDX2JSON.Installer).setup(.pVars)</Description>
 ]]></Implementation>
 </Method>
 
-<Method name="SetDispatchClass">
+<Method name="CreateWebApp">
 <ClassMethod>1</ClassMethod>
 <FormalSpec>pVars,pLogLevel,tInstaller</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-    s tUrl=tInstaller.Evaluate("/${Namespace}")
+    Set Namespace=tInstaller.Evaluate("${Namespace}")
     Do tInstaller.PushNS("%SYS")
-    s p("DispatchClass")="MDX2JSON.REST"
-    Set tSC = ##class(Security.Applications).Modify(tUrl, .p)
+    Set cspProperties("AutheEnabled") = 64 
+    Set cspProperties("NameSpace") = Namespace
+    Set cspProperties("IsNameSpaceDefault") = 1
+    Set cspProperties("DispatchClass")="MDX2JSON.REST"
+    Set tSC = ##class(Security.Applications).Create("/"_Namespace, .cspProperties)
     Do tInstaller.PopNS()
     If $$$ISERR(tSC) Throw ##class(%Installer.Exception).CreateFromStatus(tSC)
     quit $$$OK
