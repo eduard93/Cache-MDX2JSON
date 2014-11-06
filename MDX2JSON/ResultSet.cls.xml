@@ -168,7 +168,6 @@ Returns array of Axes</Description>
             	do cell.children.Insert(children)
 	        } elseif (children.%IsA("%Collection.AbstractList")) {
 		        for i=1:1:children.Count() {
-			        
 			        do cell.children.Insert(children.GetAt(i))
 		        }
 	        }
