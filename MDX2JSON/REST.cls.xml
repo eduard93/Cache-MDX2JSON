@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Export generator="Cache" version="25" zv="Cache for Windows (x86-64) 2014.1.1 (Build 702U)" ts="2014-11-13 01:24:30">
+<Export generator="Cache" version="25" zv="Cache for Windows (x86-64) 2014.1.1 (Build 702U)" ts="2014-11-13 01:39:57">
 <Class name="MDX2JSON.REST">
 <Description><![CDATA[
 Class for REST-like web api for MDX2JSON transformation (and XML/A).<br>
@@ -30,7 +30,7 @@ webapplication/MDX?Namespace=Samples
 ]]></Description>
 <IncludeCode>MDX2JSON.MDX2JSON</IncludeCode>
 <Super>%CSP.REST</Super>
-<TimeChanged>63504,5052.452187</TimeChanged>
+<TimeChanged>63504,5862.54237</TimeChanged>
 <TimeCreated>63165,65257.8179</TimeCreated>
 
 <XData name="UrlMap">
@@ -202,7 +202,7 @@ Retrieves drilldown information with given parameters.</Description>
     s proxyObject = ##class(MDX2JSON.DrillItemInfo).%New()
     
     try {
-        d zGetItemSpec^%DeepSee.Component.pivotTable.1(
+        d ##class(%DeepSee.Component.pivotTable).GetItemSpec(
             proxyObject,
             req.cubeName,
             req.queryKey,
