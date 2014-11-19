@@ -194,20 +194,24 @@ Converts incoming request object and calls abovementioned method.]]></Descriptio
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
 	set callback=$get(%request.Data("callback",1),"")
-	if callback'="" w callback_"("
-	set st = ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(%request.Content,,.obj,1)
+	write:(callback'="") callback_"("
+	
+	set st = ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(%request.Content,,.obj,1)	
+ 
 	return:$$$ISERR(st) st
-	set tMDX = obj.MDX
-	set tMDX = $ZCVT(tMDX,"I","UTF8")
+	return:'$IsObject(obj) $$$ERROR($$$ArgumentIsNotAnObject,"Body")
+	
 	try {
+		set tMDX = obj.MDX
+		set tMDX = $ZCVT(tMDX,"I","UTF8")
 		set st = ##class(MDX2JSON.Utils).WriteJSONfromMDX(tMDX)
 	} catch ex {
 		//zw obj
 		set st=ex.AsStatus()
 	}
 
-  	if callback'="" w ")"
-  	quit st
+  	write:(callback'="") ")"
+  	return st
 ]]></Implementation>
 </Method>
 
