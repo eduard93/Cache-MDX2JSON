@@ -332,13 +332,15 @@ Add param Namespace to a request to execute MDX in desired namespace.]]></Descri
                 #; Dispatch
                 set Namespace = $get(%request.Data("Namespace",1))
                 
-                if ((Namespace'="") && ##class(%SYS.Namespace).Exists(Namespace)) {
+                if (##class(%SYS.Namespace).Exists(Namespace)) {
                 	set oldNS = $Namespace
                 	zn Namespace
-                	Set tSC=$zobjclassmethod(tClass,tTarget,tArgs...)
+                	set tSC=$zobjclassmethod(tClass,tTarget,tArgs...)
                 	zn oldNS
-                } else {
-	                Set tSC=$zobjclassmethod(tClass,tTarget,tArgs...)                	
+                } elseif (Namespace = "") {
+	                set tSC=$zobjclassmethod(tClass,tTarget,tArgs...)
+                }else {
+	                set tSC = $$$ERROR($$$NamespaceUnavailable,Namespace)                	
                 }
                 If $$$ISERR(tSC) Do ..Http500(tSC)
                 
