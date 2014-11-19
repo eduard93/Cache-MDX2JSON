@@ -52,4 +52,4 @@ Request body:
     
 Result: http://pastebin.com/XddMUPHX
 
-Please note that corresponding cube must be comiled and built beforehand.
+Please note that corresponding cube must be compiled and built beforehand.
