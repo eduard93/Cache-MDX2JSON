@@ -182,6 +182,9 @@ Using dashboard name get JSON representation (array of ("type","title","mdx")) o
 <FormalSpec>pDashName:%String</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
+	#Dim widgets As List Of %DeepSee.Dashboard.Widget
+	#Dim widget As %DeepSee.Dashboard.Widget
+	
 	set st = $$$OK
 	try {
 		
@@ -196,16 +199,16 @@ Using dashboard name get JSON representation (array of ("type","title","mdx")) o
 
 		return:($$$ISERR(st)) st
 		set widgets = dash.widgets.%ConstructClone("true")
-		//Widget : {type,  title, mdx}
+		//Widget : {type, title, key, mdx}
 
 		set widget = widgets.GetNext(.key)
 		
 		do {
-			set out(key) =$lb(widget.subtype, widget.title, ..GetMdx(widget.dataSource))
+			set out(key) =$lb(widget.subtype, widget.title, widget.key, ..GetMdx(widget.dataSource))
 			set widget = widgets.GetNext(.key)
 		} while (key'="")
 
-		do ##class(%ZEN.Auxiliary.jsonProvider).%ArrayToJSON($lb("type","title","mdx"),.out)
+		do ##class(%ZEN.Auxiliary.jsonProvider).%ArrayToJSON($lb("type","title","key","mdx"),.out)
 		
 	} catch ex {
 		set st = ex.AsStatus()
