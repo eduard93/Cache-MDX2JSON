@@ -35,6 +35,7 @@ These are the possible requests to web application (add param ?Namespace={Desire
 | MDX2XMLA                    | POST | { "MDX":"QUERY" }           | XMLA      | Results of MDX execution       |
 | Dashboards                  | GET  |                             | JSON      | All dashboards                 |
 | Widgets                     | POST | {Dashboard:"DashboardName"} | JSON      | All widgets in a dashboard     |
+| DataSource                  | POST | {DataSource:"Name of DS"}   | JSON      | All info about data source     |
 | FilterValues/:cube         | GET  |                             | JSON      | All filters for DeepSee Cube   |
 | FilterValues/:cube/:filter | GET  |                             | JSON      | All possible values for filter |
 | DrillInfo                  | POST | { cubeName: "HoleFoods", queryKey: "ru512140103", sortDir: "ASC", sortColumn: 0, row: 1 } | JSON      | Returns drilldown information |
@@ -52,3 +53,5 @@ Request body:
     {"MDX": "SELECT NON EMPTY [Product].[P1].[Product Category].Members ON 0,NON EMPTY [Outlet].[H1].[Region].Members ON 1 FROM [HoleFoods]"} 
     
 Result: http://pastebin.com/XddMUPHX
+
+Please note that corresponding cube must be compiled and built beforehand.

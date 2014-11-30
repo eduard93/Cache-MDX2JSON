@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Export generator="Cache" version="25" zv="Cache for Windows (x86-64) 2014.1.1 (Build 702U)" ts="2014-11-13 01:39:57">
+<Export generator="Cache" version="25" zv="Cache for Windows (x86-64) 2014.1.1 (Build 702U)" ts="2014-11-24 20:24:29">
 <Class name="MDX2JSON.REST">
 <Description><![CDATA[
 Class for REST-like web api for MDX2JSON transformation (and XML/A).<br>
@@ -30,7 +30,7 @@ webapplication/MDX?Namespace=Samples
 ]]></Description>
 <IncludeCode>MDX2JSON.MDX2JSON</IncludeCode>
 <Super>%CSP.REST</Super>
-<TimeChanged>63504,5862.54237</TimeChanged>
+<TimeChanged>63515,67956.917968</TimeChanged>
 <TimeCreated>63165,65257.8179</TimeCreated>
 
 <XData name="UrlMap">
@@ -50,6 +50,8 @@ webapplication/MDX?Namespace=Samples
       
     <Route Url="/Dashboards" Method="GET" Call="GetDashboardsList"/> 
     <Route Url="/Widgets" Method="POST" Call="GetWidgetsList"/>   
+     
+   <Route Url="/DataSource" Method="POST" Call="GetDataSource"/>   
      
    <!-- Valid but illicit, do not use-->
    <Route Url="/MDX/:query" Method="GET" Call="WriteJSONfromMDXURL"/>  
@@ -77,6 +79,16 @@ Test method, outputs <b>%request</b>, <b>%response</b> and <b>%session</b> objec
     &html<<br><br>>
     zw %session
     return $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="GetDataSource">
+<ClassMethod>1</ClassMethod>
+<Implementation><![CDATA[
+    set st = ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(%request.Content,,.obj,1)
+    return:$$$ISERR(st) st
+    set dataSource = $ZCVT(obj.DataSource,"I","UTF8")
+    return ##class(MDX2JSON.Utils).GetDataSource(dataSource)
 ]]></Implementation>
 </Method>
 
@@ -231,20 +243,24 @@ Converts incoming request object and calls abovementioned method.]]></Descriptio
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
     set callback=$get(%request.Data("callback",1),"")
-    if callback'="" w callback_"("
-    set st = ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(%request.Content,,.obj,1)
+    write:(callback'="") callback_"("
+    
+    set st = ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(%request.Content,,.obj,1)    
+ 
     return:$$$ISERR(st) st
-    set tMDX = obj.MDX
-    set tMDX = $ZCVT(tMDX,"I","UTF8")
+    return:'$IsObject(obj) $$$ERROR($$$ArgumentIsNotAnObject,"Body")
+    
     try {
+        set tMDX = obj.MDX
+        set tMDX = $ZCVT(tMDX,"I","UTF8")
         set st = ##class(MDX2JSON.Utils).WriteJSONfromMDX(tMDX)
     } catch ex {
         //zw obj
         set st=ex.AsStatus()
     }
 
-    if callback'="" w ")"
-    quit st
+    write:(callback'="") ")"
+    return st
 ]]></Implementation>
 </Method>
 
@@ -369,13 +385,15 @@ Add param Namespace to a request to execute MDX in desired namespace.]]></Descri
                 #; Dispatch
                 set Namespace = $get(%request.Data("Namespace",1))
                 
-                if ((Namespace'="") && ##class(%SYS.Namespace).Exists(Namespace)) {
+                if (##class(%SYS.Namespace).Exists(Namespace)) {
                     set oldNS = $Namespace
                     zn Namespace
-                    Set tSC=$zobjclassmethod(tClass,tTarget,tArgs...)
+                    set tSC=$zobjclassmethod(tClass,tTarget,tArgs...)
                     zn oldNS
-                } else {
-                    Set tSC=$zobjclassmethod(tClass,tTarget,tArgs...)                   
+                } elseif (Namespace = "") {
+                    set tSC=$zobjclassmethod(tClass,tTarget,tArgs...)
+                }else {
+                    set tSC = $$$ERROR($$$NamespaceUnavailable,Namespace)                   
                 }
                 If $$$ISERR(tSC) Do ..Http500(tSC)
                 
