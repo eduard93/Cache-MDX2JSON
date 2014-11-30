@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Export generator="Cache" version="25" zv="Cache for Windows (x86-64) 2014.1.1 (Build 702U)" ts="2014-11-24 20:24:41">
+<Export generator="Cache" version="25" zv="Cache for Windows (x86-64) 2014.1.1 (Build 702U)" ts="2014-11-30 19:59:50">
 <Class name="MDX2JSON.Utils">
 <Description><![CDATA[
 Utility class, wrappers for processing of MDX queries in <b>MDX2JSON.ResultSet</b>.
 Outputs JSON, JSONP and XML/A.<br>
 Also has functionality for getting information about cubes, dashboards and widgets.]]></Description>
 <IncludeCode>MDX2JSON.MDX2JSON</IncludeCode>
-<TimeChanged>63515,68202.401147</TimeChanged>
+<TimeChanged>63521,3289.887636</TimeChanged>
 <TimeCreated>63165,65653.547419</TimeCreated>
 
 <Method name="GetResultSet">
@@ -236,11 +236,11 @@ Using dashboard name get JSON representation (array of ("type","title","mdx")) o
         set widget = widgets.GetNext(.key)
         
         do {
-            set out(key) =$lb(widget.subtype, widget.title, widget.key, ..GetMdx(widget.dataSource), widget.dataSource)
+            set out(key) =$lb(widget.subtype, widget.title, widget.key, ..GetMdx(widget.dataSource), widget.dataSource, widget.drillDownDataSource)
             set widget = widgets.GetNext(.key)
         } while (key'="")
 
-        do ##class(%ZEN.Auxiliary.jsonProvider).%ArrayToJSON($lb("type","title","key","mdx","dataSource"),.out)
+        do ##class(%ZEN.Auxiliary.jsonProvider).%ArrayToJSON($lb("type","title","key","mdx","dataSource","drillDownDataSource"),.out)
         
     } catch ex {
         set st = ex.AsStatus()
