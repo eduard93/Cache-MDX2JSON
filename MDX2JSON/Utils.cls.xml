@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Export generator="Cache" version="25">
+<Export generator="Cache" version="25" zv="Cache for Windows (x86-64) 2014.1.1 (Build 702U)" ts="2014-12-02 00:11:19">
 <Class name="MDX2JSON.Utils">
 <Description><![CDATA[
 Utility class, wrappers for processing of MDX queries in <b>MDX2JSON.ResultSet</b>.
 Outputs JSON, JSONP and XML/A.<br>
 Also has functionality for getting information about cubes, dashboards and widgets.]]></Description>
 <IncludeCode>MDX2JSON.MDX2JSON</IncludeCode>
+<TimeChanged>63523,591.0226</TimeChanged>
 <TimeCreated>63165,65653.547419</TimeCreated>
 
 <Method name="GetResultSet">
@@ -209,7 +210,7 @@ Get information about pivot. <br>
             set dataSource = ##class(%DeepSee.Dashboard.Pivot).%OpenId(sourceId,,.st)
             return:($$$ISERR(st)) st
             
-            do ##class(%ZEN.Auxiliary.jsonProvider).%ObjectToJSON(dataSource, .out)
+            set st = ##class(%ZEN.Auxiliary.jsonProvider).%ObjectToJSON(dataSource, .out)
             
         }
          
@@ -251,11 +252,11 @@ Using dashboard name get JSON representation (array of ("type","title","mdx")) o
         set widget = widgets.GetNext(.key)
         
         do {
-            set out(key) =$lb(widget.subtype, widget.title, widget.key, ..GetMdx(widget.dataSource), widget.dataSource)
+            set out(key) =$lb(widget.subtype, widget.title, widget.key, ..GetMdx(widget.dataSource), widget.dataSource, widget.drillDownDataSource)
             set widget = widgets.GetNext(.key)
         } while (key'="")
 
-        do ##class(%ZEN.Auxiliary.jsonProvider).%ArrayToJSON($lb("type","title","key","mdx","dataSource"),.out)
+        do ##class(%ZEN.Auxiliary.jsonProvider).%ArrayToJSON($lb("type","title","key","mdx","dataSource","drillDownDataSource"),.out)
         
     } catch ex {
         set st = ex.AsStatus()

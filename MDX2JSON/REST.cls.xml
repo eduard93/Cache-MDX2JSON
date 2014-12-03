@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Export generator="Cache" version="25" zv="Cache for Windows (x86-64) 2014.1.1 (Build 702U)" ts="2014-11-24 20:24:29">
+<Export generator="Cache" version="25" zv="Cache for Windows (x86-64) 2014.1.1 (Build 702U)" ts="2014-12-03 18:09:02">
 <Class name="MDX2JSON.REST">
 <Description><![CDATA[
 Class for REST-like web api for MDX2JSON transformation (and XML/A).<br>
