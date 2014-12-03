@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Export generator="Cache" version="25" zv="Cache for Windows (x86-64) 2014.1.1 (Build 702U)" ts="2014-12-03 18:09:02">
+<Export generator="Cache" version="25">
 <Class name="MDX2JSON.REST">
 <Description><![CDATA[
 Class for REST-like web api for MDX2JSON transformation (and XML/A).<br>
@@ -30,7 +30,6 @@ webapplication/MDX?Namespace=Samples
 ]]></Description>
 <IncludeCode>MDX2JSON.MDX2JSON</IncludeCode>
 <Super>%CSP.REST</Super>
-<TimeChanged>63515,67956.917968</TimeChanged>
 <TimeCreated>63165,65257.8179</TimeCreated>
 
 <XData name="UrlMap">
@@ -44,12 +43,14 @@ webapplication/MDX?Namespace=Samples
 
    <!-- Get info about availible filters and their values -->
    <Route Url="/FilterValues/:cube" Method="GET" Call="WriteFiltersForCube"/>
+   <Route Url="/FilterValues" Method="POST" Call="WriteFilterValuesForCube"/>
    <Route Url="/FilterValues/:cube/:filter" Method="GET" Call="WriteFilterValues"/> 
    
     <Route Url="/Widgets" Method="GET" Call="GetWidgets"/> 
       
     <Route Url="/Dashboards" Method="GET" Call="GetDashboardsList"/> 
-    <Route Url="/Widgets" Method="POST" Call="GetWidgetsList"/>   
+    <Route Url="/Widgets" Method="POST" Call="GetWidgetsList"/>
+       
      
    <Route Url="/DataSource" Method="POST" Call="GetDataSource"/>   
      
@@ -95,14 +96,15 @@ Wrapper for ##class(MDX2JSON.Utils).GetWidgetsList()<br>
 Converts incoming request object (JSON: {Dashboard:"Dashboard Full Name"} and calls abovementioned method.]]></Description>
 <ClassMethod>1</ClassMethod>
 <Implementation><![CDATA[
-    set dashboard = $$$get("w")
-    if (dashboard = "") {
-        set st = ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(%request.Content,,.obj,1)
-        return:$$$ISERR(st) st
-        set dashboard = obj.Dashboard
-        set dashboard = $ZCVT(dashboard,"I","UTF8")
-    }
-    return ##class(MDX2JSON.Utils).GetWidgetsList(dashboard)
+	set st = ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(%request.Content,,.obj,1)
+    return:$$$ISERR(st) st
+    
+    set dashboard = obj.Dashboard
+    set dashboard = $ZCVT(dashboard,"I","UTF8")
+    
+    set st = ##class(MDX2JSON.Utils).GetWidgetsList(dashboard)
+   
+    return st
 ]]></Implementation>
 </Method>
 
@@ -181,6 +183,26 @@ Wrapper for ##class(MDX2JSON.Utils).WriteFiltersForCube(pCube)</Description>
   set Cube = $ZCONVERT($ZCONVERT(Cube ,"I","URL") ,"I","UTF8")
   set st = ##class(MDX2JSON.Utils).WriteFiltersForCube(Cube)
   quit st
+]]></Implementation>
+</Method>
+
+<Method name="WriteFilterValuesForCube">
+<Description>
+Wrapper for ##class(MDX2JSON.Utils).WriteFilterValues(pCupe, pFilter)</Description>
+<ClassMethod>1</ClassMethod>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	
+    set st = ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(%request.Content,,.obj,1)    
+    return:$$$ISERR(st) st
+    return:'$IsObject(obj) $$$ERROR($$$ArgumentIsNotAnObject,"Body")
+    
+    set Cube = obj.Cube
+    set Values = obj.Values
+    set Cube = $ZCVT(Cube,"I","UTF8")
+    
+   	set st = ##class(MDX2JSON.Utils).WriteFiltersForCube(Cube,Values)
+  	return st
 ]]></Implementation>
 </Method>
 
