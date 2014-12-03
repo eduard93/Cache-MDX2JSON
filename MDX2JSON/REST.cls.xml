@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Export generator="Cache" version="25" zv="Cache for Windows (x86-64) 2014.1.1 (Build 702U)" ts="2014-11-24 20:24:29">
+<Export generator="Cache" version="25" zv="Cache for Windows (x86-64) 2014.1.1 (Build 702U)" ts="2014-12-03 18:09:02">
 <Class name="MDX2JSON.REST">
 <Description><![CDATA[
 Class for REST-like web api for MDX2JSON transformation (and XML/A).<br>
@@ -56,9 +56,6 @@ webapplication/MDX?Namespace=Samples
    <!-- Valid but illicit, do not use-->
    <Route Url="/MDX/:query" Method="GET" Call="WriteJSONfromMDXURL"/>  
    <Route Url="/MDXfilters/:query" Method="GET" Call="WriteFiltersForMDX"/>
-   
-   <!-- Drilldown -->
-   <Route Url="/MDX/DrillInfo" Method="POST" Call="DrillInfo"/>
 
    <!-- Test method-->
    <Route Url="/Test" Method="GET" Call="Test"/>
@@ -198,39 +195,6 @@ Wrapper for ##class(MDX2JSON.Utils).WriteFilterValues(pCupe, pFilter)</Descripti
   set Filter = $ZCONVERT($ZCONVERT(Filter ,"I","URL") ,"I","UTF8")
   set st = ##class(MDX2JSON.Utils).WriteFilterValues(Cube, Filter)
   quit st
-]]></Implementation>
-</Method>
-
-<Method name="DrillInfo">
-<Description>
-Wrapper for classMethod zGetItemSpec^%DeepSee.Component.pivotTable
-Retrieves drilldown information with given parameters.</Description>
-<ClassMethod>1</ClassMethod>
-<ProcedureBlock>0</ProcedureBlock>
-<ReturnType>%Status</ReturnType>
-<Implementation><![CDATA[
-    set st = ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(%request.Content,,.req,1)
-    return:$$$ISERR(st) st
-    s proxyObject = ##class(MDX2JSON.DrillItemInfo).%New()
-    
-    try {
-        d ##class(%DeepSee.Component.pivotTable).GetItemSpec(
-            proxyObject,
-            req.cubeName,
-            req.queryKey,
-            req.sortDir,
-            req.sortColumn,
-            "row",
-            req.row
-        )
-        w "{""spec"":""" _ proxyObject.spec _ """,""text"":""" _ proxyObject.text
-          _ """,""childSpec"":""" _ proxyObject.childSpec _ """,""error"":""" _
-          proxyObject.error _ """}"
-    } catch (e) {
-        if proxyObject.error = "" s proxyObject.error = e.AsSystemError()
-        w "{""error"":""" _ proxyObject.error _ """}"
-    }
-    q $$$OK
 ]]></Implementation>
 </Method>
 
