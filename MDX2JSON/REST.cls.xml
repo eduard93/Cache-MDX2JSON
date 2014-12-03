@@ -26,8 +26,17 @@ To get information about possible Cube's filters and filters' values:<br><ul>
         <li>webapplication/FilterValues/:cube/:filter - to get all values for Filter for DeepSee Cube in JSON format.</li></ul> 
 Example: send HTTP GET request to web application with Dispatch class <b>MDX2JSON.REST</b> and URL:<br>
 /FilterValues/HoleFoods/[DateOfSale].[Actual].[MonthSold] -  to get information about possible values of [DateOfSale].[Actual].[MonthSold] in HoleFoods Cube.<br>
+
+To get information about pivot:<br><ul>
+        <li>webapplication/DataSource- to get info about pivot (POST {DataSource:"Name of DS"})</li> </ul> 
+
+
+
 You can add a param Namespace to request to execute MDX in desired namespace (MDX2JSON package must be mapped to that namespace):<br>
-webapplication/MDX?Namespace=Samples
+webapplication/MDX?Namespace=Samples<br>
+
+
+
 ]]></Description>
 <IncludeCode>MDX2JSON.MDX2JSON</IncludeCode>
 <Super>%CSP.REST</Super>
@@ -47,12 +56,12 @@ webapplication/MDX?Namespace=Samples
    <Route Url="/FilterValues" Method="POST" Call="WriteFilterValuesForCube"/>
    <Route Url="/FilterValues/:cube/:filter" Method="GET" Call="WriteFilterValues"/> 
    
-    <Route Url="/Widgets" Method="GET" Call="GetWidgets"/> 
-      
-    <Route Url="/Dashboards" Method="GET" Call="GetDashboardsList"/> 
-    <Route Url="/Widgets" Method="POST" Call="GetWidgetsList"/>
+   <!-- Get info about widgets-->
+   <Route Url="/Widgets" Method="GET" Call="GetWidgets"/>    
+   <Route Url="/Dashboards" Method="GET" Call="GetDashboardsList"/> 
+   <Route Url="/Widgets" Method="POST" Call="GetWidgetsList"/>
        
-     
+   <!-- Get info about pivot-->
    <Route Url="/DataSource" Method="POST" Call="GetDataSource"/>   
      
    <!-- Valid but illicit, do not use-->
