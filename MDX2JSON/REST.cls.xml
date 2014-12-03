@@ -292,6 +292,11 @@ Add param Namespace to a request to execute MDX in desired namespace.]]></Descri
 <FormalSpec>pUrl:%String,pMethod:%String</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
+	#dim %response As %CSP.Response
+	#dim %request As %CSP.Request
+	#dim %session As %CSP.Session
+	 
+	set %response.ContentType="text/json"
     do %response.SetHeader("Access-Control-Allow-Origin","*")
     do %response.SetHeader("Access-Control-Allow-Headers","Authorization")
     
