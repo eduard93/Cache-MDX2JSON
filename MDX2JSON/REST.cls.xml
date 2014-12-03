@@ -22,6 +22,7 @@ Dashboard related requests are:
 </ul>
 To get information about possible Cube's filters and filters' values:<br><ul>
         <li>webapplication/FilterValues/:cube - to get all filters for DeepSee Cube in JSON format.</li> 
+        <li>webapplication/FilterValues/:cube - Same but with POST { "Cube":"CubeName","Values":0} body. If values = 1, then filters' values would also be provided.</li> 
         <li>webapplication/FilterValues/:cube/:filter - to get all values for Filter for DeepSee Cube in JSON format.</li></ul> 
 Example: send HTTP GET request to web application with Dispatch class <b>MDX2JSON.REST</b> and URL:<br>
 /FilterValues/HoleFoods/[DateOfSale].[Actual].[MonthSold] -  to get information about possible values of [DateOfSale].[Actual].[MonthSold] in HoleFoods Cube.<br>
