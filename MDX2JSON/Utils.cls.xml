@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Export generator="Cache" version="25" zv="Cache for Windows (x86-64) 2014.1.1 (Build 702U)" ts="2014-11-24 20:24:41">
+<Export generator="Cache" version="25">
 <Class name="MDX2JSON.Utils">
 <Description><![CDATA[
 Utility class, wrappers for processing of MDX queries in <b>MDX2JSON.ResultSet</b>.
 Outputs JSON, JSONP and XML/A.<br>
 Also has functionality for getting information about cubes, dashboards and widgets.]]></Description>
 <IncludeCode>MDX2JSON.MDX2JSON</IncludeCode>
-<TimeChanged>63515,68202.401147</TimeChanged>
 <TimeCreated>63165,65653.547419</TimeCreated>
 
 <Method name="GetResultSet">
@@ -119,7 +118,7 @@ Gets filters for MDX expression.<br>
 <Description><![CDATA[
 Get all filters for DeepSee Cube in JSON format.<br>
 <b>pCube</b> - name of DeepSee cube.<br>
-<b>values</b> - write all filters' values. Slow.]]></Description>
+<b>values</b> - write all filters' values. Takes time.]]></Description>
 <ClassMethod>1</ClassMethod>
 <FormalSpec>pCube:%String,values:%Boolean=0</FormalSpec>
 <ReturnType>%Status</ReturnType>
@@ -189,6 +188,9 @@ Returns MDX string used to create pivot.<br>
 </Method>
 
 <Method name="GetDataSource">
+<Description><![CDATA[
+Get information about pivot. <br>
+<b>pDataSource</b> - pivot fullName.]]></Description>
 <ClassMethod>1</ClassMethod>
 <FormalSpec>pDataSource:%String</FormalSpec>
 <Implementation><![CDATA[
@@ -244,7 +246,7 @@ Using dashboard name get JSON representation (array of ("type","title","mdx")) o
 
         return:($$$ISERR(st)) st
         set widgets = dash.widgets.%ConstructClone("true")
-        //Widget : {type, title, key, mdx}
+        //Widget : {type, title, key, mdx, dataSource}
 
         set widget = widgets.GetNext(.key)
         
