@@ -80,12 +80,7 @@ Test method, outputs <b>%request</b>, <b>%response</b> and <b>%session</b> objec
 <ClassMethod>1</ClassMethod>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-    &html<<h1>Status: OK!</h1><br>>
-    zw %request
-    &html<<br><br>>
-    zw %response
-    &html<<br><br>>
-    zw %session
+    write "{ Status: ""OK""}"
     return $$$OK
 ]]></Implementation>
 </Method>
@@ -306,8 +301,8 @@ Add param Namespace to a request to execute MDX in desired namespace.]]></Descri
 	#dim %session As %CSP.Session
 	 
 	set %response.ContentType="text/json"
-    do %response.SetHeader("Access-Control-Allow-Origin","*")
-    do %response.SetHeader("Access-Control-Allow-Headers","Authorization")
+    //do %response.SetHeader("Access-Control-Allow-Origin","*")
+    //do %response.SetHeader("Access-Control-Allow-Headers","Authorization")
     
     #dim tSC As %Status = $$$OK
     #dim e As %Exception.AbstractException
