@@ -25,7 +25,7 @@ Converts ResultSet to %ZEN.proxyObject.<br>
     }
       
     if (..%GetAxisCount() > 2) {
-        set pStatus  = "Multidimensional (>2) queries are not supported"
+        set pStatus  = $$$ERROR($$$GeneralError,"Multidimensional (>2) queries are not supported")
         return ""
     }
     
