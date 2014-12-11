@@ -262,6 +262,7 @@ Using dashboard name get JSON representation (array of ("type","title","mdx")) o
         
     } catch ex {
         set st = ex.AsStatus()
+        d ex.Log() 
     }
     return st
 ]]></Implementation>
