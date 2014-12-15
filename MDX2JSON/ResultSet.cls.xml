@@ -187,14 +187,17 @@ Returns array of Axes</Description>
 </Method>
 
 <Method name="IsCellNull">
+<Description>
+Determine if cell is an invisyble system cell.</Description>
 <ClassMethod>1</ClassMethod>
 <FormalSpec>caption,path</FormalSpec>
 <ReturnType>%Boolean</ReturnType>
 <Implementation><![CDATA[
-	return:(path="") 1
-	return:(caption="") 1
 	return:(caption=0) 1
 	return:(caption=1) 1
+	return:(caption="") 1
+	return:(caption'="") 0
+	return:(path="") 1
 	return 0
 ]]></Implementation>
 </Method>
