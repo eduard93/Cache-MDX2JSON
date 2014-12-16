@@ -316,9 +316,15 @@ Add param Namespace to a request to execute MDX in desired namespace.]]></Descri
     #dim tMethodMatched As %Boolean
     
     Try {
+	    // Desired execusion namespace
+	    set Namespace = $get(%request.Data("Namespace",1))
+	    set st = ..CheckNamespace(.Namespace)
+	    If $$$ISERR(st) Do ..Http500(st) Quit
+	    
         #; Check that the effective user ( could be unknown user ) can access this resource
         Set tAccess=$SYSTEM.Security.Check($Piece($zu(90,21,$namespace),"^",4))
-        If tAccess'["READ,WRITE"
+        Set tAccess2=$SYSTEM.Security.Check($Piece($zu(90,21,Namespace),"^",4))
+        If ((tAccess'["READ,WRITE") || (tAccess2'["READ,WRITE"))
         {
             #; Don't want the session token
             Set %response.OutputSessionToken=0
@@ -378,17 +384,15 @@ Add param Namespace to a request to execute MDX in desired namespace.]]></Descri
                 If tTarget[":" Set tClass=$Piece(tTarget,":"),tTarget=$Piece(tTarget,":",2)
                 
                 #; Dispatch
-                set Namespace = $get(%request.Data("Namespace",1))
                 
-                if (##class(%SYS.Namespace).Exists(Namespace)) {
+                
+                if (Namespace'=$Namespace) {
                     set oldNS = $Namespace
                     zn Namespace
                     set tSC=$zobjclassmethod(tClass,tTarget,tArgs...)
                     zn oldNS
-                } elseif (Namespace = "") {
+                } else {
                     set tSC=$zobjclassmethod(tClass,tTarget,tArgs...)
-                }else {
-                    set tSC = $$$ERROR($$$NamespaceUnavailable,Namespace)                   
                 }
                 If $$$ISERR(tSC) Do ..Http500(tSC)
                 
@@ -428,6 +432,33 @@ Issue an '500' error and give some indication as to what occurred.<br>
     
     #; Return a helpful error string
     Write "{Error:"_$$$ZENJSSTR($System.Status.GetErrorText(pStatus))_"}"
+]]></Implementation>
+</Method>
+
+<Method name="CheckNamespace">
+<Description><![CDATA[
+Returns OK if namespace both exists and contains MDX2JSON package.<br>
+<b>Namespace</b> - name of namespace. Sets namespace variable to current namespace if empty or missing.]]></Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec><![CDATA[&Namespace:%String=$Namespace]]></FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	if (Namespace = "") {
+		set Namespace = $Namespace
+		return $$$OK
+	}
+	
+	return:(##class(%SYS.Namespace).Exists(Namespace)) $$$ERROR($$$NamespaceUnavailable,Namespace) 
+	
+	if Namespace'=$Namespace {
+        set oldNS = $Namespace
+        zn Namespace
+        set exists = ##class(%Dictionary.CompiledClass).%ExistsId("MDX2JSON.Utils") 
+        zn oldNS
+        return:(exists=0) $$$ERROR($$$GeneralError, "MDX2JSON package is not mapped to " _ Namespace)		
+	}
+	
+	return $$$OK
 ]]></Implementation>
 </Method>
 </Class>
