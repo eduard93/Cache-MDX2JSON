@@ -215,7 +215,7 @@ Get information about pivot. <br>
          
     } catch ex {
         set st = ex.AsStatus()
-        d ex.Log() // logs error info to System Error log
+        do ex.Log() // logs error info to System Error log
     }
     
     return st
@@ -262,7 +262,7 @@ Using dashboard name get JSON representation (array of ("type","title","mdx")) o
         
     } catch ex {
         set st = ex.AsStatus()
-        d ex.Log() 
+        do ex.Log() 
     }
     return st
 ]]></Implementation>

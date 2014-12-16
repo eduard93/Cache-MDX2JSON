@@ -303,6 +303,7 @@ Add param Namespace to a request to execute MDX in desired namespace.]]></Descri
 	set %response.ContentType="text/json"
     //do %response.SetHeader("Access-Control-Allow-Origin","*")
     //do %response.SetHeader("Access-Control-Allow-Headers","Authorization")
+    //return:($ZCVT(pMethod,"U") = "OPTIONS") $$$OK
     
     #dim tSC As %Status = $$$OK
     #dim e As %Exception.AbstractException
@@ -331,8 +332,6 @@ Add param Namespace to a request to execute MDX in desired namespace.]]></Descri
             #; Done
             Quit
         }
-        
-        return:($ZCVT(pMethod,"U") = "OPTIONS") $$$OK
         
         Set (tResourceMatched,tMethodMatched)=0
         
@@ -404,10 +403,10 @@ Add param Namespace to a request to execute MDX in desired namespace.]]></Descri
         #; Had a match for resource but method not matched
         If tMethodMatched=0 Set tSC=..Http405() Quit
             
-    } Catch (e) {
+    } Catch (ex) {
         
         #; Issue a '500'
-        Do ..Http500(e)
+        Do ..Http500(ex.AsStatus())
     }
     
     If ..#UseSession=0 Set %session.EndSession=1
