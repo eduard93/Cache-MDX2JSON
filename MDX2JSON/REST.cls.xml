@@ -448,7 +448,7 @@ Returns OK if namespace both exists and contains MDX2JSON package.<br>
 		return $$$OK
 	}
 	
-	return:(##class(%SYS.Namespace).Exists(Namespace)) $$$ERROR($$$NamespaceUnavailable,Namespace) 
+	return:('##class(%SYS.Namespace).Exists(Namespace)) $$$ERROR($$$NamespaceUnavailable,Namespace) 
 	
 	if Namespace'=$Namespace {
         set oldNS = $Namespace
