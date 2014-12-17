@@ -212,6 +212,7 @@ Returns array of cells (left-to-right, up-to-down)</Description>
 	set tCubeIndex = ..%CubeKey
     set tQueryKey = ..%QueryKey
 	set tAxisCount = ..%GetAxisCount()
+	set tAddr = tAxisCount
 	
 	set tNodeNo = ""
 	
@@ -239,16 +240,7 @@ Returns array of cells (left-to-right, up-to-down)</Description>
 				set tItemNo(1) = $O($$$DeepSeeResultsGLVN(tCubeIndex,tQueryKey,"leaf",1,""),1,tNodeNo)
 				set tAddr(1) = tNodeNo
 				while (tItemNo(1)'="") {
-					set tValue = $Case(tAxisCount,
-						0:..%GetValue(),
-						1:..%GetValue(tAddr(1)),
-						2:..%GetValue(tAddr(1),tAddr(2)),
-						3:..%GetValue(tAddr(1),tAddr(2),tAddr(3)),
-						4:..%GetValue(tAddr(1),tAddr(2),tAddr(3),tAddr(4)),
-						5:..%GetValue(tAddr(1),tAddr(2),tAddr(3),tAddr(4),tAddr(5)),
-						6:..%GetValue(tAddr(1),tAddr(2),tAddr(3),tAddr(4),tAddr(5),tAddr(6)),
-						7:..%GetValue(tAddr(1),tAddr(2),tAddr(3),tAddr(4),tAddr(5),tAddr(6),tAddr(7)),
-						:"")
+					set tValue = ..%GetValue(tAddr...) // for 2 axes ..%GetValue(tAddr(1),tAddr(2))
 					do data.Insert(tValue)
 
 					set tItemNo(1) = $O($$$DeepSeeResultsGLVN(tCubeIndex,tQueryKey,"leaf",1,tItemNo(1)),1,tNodeNo)
