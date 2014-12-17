@@ -233,9 +233,7 @@ Converts incoming request object and calls abovementioned method.]]></Descriptio
 <ProcedureBlock>0</ProcedureBlock>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-    set callback=$get(%request.Data("callback",1),"")
-    write:(callback'="") callback_"("
-    
+   
     set st = ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(%request.Content,,.obj,1)    
  
     return:$$$ISERR(st) st
@@ -246,11 +244,9 @@ Converts incoming request object and calls abovementioned method.]]></Descriptio
         set tMDX = $ZCVT(tMDX,"I","UTF8")
         set st = ##class(MDX2JSON.Utils).WriteJSONfromMDX(tMDX)
     } catch ex {
-        //zw obj
         set st=ex.AsStatus()
     }
 
-    write:(callback'="") ")"
     return st
 ]]></Implementation>
 </Method>
