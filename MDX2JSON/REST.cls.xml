@@ -29,15 +29,8 @@ Example: send HTTP GET request to web application with Dispatch class <b>MDX2JSO
 
 To get information about pivot:<br><ul>
         <li>webapplication/DataSource- to get info about pivot (POST {DataSource:"Name of DS"})</li> </ul> 
-
-
-
 You can add a param Namespace to request to execute MDX in desired namespace (MDX2JSON package must be mapped to that namespace):<br>
-webapplication/MDX?Namespace=Samples<br>
-
-
-
-]]></Description>
+webapplication/MDX?Namespace=Samples<br>]]></Description>
 <IncludeCode>MDX2JSON.MDX2JSON</IncludeCode>
 <Super>%CSP.REST</Super>
 <TimeCreated>63165,65257.8179</TimeCreated>
