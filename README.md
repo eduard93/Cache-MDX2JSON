@@ -66,3 +66,5 @@ If something goes wrong, server must report an error in the following format { E
 | CSP Error                   | User does not have enough rights. Configure User or Webapplication roles  | 
 | Authenticated access        | Guideline to configure [here](https://github.com/intersystems-ru/Cache-MDX2JSON/issues/24)|
 | No dashboards               | Configure roles. Change [dashboard scope](https://github.com/intersystems-ru/Cache-MDX2JSON/issues/10)|
+| DeepSee errors              | Build and compile DeepSee cube(s)|
+| MDX errors                  | Don't forget to escape JSON strings [here](http://json.org/string.gif) |
