@@ -61,7 +61,7 @@ do ##class(MDX2JSON.Installer).setup(.pVars)</Description>
 <Internal>1</Internal>
 <ClassMethod>1</ClassMethod>
 <CodeMode>objectgenerator</CodeMode>
-<FormalSpec><![CDATA[&pVars,pLogLevel:%Integer,pInstaller:%Installer.Installer]]></FormalSpec>
+<FormalSpec><![CDATA[&pVars,pLogLevel:%Integer=0,pInstaller:%Installer.Installer]]></FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[ 	Quit ##class(%Installer.Manifest).%Generate(%compiledclass, %code, "Manifest")
 ]]></Implementation>
