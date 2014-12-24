@@ -154,6 +154,9 @@ Returns array of Axes</Description>
 
 	do ##class(%DeepSee.Utils).%GetDimensionCaption(CubeName,tDimNo, tHierNo,tLevelNo, .tAxisCaption)
 	set cell.dimension = tAxisCaption
+	set cell.info = $LG(tNode,18)
+	set cell.type = $LG(tNode,1)
+    set cell.tMbrId = $LG(tNode,6)
     
     set cell.caption = tCaption
     set cell.path = ##class(%DeepSee.Query.Engine).%GetSpecForAxisNode(CubeName, QueryKey, AxisNumber, Node)
