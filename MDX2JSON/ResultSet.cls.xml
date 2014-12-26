@@ -138,29 +138,44 @@ Returns array of Axes</Description>
     set cell=##class(%ZEN.proxyObject).%New()
         
     set tNode = $G($$$DeepSeeAxisGLVN(CubeIndex,AxisKey,"axes",Node))
-    
-    set tCaption = $LG(tNode,5)
-    
-    /*
-    Set tType = $LG(tNode,1)
-    Set tParent = $LG(tNode,4)
-    Set tMbrId = $LG(tNode,6)
-    Set tFmt = $LG(tNode,12)
-    */
-    
-    Set tDimNo = $LG(tNode,9)
-    Set tHierNo = $LG(tNode,10)
-    Set tLevelNo = $LG(tNode,11)
+    set tDimNo = $LG(tNode,9)
+    set tHierNo = $LG(tNode,10)
+    set tLevelNo = $LG(tNode,11)
 
-	do ##class(%DeepSee.Utils).%GetDimensionCaption(CubeName,tDimNo, tHierNo,tLevelNo, .tAxisCaption)
-	set cell.dimension = tAxisCaption
-	set cell.info = $LG(tNode,18)
-	set cell.type = $LG(tNode,1)
-    set cell.tMbrId = $LG(tNode,6)
-    
-    set cell.caption = tCaption
+	set cell.caption = $LG(tNode,5)
+    set cell.format = $LG(tNode,12)
+    set cell.total = $LG(tNode,8)
+    set cell.type = $LG(tNode,1)
+    set cell.valueID = $LG(tNode,6)   
     set cell.path = ##class(%DeepSee.Query.Engine).%GetSpecForAxisNode(CubeName, QueryKey, AxisNumber, Node)
     
+    set info = $LG(tNode,18)
+	set cell.info = info // expected structure is property1:value1;property2:value2;...;propertyN:valueN;
+	
+	if info'="" { // extract aggregation information, leave the rest as css	
+		set summaryposition = $f(info,"summary")
+		if summaryposition>0 {
+			set summaryvalue = $e(info,summaryposition+1,$f(info,";",summaryposition)-2)
+			set cell.summary = summaryvalue
+			set $e(info,summaryposition-7,summaryposition + $l(summaryvalue) + 1) = "" 
+		}
+		set cell.style = info
+		
+		/*for i=1:1:($L(cell.info,";")-1) { 
+		set part = $P(cell.info,";",i)
+		set property = $P(part,":",1)
+		set value = $P(part,":",2)
+		do cell.%DispatchSetProperty(property, value)
+		}*/
+	}
+	
+
+
+    do ##class(%DeepSee.Utils).%GetDimensionCaption(CubeName,tDimNo, tHierNo,tLevelNo, .tAxisCaption)
+    set cell.dimension = tAxisCaption
+
+    //Set cell.all = $LG(tNode,2)_" "_$LG(tNode,3)_" "_$LG(tNode,5)_" "_$LG(tNode,7)_" "_$LG(tNode,8)_" "_$LG(tNode,13)
+        
     if ($D($$$DeepSeeAxisGLVN(CubeIndex, AxisKey, "axes", Node, "ch")) = 10) {
         set cell.children = ##class(%ListOfObjects).%New()
         set key = $O($$$DeepSeeAxisGLVN(CubeIndex, AxisKey, "axes", Node, "ch", ""))
@@ -182,7 +197,7 @@ Returns array of Axes</Description>
         // To filter out invisible top-level сells
         if (..IsCellNull(cell.caption, cell.path)=1) {
 			return cell.children	
-		}
+        }
     } 
 
     return cell
