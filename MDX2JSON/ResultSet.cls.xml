@@ -168,35 +168,31 @@ Returns array of Axes</Description>
 		do cell.%DispatchSetProperty(property, value)
 		}*/
 	}
-	
-
 
     do ##class(%DeepSee.Utils).%GetDimensionCaption(CubeName,tDimNo, tHierNo,tLevelNo, .tAxisCaption)
     set cell.dimension = tAxisCaption
-
-    //Set cell.all = $LG(tNode,2)_" "_$LG(tNode,3)_" "_$LG(tNode,5)_" "_$LG(tNode,7)_" "_$LG(tNode,8)_" "_$LG(tNode,13)
         
     if ($D($$$DeepSeeAxisGLVN(CubeIndex, AxisKey, "axes", Node, "ch")) = 10) {
         set cell.children = ##class(%ListOfObjects).%New()
         set key = $O($$$DeepSeeAxisGLVN(CubeIndex, AxisKey, "axes", Node, "ch", ""))
         while (key'="") {
-	        set children = ..ProcessOneAxisCell(CubeIndex, AxisKey, CubeName, QueryKey, AxisNumber, key)
-	        // Append children to cell
-	        if (children.%IsA("%ZEN.proxyObject")) {
-            	do cell.children.Insert(children)
-	        } elseif (children.%IsA("%Collection.AbstractList")) {
-		        for i=1:1:children.Count() {
-			        do cell.children.Insert(children.GetAt(i))
-		        }
-	        }
-	        
+            set children = ..ProcessOneAxisCell(CubeIndex, AxisKey, CubeName, QueryKey, AxisNumber, key)
+            // Append children to cell
+            if (children.%IsA("%ZEN.proxyObject")) {
+                do cell.children.Insert(children)
+            } elseif (children.%IsA("%Collection.AbstractList")) {
+                for i=1:1:children.Count() {
+                    do cell.children.Insert(children.GetAt(i))
+                }
+            }
+            
             set key = $O($$$DeepSeeAxisGLVN(CubeIndex, AxisKey, "axes", Node, "ch", key))
         }
         
 
         // To filter out invisible top-level сells
         if (..IsCellNull(cell.caption, cell.path)=1) {
-			return cell.children	
+            return cell.children    
         }
     } 
 
