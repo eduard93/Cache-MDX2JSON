@@ -170,20 +170,25 @@ Returns MDX string used to create pivot.<br>
 <FormalSpec>pPivotName:%String,*pStatus:%Status=$$$OK</FormalSpec>
 <ReturnType>%String</ReturnType>
 <Implementation><![CDATA[
+	#dim tPivot As %DeepSee.Dashboard.Pivot
     set tPivot = ##class(%DeepSee.UserLibrary.Utils).%OpenFolderItem(pPivotName,.pStatus)
+
     return:$$$ISERR(pStatus) $System.Status.GetErrorText(pStatus)
 
     set tPivotTable = ##class(%DeepSee.Component.pivotTable).%New()
     set st = tPivot.%CopyToComponent(tPivotTable)
     return:$$$ISERR(pStatus) $System.Status.GetErrorText(pStatus)
 
-    set rs = tPivotTable.%CreateResultSet(.st,.tParms,.tFilterInfo,.tAdvancedFilters,.tQueryText)
-    return:$$$ISERR(pStatus) $System.Status.GetErrorText(pStatus)
+    set rs = tPivotTable.%CreateResultSet(.st,.tParms,.tFilterInfo,.tAdvancedFilters,.tQueryText) // returns tQueryText - mdx without filters
+    return:$$$ISERR(pStatus) $System.Status.GetErrorText(pStatus) 
     
-    set pMDX = tQueryText
+    for i=1:1:tPivot.filters.Count() {
+	    // append filters to MDX expression, if any
+	    set tQueryText = tQueryText _ " %FILTER " _ tPivot.filters.GetAt(i).spec
+    } 
     set pStatus = $$$OK
         
-    return pMDX
+    return tQueryText
 ]]></Implementation>
 </Method>
 
