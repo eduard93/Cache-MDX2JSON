@@ -171,21 +171,21 @@ Returns MDX string used to create pivot.<br>
 <ReturnType>%String</ReturnType>
 <Implementation><![CDATA[
 	#dim tPivot As %DeepSee.Dashboard.Pivot
+	#dim tPivotTable As %DeepSee.Component.pivotTable
+	
     set tPivot = ##class(%DeepSee.UserLibrary.Utils).%OpenFolderItem(pPivotName,.pStatus)
-
-    return:$$$ISERR(pStatus) $System.Status.GetErrorText(pStatus)
+    return:$$$ISERR(pStatus)
 
     set tPivotTable = ##class(%DeepSee.Component.pivotTable).%New()
-    set st = tPivot.%CopyToComponent(tPivotTable)
-    return:$$$ISERR(pStatus) $System.Status.GetErrorText(pStatus)
-
-    set rs = tPivotTable.%CreateResultSet(.st,.tParms,.tFilterInfo,.tAdvancedFilters,.tQueryText) // returns tQueryText - mdx without filters
-    return:$$$ISERR(pStatus) $System.Status.GetErrorText(pStatus) 
+    set pStatus = tPivot.%CopyToComponent(tPivotTable)
+    return:$$$ISERR(pStatus)
+	
+	set pStatus = tPivotTable.%GetFilterInfo(.tFilterInfo,.pAdvancedFilters)
+	return:$$$ISERR(pStatus)
+	
+    set rs = tPivotTable.%CreateResultSet(.pStatus,.tParms,.tFilterInfo,.tAdvancedFilters,.tQueryText) // returns tQueryText - mdx without filters
+	return:$$$ISERR(pStatus)
     
-    for i=1:1:tPivot.filters.Count() {
-	    // append filters to MDX expression, if any
-	    set tQueryText = tQueryText _ " %FILTER " _ tPivot.filters.GetAt(i).spec
-    } 
     set pStatus = $$$OK
         
     return tQueryText
@@ -259,7 +259,12 @@ Using dashboard name get JSON representation (array of ("type","title","mdx")) o
         do {
 	        &sql(SELECT cubeName into :cube FROM %DeepSee_Dashboard.Pivot WHERE fullName=:widget.dataSource)
 			set:(SQLCODE'=0) cube=""
-            set out(key) =$lb(widget.subtype, widget.title, widget.key, ..GetMdx(widget.dataSource), widget.dataSource, widget.drillDownDataSource, cube)
+			
+			set mdx = ..GetMdx(widget.dataSource, .st)
+			return:($$$ISERR(st)) st
+			
+            set out(key) =$lb(widget.subtype, widget.title, widget.key, mdx, widget.dataSource, widget.drillDownDataSource, cube)
+
             set widget = widgets.GetNext(.key)
         } while (key'="")
 
