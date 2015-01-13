@@ -167,28 +167,33 @@ Returns MDX string used to create pivot.<br>
 <b>pPivotName</b> - fullname of pivot. Eg: "KPIs & Plugins/HoleFoods.pivot". Case insensitive.<br>
 <b>pStatus</b> - Status of query execution.<br>]]></Description>
 <ClassMethod>1</ClassMethod>
-<FormalSpec>pPivotName:%String,*pStatus:%Status=$$$OK</FormalSpec>
-<ReturnType>%String</ReturnType>
+<FormalSpec>pPivotName:%String,*MDX,*BaseNDX</FormalSpec>
+<ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
 	#dim tPivot As %DeepSee.Dashboard.Pivot
 	#dim tPivotTable As %DeepSee.Component.pivotTable
-	
     set tPivot = ##class(%DeepSee.UserLibrary.Utils).%OpenFolderItem(pPivotName,.pStatus)
+
     return:$$$ISERR(pStatus)
 
     set tPivotTable = ##class(%DeepSee.Component.pivotTable).%New()
     set pStatus = tPivot.%CopyToComponent(tPivotTable)
     return:$$$ISERR(pStatus)
+    
+    set rs = tPivotTable.%CreateResultSet(.pStatus,.tParms,.tFilterInfo,.tAdvancedFilters,.BaseNDX) // returns tQueryText - mdx without filters
+	return:$$$ISERR(pStatus)
 	
 	set pStatus = tPivotTable.%GetFilterInfo(.tFilterInfo,.pAdvancedFilters)
 	return:$$$ISERR(pStatus)
 	
-    set rs = tPivotTable.%CreateResultSet(.pStatus,.tParms,.tFilterInfo,.tAdvancedFilters,.tQueryText) // returns tQueryText - mdx without filters
-	return:$$$ISERR(pStatus)
-    
-    set pStatus = $$$OK
+	if (($d(tFilterInfo)=0) &&($d(pAdvancedFilters)=0)) {
+		set MDX = BaseNDX // no filters, so we're good
+	} else {
+		set rs = tPivotTable.%CreateResultSet(.pStatus,.tParms,.tFilterInfo,.tAdvancedFilters,.MDX) // returns tQueryText - mdx with filters
+		return:$$$ISERR(pStatus)		
+	} 
         
-    return tQueryText
+    return pStatus
 ]]></Implementation>
 </Method>
 
@@ -237,10 +242,12 @@ Using dashboard name get JSON representation (array of ("type","title","mdx")) o
 <Implementation><![CDATA[
     #Dim widgets As List Of %DeepSee.Dashboard.Widget
     #Dim widget As %DeepSee.Dashboard.Widget
+    set widgetlist = ##class(%ZEN.proxyObject).%New()
+    set widgetlist.children = ##class(%ListOfObjects).%New()
     
     set st = $$$OK
     try {
-        
+
         &sql(
             SELECT TOP 1 ID into :tDashId
             FROM %DeepSee_Dashboard.Definition
@@ -257,18 +264,52 @@ Using dashboard name get JSON representation (array of ("type","title","mdx")) o
         set widget = widgets.GetNext(.key)
         
         do {
+	        set obj = ##class(%ZEN.proxyObject).%New()
+	                
 	        &sql(SELECT cubeName into :cube FROM %DeepSee_Dashboard.Pivot WHERE fullName=:widget.dataSource)
 			set:(SQLCODE'=0) cube=""
 			
-			set mdx = ..GetMdx(widget.dataSource, .st)
+			set st = ..GetMdx(widget.dataSource, .mdx, .basemdx)
 			return:($$$ISERR(st)) st
 			
-            set out(key) =$lb(widget.subtype, widget.title, widget.key, mdx, widget.dataSource, widget.drillDownDataSource, cube)
-
+			set obj.mdx = mdx
+			set obj.basemdx = basemdx
+			set obj.type =widget.subtype
+			set obj.title = widget.title
+			set obj.key =  widget.key 
+			set obj.dataSource = widget.dataSource
+			set obj.drillDownDataSource = widget.drillDownDataSource
+			set obj.cube = cube
+			set obj.controls = ##class(%ListOfObjects).%New()
+		
+			for k=1:1:widget.controls.Count()
+			{				
+				set control = widget.controls.GetAt(k)
+				set controlobj = ##class(%ZEN.proxyObject).%New()
+				set controlobj.action = control.action 
+				set controlobj.label  = control.label  
+				set controlobj.location  = control.location  
+				set controlobj.readOnly  = control.readOnly  
+				set controlobj.name  = control.name  
+				set controlobj.size  = control.size  
+				set controlobj.target  = control.target  
+				set controlobj.targetProperty   = control.targetProperty   
+				set controlobj.targetPropertyDisplay   = control.targetPropertyDisplay   
+				set controlobj.text   = control.text 
+				set controlobj.timeout   = control.timeout 
+				set controlobj.title   = control.title 
+				set controlobj.type   = control.type 
+				set controlobj.typeDisplay   = control.typeDisplay 
+				set controlobj.value    = control.value  
+				set controlobj.valueList    = control.valueList 
+				do obj.controls.Insert(controlobj)
+			}
+			
+			do widgetlist.children.Insert(obj)
             set widget = widgets.GetNext(.key)
         } while (key'="")
-
-        do ##class(%ZEN.Auxiliary.jsonProvider).%ArrayToJSON($lb("type","title","key","mdx","dataSource","drillDownDataSource","cube"),.out)
+        
+        do widgetlist.%ToJSON()
         
     } catch ex {
         set st = ex.AsStatus()
