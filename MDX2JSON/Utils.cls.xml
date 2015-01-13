@@ -306,7 +306,7 @@ Using dashboard name get JSON representation (array of ("type","title","mdx")) o
 					set expression = $G(^DeepSee.User.Settings(name,"value"))
 					set global = $R(1000000)
 					set @("^mdxtemp("_global_")="_expression)
-					set controlobj.value = ^mdxtemp(global)
+					set controlobj.value = "&[" _ ^mdxtemp(global) _ "]"
 					kill ^mdxtemp(global)
 				} else {
 					set controlobj.value = control.value 
