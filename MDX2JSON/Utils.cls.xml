@@ -300,7 +300,17 @@ Using dashboard name get JSON representation (array of ("type","title","mdx")) o
 				set controlobj.title   = control.title 
 				set controlobj.type   = control.type 
 				set controlobj.typeDisplay   = control.typeDisplay 
-				set controlobj.value    = control.value  
+				if $e(control.value)="@" {
+					// Very ugly hack
+					set name = $e(control.value,2,*)
+					set expression = $G(^DeepSee.User.Settings(name,"value"))
+					set global = $R(1000000)
+					set @("^mdxtemp("_global_")="_expression)
+					set controlobj.value = ^mdxtemp(global)
+					kill ^mdxtemp(global)
+				} else {
+					set controlobj.value = control.value 
+				}  
 				set controlobj.valueList    = control.valueList 
 				do obj.controls.Insert(controlobj)
 			}
