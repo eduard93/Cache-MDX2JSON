@@ -290,6 +290,8 @@ Add param Namespace to a request to execute MDX in desired namespace.]]></Descri
 	#dim %session As %CSP.Session
 	 
 	set %response.ContentType="text/json"
+	set %session.Language=$$MatchLanguage^%occMessages(%request.GetCgiEnv("HTTP_ACCEPT_LANGUAGE"),"%CSP","+s") // Localization support
+	
     //do %response.SetHeader("Access-Control-Allow-Origin","*")
     //do %response.SetHeader("Access-Control-Allow-Headers","Authorization")
     //return:($ZCVT(pMethod,"U") = "OPTIONS") $$$OK
