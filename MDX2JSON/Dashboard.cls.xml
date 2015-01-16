@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Export generator="Cache" version="25">
 <Class name="MDX2JSON.Dashboard">
+<IncludeCode>MDX2JSON.MDX2JSON</IncludeCode>
 <TimeCreated>63568,54242.448605</TimeCreated>
 
 <Method name="OpenDashboardByName">
