@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="MDX2JSON.Dashboard">
+<TimeCreated>63568,54242.448605</TimeCreated>
+
+<Method name="OpenDashboardByName">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>DashName:%Integer,*Dashboard:%DeepSee.Dashboard.Definition</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	 &sql(
+        SELECT TOP 1 ID into :tDashId
+        FROM %DeepSee_Dashboard.Definition
+        WHERE fullName=:DashName
+     )
+     return:(SQLCODE'=0) $$$ERROR($$$SQLError, SQLCODE)
+     
+	 set Dashboard = ##class(%DeepSee.Dashboard.Definition).%OpenId(tDashId,,.st)
+	 return st
+]]></Implementation>
+</Method>
+
+<Method name="WidgetsToProxyObject">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>Dashboard:%DeepSee.Dashboard.Definition,*Widgetlist:%ZEN.proxyObject</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+    #Dim widget As %DeepSee.Dashboard.Widget
+    set Widgetlist = ##class(%ZEN.proxyObject).%New()
+    set Widgetlist.children = ##class(%ListOfObjects).%New()
+    
+    set st = $$$OK
+    try {
+        set widget = Dashboard.widgets.GetNext(.key)
+        
+        do {
+	        set obj = ##class(%ZEN.proxyObject).%New()
+	                
+	        &sql(SELECT cubeName into :cube FROM %DeepSee_Dashboard.Pivot WHERE fullName=:widget.dataSource)
+			set:(SQLCODE'=0) cube=""
+			
+			set st = ..GetMdx(widget.dataSource, .mdx, .basemdx)
+			return:($$$ISERR(st)) st
+			
+			set obj.mdx = mdx
+			set obj.basemdx = basemdx
+			set obj.type =widget.subtype
+			set obj.title = widget.title
+			set obj.key =  widget.key 
+			set obj.dataSource = widget.dataSource
+			set obj.drillDownDataSource = widget.drillDownDataSource
+			set obj.cube = cube
+			set obj.controls = ##class(%ListOfObjects).%New()
+		
+			for k=1:1:widget.controls.Count()
+			{				
+				set control = widget.controls.GetAt(k)
+				set controlobj = ##class(%ZEN.proxyObject).%New()
+				set controlobj.action = control.action 
+				set controlobj.label  = control.label  
+				set controlobj.location  = control.location  
+				set controlobj.readOnly  = control.readOnly  
+				set controlobj.name  = control.name  
+				set controlobj.size  = control.size  
+				set controlobj.target  = control.target  
+				set controlobj.targetProperty   = control.targetProperty   
+				set controlobj.targetPropertyDisplay   = control.targetPropertyDisplay   
+				set controlobj.text   = control.text 
+				set controlobj.timeout   = control.timeout 
+				set controlobj.title   = control.title 
+				set controlobj.type   = control.type 
+				set controlobj.typeDisplay   = control.typeDisplay 
+				if $e(control.value)="@" {
+					// Very ugly hack
+					set name = $e(control.value,2,*)
+					set expression = $G(^DeepSee.User.Settings(name,"value"))
+					set global = $R(1000000)
+					set @("^mdxtemp("_global_")="_expression)
+					set controlobj.value = "&[" _ ^mdxtemp(global) _ "]"
+					kill ^mdxtemp(global)
+				} else {
+					set controlobj.value = control.value 
+				}  
+				set controlobj.valueList    = control.valueList 
+				do obj.controls.Insert(controlobj)
+			}
+			
+			do Widgetlist.children.Insert(obj)
+            set widget = Dashboard.widgets.GetNext(.key)
+        } while (key'="")        
+    } catch ex {
+        set st = ex.AsStatus()
+        do ex.Log() 
+    }
+    return st
+]]></Implementation>
+</Method>
+
+<Method name="GetMdx">
+<Description><![CDATA[
+Returns MDX string used to create pivot.<br>
+<b>pPivotName</b> - fullname of pivot. Eg: "KPIs & Plugins/HoleFoods.pivot". Case insensitive.<br>
+<b>pStatus</b> - Status of query execution.<br>]]></Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>pPivotName:%String,*MDX,*BaseNDX</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	#dim tPivot As %DeepSee.Dashboard.Pivot
+	#dim tPivotTable As %DeepSee.Component.pivotTable
+    set tPivot = ##class(%DeepSee.UserLibrary.Utils).%OpenFolderItem(pPivotName,.pStatus)
+
+    return:$$$ISERR(pStatus)
+
+    set tPivotTable = ##class(%DeepSee.Component.pivotTable).%New()
+    set pStatus = tPivot.%CopyToComponent(tPivotTable)
+    return:$$$ISERR(pStatus)
+    
+    set rs = tPivotTable.%CreateResultSet(.pStatus,.tParms,.tFilterInfo,.tAdvancedFilters,.BaseNDX) // returns tQueryText - mdx without filters
+	return:$$$ISERR(pStatus)
+	
+	set pStatus = tPivotTable.%GetFilterInfo(.tFilterInfo,.pAdvancedFilters)
+	return:$$$ISERR(pStatus)
+	
+	if (($d(tFilterInfo)=0) &&($d(pAdvancedFilters)=0)) {
+		set MDX = BaseNDX // no filters, so we're good
+	} else {
+		set rs = tPivotTable.%CreateResultSet(.pStatus,.tParms,.tFilterInfo,.tAdvancedFilters,.MDX) // returns tQueryText - mdx with filters
+		return:$$$ISERR(pStatus)		
+	} 
+        
+    return pStatus
+]]></Implementation>
+</Method>
+
+<Storage name="Default">
+<Type>%Library.CacheStorage</Type>
+</Storage>
+</Class>
+</Export>
