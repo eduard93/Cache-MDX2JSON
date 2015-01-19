@@ -219,21 +219,5 @@ Using dashboard name get JSON representation (array of ("type","title","mdx")) o
     return st
 ]]></Implementation>
 </Method>
-
-<Method name="Export">
-<Description>
-Export project
-do ##class(MDX2JSON.Utils).Export()</Description>
-<Internal>1</Internal>
-<ClassMethod>1</ClassMethod>
-<ReturnType>%Status</ReturnType>
-<Implementation><![CDATA[
-    set list = "MDX2JSON.ResultSet.cls,MDX2JSON.REST.cls,MDX2JSON.Utils.cls,MDX2JSON.MDX2JSON.inc"
-    set path = "/InterSystems/Cache2014/csp/sys/mdx2json "_$ZSTRIP($ZDT($NOW(),3,2),"*",":-")_".xml"
-    set st=$system.OBJ.Export(list,path)
-    w $System.Status.GetErrorText(st)
-    return st
-]]></Implementation>
-</Method>
 </Class>
 </Export>

@@ -50,7 +50,6 @@ webapplication/MDX?Namespace=Samples<br>]]></Description>
    <Route Url="/FilterValues/:cube/:filter" Method="GET" Call="WriteFilterValues"/> 
    
    <!-- Get info about widgets-->
-   <Route Url="/Widgets" Method="GET" Call="GetWidgets"/>    
    <Route Url="/Dashboards" Method="GET" Call="GetDashboardList"/> 
    <Route Url="/Widgets" Method="POST" Call="GetWidgetsList"/>
        
