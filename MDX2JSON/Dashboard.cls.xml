@@ -5,10 +5,15 @@
 <TimeCreated>63568,54242.448605</TimeCreated>
 
 <Method name="OpenDashboardByName">
+<Description><![CDATA[
+Opens DeepSee dashboard by it's name. Returns status of aatempt to locate and open dashboard.
+<b>DashName</b> - fullName property of %DeepSee.Dashboard.Definition class.<br>
+<b>Dashboard</b> - OREF to opened dashboard would be passed here upon successfull execution.]]></Description>
 <ClassMethod>1</ClassMethod>
 <FormalSpec>DashName:%Integer,*Dashboard:%DeepSee.Dashboard.Definition</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
+	 kill Dashboard
 	 &sql(
         SELECT TOP 1 ID into :tDashId
         FROM %DeepSee_Dashboard.Definition
@@ -22,6 +27,8 @@
 </Method>
 
 <Method name="WidgetsToProxyObject">
+<Description>
+Converts %DeepSee.Dashboard.Definition widgets into %ZEN.proxyObject.</Description>
 <ClassMethod>1</ClassMethod>
 <FormalSpec>Dashboard:%DeepSee.Dashboard.Definition,*Widgetlist:%ZEN.proxyObject</FormalSpec>
 <ReturnType>%Status</ReturnType>
@@ -32,68 +39,87 @@
     
     set st = $$$OK
     try {
-        set widget = Dashboard.widgets.GetNext(.key)
-        
-        do {
-	        set obj = ##class(%ZEN.proxyObject).%New()
-	                
-	        &sql(SELECT cubeName into :cube FROM %DeepSee_Dashboard.Pivot WHERE fullName=:widget.dataSource)
-			set:(SQLCODE'=0) cube=""
-			
-			set st = ..GetMdx(widget.dataSource, .mdx, .basemdx)
-			return:($$$ISERR(st)) st
-			
-			set obj.mdx = mdx
-			set obj.basemdx = basemdx
-			set obj.type =widget.subtype
-			set obj.title = widget.title
-			set obj.key =  widget.key 
-			set obj.dataSource = widget.dataSource
-			set obj.drillDownDataSource = widget.drillDownDataSource
-			set obj.cube = cube
-			set obj.controls = ##class(%ListOfObjects).%New()
-		
-			for k=1:1:widget.controls.Count()
-			{				
-				set control = widget.controls.GetAt(k)
-				set controlobj = ##class(%ZEN.proxyObject).%New()
-				set controlobj.action = control.action 
-				set controlobj.label  = control.label  
-				set controlobj.location  = control.location  
-				set controlobj.readOnly  = control.readOnly  
-				set controlobj.name  = control.name  
-				set controlobj.size  = control.size  
-				set controlobj.target  = control.target  
-				set controlobj.targetProperty   = control.targetProperty   
-				set controlobj.targetPropertyDisplay   = control.targetPropertyDisplay   
-				set controlobj.text   = control.text 
-				set controlobj.timeout   = control.timeout 
-				set controlobj.title   = control.title 
-				set controlobj.type   = control.type 
-				set controlobj.typeDisplay   = control.typeDisplay 
-				if $e(control.value)="@" {
-					// Very ugly hack
-					set name = $e(control.value,2,*)
-					set expression = $G(^DeepSee.User.Settings(name,"value"))
-					set global = $R(1000000)
-					set @("^mdxtemp("_global_")="_expression)
-					set controlobj.value = "&[" _ ^mdxtemp(global) _ "]"
-					kill ^mdxtemp(global)
-				} else {
-					set controlobj.value = control.value 
-				}  
-				set controlobj.valueList    = control.valueList 
-				do obj.controls.Insert(controlobj)
-			}
-			
-			do Widgetlist.children.Insert(obj)
-            set widget = Dashboard.widgets.GetNext(.key)
-        } while (key'="")        
+	    for i=1:1:Dashboard.widgets.Count() {
+			do Widgetlist.children.Insert(..WidgetToProxyObject(Dashboard.widgets.GetAt(i)))
+        }         
     } catch ex {
         set st = ex.AsStatus()
         do ex.Log() 
     }
     return st
+]]></Implementation>
+</Method>
+
+<Method name="WidgetToProxyObject">
+<Description>
+Converts relevant parts of %DeepSee.Dashboard.Widget object into %ZEN.proxyObject.</Description>
+<Internal>1</Internal>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>Widget:%DeepSee.Dashboard.Widget</FormalSpec>
+<ReturnType>%ZEN.proxyObject</ReturnType>
+<Implementation><![CDATA[
+    set obj = ##class(%ZEN.proxyObject).%New()
+            
+    &sql(SELECT cubeName into :cube FROM %DeepSee_Dashboard.Pivot WHERE fullName=:Widget.dataSource)
+	set:(SQLCODE'=0) cube=""
+	
+	set st = ..GetMdx(Widget.dataSource, .mdx, .basemdx)
+	//return:($$$ISERR(st)) st //all checks passed beforehand
+	
+	set obj.mdx = mdx
+	set obj.basemdx = basemdx
+	set obj.type =Widget.subtype
+	set obj.title = Widget.title
+	set obj.key =  Widget.key 
+	set obj.dataSource = Widget.dataSource
+	set obj.drillDownDataSource = Widget.drillDownDataSource
+	set obj.cube = cube
+	set obj.controls = ##class(%ListOfObjects).%New()
+
+	for i=1:1:Widget.controls.Count()
+	{
+		do obj.controls.Insert(..WidgetControlToProxyObject(Widget.controls.GetAt(i)))
+	}
+	return obj
+]]></Implementation>
+</Method>
+
+<Method name="WidgetControlToProxyObject">
+<Description>
+Converts %DeepSee.Dashboard.Control object into %ZEN.proxyObject, handles run-time DeepSee variables.</Description>
+<Internal>1</Internal>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>Control:%DeepSee.Dashboard.Control</FormalSpec>
+<ReturnType>%ZEN.proxyObject</ReturnType>
+<Implementation><![CDATA[
+	set obj = ##class(%ZEN.proxyObject).%New()
+	set obj.action = Control.action 
+	set obj.label = Control.label  
+	set obj.location = Control.location  
+	set obj.readOnly = Control.readOnly  
+	set obj.name = Control.name  
+	set obj.size = Control.size  
+	set obj.target = Control.target  
+	set obj.targetProperty = Control.targetProperty   
+	set obj.targetPropertyDisplay = Control.targetPropertyDisplay   
+	set obj.text = Control.text 
+	set obj.timeout = Control.timeout 
+	set obj.title = Control.title 
+	set obj.type = Control.type 
+	set obj.typeDisplay = Control.typeDisplay 
+	if ($e(Control.value)="@") {
+		set name = $e(Control.value,2,*)
+		set value = ##class(%DeepSee.UserPortal.Utils).%GetUserSetting(name,.st)
+		if $e(value,1,2)="&[" {
+			set obj.value = value
+		} else {
+			set obj.value = "&[" _ value _ "]"
+		}
+	} else {
+		set obj.value = Control.value 
+	}  
+	set obj.valueList = Control.valueList
+	return obj
 ]]></Implementation>
 </Method>
 
