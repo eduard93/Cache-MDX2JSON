@@ -1,8 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Export generator="Cache" version="25">
 <Class name="MDX2JSON.Dashboard">
+<Description>
+Class with methods related to DeepSee Dashboard and Widget processing.</Description>
 <IncludeCode>MDX2JSON.MDX2JSON</IncludeCode>
 <TimeCreated>63568,54242.448605</TimeCreated>
+
+<Parameter name="folderName">
+<Description>
+Folder, from which we get Dashboards.</Description>
+<Type>%String</Type>
+<Default>Mobile</Default>
+</Parameter>
+
+<Method name="GetDashboardListSQL">
+<Description>
+Get SQL for folder, from which we get Dashboards. </Description>
+<ClassMethod>1</ClassMethod>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[	return "SELECT title, fullName As path FROM %DeepSee_Dashboard.Definition WHERE folderName = '" _ ##class(MDX2JSON.Dashboard).#folderName _"'"
+]]></Implementation>
+</Method>
 
 <Method name="OpenDashboardByName">
 <Description><![CDATA[

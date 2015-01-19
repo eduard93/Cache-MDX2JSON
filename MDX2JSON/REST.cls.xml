@@ -51,7 +51,7 @@ webapplication/MDX?Namespace=Samples<br>]]></Description>
    
    <!-- Get info about widgets-->
    <Route Url="/Widgets" Method="GET" Call="GetWidgets"/>    
-   <Route Url="/Dashboards" Method="GET" Call="GetDashboardsList"/> 
+   <Route Url="/Dashboards" Method="GET" Call="GetDashboardList"/> 
    <Route Url="/Widgets" Method="POST" Call="GetWidgetsList"/>
        
    <!-- Get info about pivot-->
@@ -106,15 +106,14 @@ Converts incoming request object (JSON: {Dashboard:"Dashboard Full Name"} and ca
 ]]></Implementation>
 </Method>
 
-<Method name="GetDashboardsList">
+<Method name="GetDashboardList">
 <Description>
 Returns JSON array of (title, path) for all dashboards in namespace (accessible to current user).</Description>
 <ClassMethod>1</ClassMethod>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-    set sql = "SELECT title, fullName As path FROM %DeepSee_Dashboard.Definition WHERE folderName = 'Mobile'"
-    try {
-        
+    set sql = ##class(MDX2JSON.Dashboard).GetDashboardListSQL()
+    try {        
         do ##class(%ZEN.Auxiliary.jsonSQLProvider).%WriteJSONFromSQL(,sql)
     } catch ex {
         write $$$ZENJSSTR($System.Status.GetErrorText(ex.AsStatus()))
