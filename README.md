@@ -73,3 +73,15 @@ If something goes wrong, server must report an error in the following format {Er
 | No dashboards               | Configure roles. Change [dashboard scope](https://github.com/intersystems-ru/Cache-MDX2JSON/issues/10)|
 | DeepSee errors              | Build and compile DeepSee cube(s)|
 | MDX errors                  | Don't forget to escape JSON strings [here](http://json.org/string.gif) |
+
+Debugging
+-----------
+
+Use $$$Debug macro. It would evaluate as true only if there is a "Debug" URL parameter present. Example request URL:
+
+        http://localhost:57772/MDX2JSON/MDX?Namespace=Samples&Debug
+		
+Use with postconditional expressions, or other flow control statements
+
+		w:$$$Debug "debugging"
+		if $$$Debug { w "debugging" } else { w "not debugging"}

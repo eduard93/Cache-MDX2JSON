@@ -373,7 +373,7 @@ Add param Namespace to a request to execute MDX in desired namespace.]]></Descri
                 If tTarget[":" Set tClass=$Piece(tTarget,":"),tTarget=$Piece(tTarget,":",2)
                 
                 #; Dispatch
-                
+                w:$$$Debug tTarget
                 
                 if (Namespace'=$Namespace) {
                     set oldNS = $Namespace
