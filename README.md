@@ -56,6 +56,11 @@ Result: http://pastebin.com/XddMUPHX
 
 Please note that corresponding cube must be compiled and built beforehand.
 
+Localization
+-----------
+
+If requested data or meta-information is available in several different languages, you can choose one, by supplying Accept-Language header to your HTTP request, formed in accordance with [RFC 2616](http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.4). 
+
 Troubleshooting
 -----------
 
