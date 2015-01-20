@@ -59,7 +59,7 @@ Please note that corresponding cube must be compiled and built beforehand.
 Troubleshooting
 -----------
 
-If something goes wrong, server must report an error in the following format { Error : "Error description" }, and usually that is a good indicator of what went wrong. If you received an error in another format or an error without "Error description" please file an issue [here](https://github.com/intersystems-ru/Cache-MDX2JSON/issues/8).
+If something goes wrong, server must report an error in the following format {Error : "Error description"}, and usually that is a good indicator of what went wrong. If you received an error in another format or an error without "Error description" please file an issue [here](https://github.com/intersystems-ru/Cache-MDX2JSON/issues/8).
 
 | Problem                     | Solution                         | 
 |-----------------------------|----------------------------------|
