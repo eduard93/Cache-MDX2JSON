@@ -84,6 +84,7 @@ Converts request into UTF8. Converts request into proxyObject. ]]></Description>
 	set content = $ZCVT(content,"I","UTF8") 
 	set st = ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(content,,.obj,1)
 	return:$$$ISERR(st) st
+	return:'$IsObject(obj) $$$ERROR($$$ArgumentIsNotAnObject,"Body")
 
 	return:'$d(obj.%data(tBody)) $$$ERROR($$$PropertyRequired,tBody)
 	
@@ -116,16 +117,7 @@ Wrapper for ##class(MDX2JSON.Utils).GetWidgetsList()<br>
 Converts incoming request object (JSON: {Dashboard:"Dashboard Full Name"} and calls abovementioned method.]]></Description>
 <ClassMethod>1</ClassMethod>
 <ReturnType>%Status</ReturnType>
-<Implementation><![CDATA[
-	set st = ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(%request.Content,,.obj,1)
-    return:$$$ISERR(st) st
-    
-    set dashboard = obj.Dashboard
-    set dashboard = $ZCVT(dashboard,"I","UTF8")
-    
-    set st = ##class(MDX2JSON.Utils).GetWidgetsList(dashboard)
-   
-    return st
+<Implementation><![CDATA[    return ##class(MDX2JSON.Utils).GetWidgetsList(%request.Content.Dashboard)
 ]]></Implementation>
 </Method>
 
@@ -151,15 +143,7 @@ Wrapper for ##class(MDX2JSON.Utils).WriteDrillthroughJSON(pMDX).<br>
 Converts incoming request object and calls abovementioned method.]]></Description>
 <ClassMethod>1</ClassMethod>
 <ReturnType>%Status</ReturnType>
-<Implementation><![CDATA[
-    set st = $$$OK
-    set obj = ##class(%ZEN.proxyObject).%New()
-    set st = ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(%request.Content,,.obj,1)
-    return:$$$ISERR(st) st
-    set tMDX = obj.MDX
-    set tMDX = $ZCVT(tMDX,"I","UTF8")
-    set st = ##class(MDX2JSON.Utils).WriteDrillthroughJSON(tMDX)
-    return st
+<Implementation><![CDATA[    return ##class(MDX2JSON.Utils).WriteDrillthroughJSON(%request.Content.MDX)
 ]]></Implementation>
 </Method>
 
@@ -172,9 +156,9 @@ Do not use.</Description>
 <FormalSpec>MDX:%String</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-  set MDX = $ZCONVERT($ZCONVERT(MDX ,"I","URL") ,"I","UTF8")
-  set st = ##class(MDX2JSON.Utils).WriteJSONfromMDX(MDX)
-  quit st
+	set MDX = $ZCONVERT($ZCONVERT(MDX ,"I","URL") ,"I","UTF8")
+  	set st = ##class(MDX2JSON.Utils).WriteJSONfromMDX(MDX)
+  	quit st
 ]]></Implementation>
 </Method>
 
@@ -187,9 +171,9 @@ Do not use.</Description>
 <FormalSpec>MDX:%String</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-  set MDX = $ZCONVERT($ZCONVERT(MDX ,"I","URL") ,"I","UTF8")
-  set st = ##class(MDX2JSON.Utils).WriteFiltersForMDX(MDX)
-  quit st
+	set MDX = $ZCONVERT($ZCONVERT(MDX ,"I","URL") ,"I","UTF8")
+	set st = ##class(MDX2JSON.Utils).WriteFiltersForMDX(MDX)
+	quit st
 ]]></Implementation>
 </Method>
 
@@ -200,9 +184,9 @@ Wrapper for ##class(MDX2JSON.Utils).WriteFiltersForCube(pCube)</Description>
 <FormalSpec>Cube:%String</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-  set Cube = $ZCONVERT($ZCONVERT(Cube ,"I","URL") ,"I","UTF8")
-  set st = ##class(MDX2JSON.Utils).WriteFiltersForCube(Cube)
-  quit st
+	set Cube = $ZCONVERT($ZCONVERT(Cube ,"I","URL") ,"I","UTF8")
+	set st = ##class(MDX2JSON.Utils).WriteFiltersForCube(Cube)
+	quit st
 ]]></Implementation>
 </Method>
 
@@ -212,14 +196,8 @@ Wrapper for ##class(MDX2JSON.Utils).WriteFilterValues(pCupe, pFilter)</Descripti
 <ClassMethod>1</ClassMethod>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-	
-    set st = ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(%request.Content,,.obj,1)    
-    return:$$$ISERR(st) st
-    return:'$IsObject(obj) $$$ERROR($$$ArgumentIsNotAnObject,"Body")
-    
-    set Cube = obj.Cube
-    set Values = obj.Values
-    set Cube = $ZCVT(Cube,"I","UTF8")
+	set Cube = %request.Content.Cube
+    set Values = %request.Content.Values
     
    	set st = ##class(MDX2JSON.Utils).WriteFiltersForCube(Cube,Values)
   	return st
@@ -245,19 +223,10 @@ Wrapper for ##class(MDX2JSON.Utils).WriteFilterValues(pCupe, pFilter)</Descripti
 Wrapper for ##class(MDX2JSON.Utils).WriteJSONPfromMDX(pMDX)<br>
 Converts incoming request object and calls abovementioned method.]]></Description>
 <ClassMethod>1</ClassMethod>
-<ProcedureBlock>0</ProcedureBlock>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-   
-    set st = ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(%request.Content,,.obj,1)    
- 
-    return:$$$ISERR(st) st
-    return:'$IsObject(obj) $$$ERROR($$$ArgumentIsNotAnObject,"Body")
-    
     try {
-        set tMDX = obj.MDX
-        set tMDX = $ZCVT(tMDX,"I","UTF8")
-        set st = ##class(MDX2JSON.Utils).WriteJSONfromMDX(tMDX)
+        set st = ##class(MDX2JSON.Utils).WriteJSONfromMDX(%request.Content.MDX)
     } catch ex {
         set st=ex.AsStatus()
     }
@@ -272,13 +241,7 @@ Wrapper for ##class(MDX2JSON.Utils).WriteJSONPfromMDX(pMDX)<br>
 Converts incoming request object and calls abovementioned method.]]></Description>
 <ClassMethod>1</ClassMethod>
 <ReturnType>%Status</ReturnType>
-<Implementation><![CDATA[
-    set st = $$$OK
-    set obj = ##class(%ZEN.proxyObject).%New()
-    set st = ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(%request.Content,,.obj,1)
-    quit:$$$ISERR(st) st
-    set st = ##class(MDX2JSON.Utils).WriteJSONPfromMDX(obj.MDX)
-    quit st
+<Implementation><![CDATA[    return ##class(MDX2JSON.Utils).WriteJSONPfromMDX(%request.Content.MDX)
 ]]></Implementation>
 </Method>
 
@@ -288,13 +251,7 @@ Wrapper for ##class(MDX2JSON.Utils).WriteXMLAfromMDX(pMDX)<br>
 Converts incoming request object and calls abovementioned method.]]></Description>
 <ClassMethod>1</ClassMethod>
 <ReturnType>%Status</ReturnType>
-<Implementation><![CDATA[
-    set st=$$$OK
-    set obj = ##class(%ZEN.proxyObject).%New()
-    set st = ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(%request.Content,,.obj,1)
-    quit:$$$ISERR(st) st
-    set st = ##class(MDX2JSON.Utils).WriteXMLAfromMDX(obj.MDX)
-    quit st
+<Implementation><![CDATA[    return ##class(MDX2JSON.Utils).WriteXMLAfromMDX(%request.Content.MDX)
 ]]></Implementation>
 </Method>
 </Class>
