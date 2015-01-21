@@ -69,7 +69,7 @@ webapplication/MDX?Namespace=Samples<br>]]></Description>
 <Method name="ValidateRequest">
 <Description><![CDATA[
 Validates incoming request body against Body Route attribute.<br>
-Converts request into UTF8. Converts request into proxyObject. ]]></Description>
+Converts request body into UTF8 proxyObject. ]]></Description>
 <ClassMethod>1</ClassMethod>
 <FormalSpec>pMethod:%String,tBody:%String</FormalSpec>
 <ReturnType>%Status</ReturnType>
