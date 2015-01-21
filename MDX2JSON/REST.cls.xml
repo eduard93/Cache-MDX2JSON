@@ -39,22 +39,22 @@ webapplication/MDX?Namespace=Samples<br>]]></Description>
 <Data><![CDATA[
 <Routes>
     <!-- Send objects in this format: {"MDX":"QUERY"} HTTP method: POST -->
-   <Route Url="/MDX" Method="POST" Call="WriteJSONfromMDX"/>
-   <Route Url="/MDX2JSONP" Method="POST" Call="WriteJSONPfromMDX"/>  
-   <Route Url="/MDXDrillthrough" Method="POST" Call="WriteDrillthroughJSON"/>
-   <Route Url="/MDX2XMLA" Method="POST" Call="WriteXMLAfromMDX"/>  
+   <Route Url="/MDX" Method="POST" Call="WriteJSONfromMDX" Body="MDX"/>
+   <Route Url="/MDX2JSONP" Method="POST" Call="WriteJSONPfromMDX" Body="MDX"/>  
+   <Route Url="/MDXDrillthrough" Method="POST" Call="WriteDrillthroughJSON" Body="MDX"/>
+   <Route Url="/MDX2XMLA" Method="POST" Call="WriteXMLAfromMDX" Body="MDX"/>  
 
    <!-- Get info about availible filters and their values -->
    <Route Url="/FilterValues/:cube" Method="GET" Call="WriteFiltersForCube"/>
-   <Route Url="/FilterValues" Method="POST" Call="WriteFilterValuesForCube"/>
+   <Route Url="/FilterValues" Method="POST" Call="WriteFilterValuesForCube" Body="Cube"/>
    <Route Url="/FilterValues/:cube/:filter" Method="GET" Call="WriteFilterValues"/> 
    
    <!-- Get info about widgets-->
    <Route Url="/Dashboards" Method="GET" Call="GetDashboardList"/> 
-   <Route Url="/Widgets" Method="POST" Call="GetWidgetsList"/>
+   <Route Url="/Widgets" Method="POST" Call="GetWidgetsList" Body="Dashboard"/>
        
    <!-- Get info about pivot-->
-   <Route Url="/DataSource" Method="POST" Call="GetDataSource"/>   
+   <Route Url="/DataSource" Method="POST" Call="GetDataSource" Body="DataSource"/>   
      
    <!-- Valid but illicit, do not use-->
    <Route Url="/MDX/:query" Method="GET" Call="WriteJSONfromMDXURL"/>  
@@ -65,6 +65,32 @@ webapplication/MDX?Namespace=Samples<br>]]></Description>
  </Routes>
 ]]></Data>
 </XData>
+
+<Method name="ValidateRequest">
+<Description><![CDATA[
+Validates incoming request body against Body Route attribute.<br>
+Converts request into UTF8. Converts request into proxyObject. ]]></Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>pMethod:%String,tBody:%String</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	#dim %request As %CSP.Request
+	#dim obj As %ZEN.proxyObject
+	
+	return:(pMethod'="POST") $$$OK
+	
+	// Convert request body into UTF8 proxyObject
+	set content = %request.Content.Read($$$MaxStringLength)
+	set content = $ZCVT(content,"I","UTF8") 
+	set st = ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(content,,.obj,1)
+	return:$$$ISERR(st) st
+
+	return:'$d(obj.%data(tBody)) $$$ERROR($$$PropertyRequired,tBody)
+	
+	set %request.Content = obj
+	return $$$OK
+]]></Implementation>
+</Method>
 
 <Method name="Test">
 <Description><![CDATA[
@@ -79,11 +105,8 @@ Test method, outputs <b>%request</b>, <b>%response</b> and <b>%session</b> objec
 
 <Method name="GetDataSource">
 <ClassMethod>1</ClassMethod>
-<Implementation><![CDATA[
-    set st = ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(%request.Content,,.obj,1)
-    return:$$$ISERR(st) st
-    set dataSource = $ZCVT(obj.DataSource,"I","UTF8")
-    return ##class(MDX2JSON.Utils).GetDataSource(dataSource)
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[    return ##class(MDX2JSON.Utils).GetDataSource(%request.Content.DataSource)
 ]]></Implementation>
 </Method>
 
@@ -92,6 +115,7 @@ Test method, outputs <b>%request</b>, <b>%response</b> and <b>%session</b> objec
 Wrapper for ##class(MDX2JSON.Utils).GetWidgetsList()<br>
 Converts incoming request object (JSON: {Dashboard:"Dashboard Full Name"} and calls abovementioned method.]]></Description>
 <ClassMethod>1</ClassMethod>
+<ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
 	set st = ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(%request.Content,,.obj,1)
     return:$$$ISERR(st) st

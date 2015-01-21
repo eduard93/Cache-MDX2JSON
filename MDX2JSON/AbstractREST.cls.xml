@@ -103,6 +103,11 @@ Add param Namespace to a request to execute MDX in desired namespace.]]></Descri
                 Set tClass=$classname()
                 If tTarget[":" Set tClass=$Piece(tTarget,":"),tTarget=$Piece(tTarget,":",2)
                 
+                #; Validate input
+                set tBody = $List(tMapEntry,4) 
+                set tSC = ..ValidateRequest(pMethod,tBody)
+                If $$$ISERR(tSC) Do ..Http500(tSC) Quit
+                
                 #; Dispatch                
                 if (Namespace'=$Namespace) {
                     set oldNS = $Namespace
@@ -134,6 +139,17 @@ Add param Namespace to a request to execute MDX in desired namespace.]]></Descri
     If ..#UseSession=0 Set %session.EndSession=1
     
     Quit tSC
+]]></Implementation>
+</Method>
+
+<Method name="ValidateRequest">
+<Description><![CDATA[
+Validates incoming request against Body Route attribute.<br>
+Converts request into UTF8. Converts request into proxyObject. ]]></Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>pMethod:%String,tBody:%String</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[	return $$$OK
 ]]></Implementation>
 </Method>
 
@@ -256,8 +272,8 @@ This project creates the DispatchMethod used to dispatch the Url and Method to t
                     }
                 }
                
-                Set tCounter=$Increment(tCounter),tMethod=tMap(tChild,"a","Method"),tDispatch=tMap(tChild,"a","Call")
-                $$$GENERATE(" If pIndex="_tCounter_" Quit $ListBuild("""_tPattern_""","""_tMethod_""","""_tDispatch_""")")
+                Set tCounter=$Increment(tCounter),tMethod=tMap(tChild,"a","Method"),tDispatch=tMap(tChild,"a","Call"),tBody=$g(tMap(tChild,"a","Body"))
+                $$$GENERATE(" If pIndex="_tCounter_" Quit $ListBuild("""_tPattern_""","""_tMethod_""","""_tDispatch_""","""_tBody_""")")
             }
             $$$GENERATE(" Quit """"")
                 
@@ -291,6 +307,7 @@ This is the Schema which defines the form of the dispatch map</Description>
 <xs:attribute name="Url"    type="string" use="required"/>
 <xs:attribute name="Method" type="string" use="required"/>
 <xs:attribute name="Call" type="call" use="required"/>
+<xs:attribute name="Body" type="string" use="optional"/>
 </xs:complexType>
 </xs:element>
 </xs:sequence>
