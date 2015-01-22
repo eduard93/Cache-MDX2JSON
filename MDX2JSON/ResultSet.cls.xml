@@ -38,9 +38,9 @@ Converts ResultSet to %ZEN.proxyObject.<br>
 	}
 	
 	try {                                       
-	    set obj.Info = ..InfoToJSON() // basic info about cube and query
-	    set obj.Cols = ..AxesToJSON() // all axes
-	    set obj.Data = ..DataToJSON() // array of all cells, left-to-right, up-to-down
+	    set obj.Info = ..InfoToProxyObject() // basic info about cube and query
+	    set obj.Cols = ..AxesToProxyObject() // all axes
+	    set obj.Data = ..DataToProxyObject() // array of all cells, left-to-right, up-to-down
 	} catch ex {
 		set pStatus = ex.AsStatus()
 		return ""
@@ -50,7 +50,7 @@ Converts ResultSet to %ZEN.proxyObject.<br>
 ]]></Implementation>
 </Method>
 
-<Method name="InfoToJSON">
+<Method name="InfoToProxyObject">
 <Description>
 Returns meta-information about ResultSet.</Description>
 <ReturnType>%ZEN.proxyObject</ReturnType>
@@ -84,7 +84,7 @@ Returns meta-information about ResultSet.</Description>
 ]]></Implementation>
 </Method>
 
-<Method name="AxesToJSON">
+<Method name="AxesToProxyObject">
 <Description>
 Returns array of Axes</Description>
 <ReturnType>%ListOfObjects</ReturnType>
@@ -217,7 +217,7 @@ Determine if cell is an invisyble system cell.</Description>
 ]]></Implementation>
 </Method>
 
-<Method name="DataToJSON">
+<Method name="DataToProxyObject">
 <Description>
 Returns array of cells (left-to-right, up-to-down)</Description>
 <ReturnType>%ListOfDataTypes</ReturnType>
