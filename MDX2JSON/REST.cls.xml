@@ -159,7 +159,7 @@ Do not use.</Description>
 <Implementation><![CDATA[
 	set MDX = $ZCONVERT($ZCONVERT(MDX ,"I","URL") ,"I","UTF8")
   	set st = ##class(MDX2JSON.Utils).WriteJSONfromMDX(MDX)
-  	quit st
+  	return st
 ]]></Implementation>
 </Method>
 
@@ -174,7 +174,7 @@ Do not use.</Description>
 <Implementation><![CDATA[
 	set MDX = $ZCONVERT($ZCONVERT(MDX ,"I","URL") ,"I","UTF8")
 	set st = ##class(MDX2JSON.Utils).WriteFiltersForMDX(MDX)
-	quit st
+	return st
 ]]></Implementation>
 </Method>
 
@@ -187,7 +187,7 @@ Wrapper for ##class(MDX2JSON.Utils).WriteFiltersForCube(pCube)</Description>
 <Implementation><![CDATA[
 	set Cube = $ZCONVERT($ZCONVERT(Cube ,"I","URL") ,"I","UTF8")
 	set st = ##class(MDX2JSON.Utils).WriteFiltersForCube(Cube)
-	quit st
+	return st
 ]]></Implementation>
 </Method>
 
@@ -215,7 +215,7 @@ Wrapper for ##class(MDX2JSON.Utils).WriteFilterValues(pCupe, pFilter)</Descripti
   set Cube = $ZCONVERT($ZCONVERT(Cube ,"I","URL") ,"I","UTF8")
   set Filter = $ZCONVERT($ZCONVERT(Filter ,"I","URL") ,"I","UTF8")
   set st = ##class(MDX2JSON.Utils).WriteFilterValues(Cube, Filter)
-  quit st
+  return st
 ]]></Implementation>
 </Method>
 
