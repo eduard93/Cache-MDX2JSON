@@ -88,7 +88,7 @@ Converts request body into UTF8 proxyObject. ]]></Description>
 
 	return:'$d(obj.%data(tBody)) $$$ERROR($$$PropertyRequired,tBody)
 	
-	set %request.Content = obj
+	set %request.Content = obj // obj here is a valid UTF8 proxyObject with required property
 	return $$$OK
 ]]></Implementation>
 </Method>
@@ -99,7 +99,7 @@ Test method, outputs <b>%request</b>, <b>%response</b> and <b>%session</b> objec
 <ClassMethod>1</ClassMethod>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-    write "{ Status: ""OK""}"
+    write "{Status: ""OK""}"
     return $$$OK
 ]]></Implementation>
 </Method>
