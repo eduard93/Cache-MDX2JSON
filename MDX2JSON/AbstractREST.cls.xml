@@ -147,7 +147,7 @@ Add param Namespace to a request to execute MDX in desired namespace.]]></Descri
 Validates incoming request against Body Route attribute.<br>
 Converts request into UTF8. Converts request into proxyObject. ]]></Description>
 <ClassMethod>1</ClassMethod>
-<FormalSpec>pMethod:%String,tBody:%String</FormalSpec>
+<FormalSpec>pMethod:%String,pBody:%String</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[	return $$$OK
 ]]></Implementation>

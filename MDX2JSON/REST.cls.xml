@@ -71,7 +71,7 @@ webapplication/MDX?Namespace=Samples<br>]]></Description>
 Validates incoming request body against Body Route attribute.<br>
 Converts request body into UTF8 proxyObject. ]]></Description>
 <ClassMethod>1</ClassMethod>
-<FormalSpec>pMethod:%String,tBody:%String</FormalSpec>
+<FormalSpec>pMethod:%String,pBody:%String</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
 	#dim %request As %CSP.Request
@@ -86,7 +86,7 @@ Converts request body into UTF8 proxyObject. ]]></Description>
 	return:$$$ISERR(st) st
 	return:'$IsObject(obj) $$$ERROR($$$ArgumentIsNotAnObject,"Body")
 
-	return:'$d(obj.%data(tBody)) $$$ERROR($$$PropertyRequired,tBody)
+	return:'$d(obj.%data(pBody)) $$$ERROR($$$PropertyRequired,pBody)
 	
 	set %request.Content = obj // obj here is a valid UTF8 proxyObject with required property
 	return $$$OK
