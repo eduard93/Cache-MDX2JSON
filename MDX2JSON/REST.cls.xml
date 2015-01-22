@@ -127,13 +127,14 @@ Returns JSON array of (title, path) for all dashboards in namespace (accessible 
 <ClassMethod>1</ClassMethod>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
+    set st = $$$OK
     set sql = ##class(MDX2JSON.Dashboard).GetDashboardListSQL()
     try {        
         do ##class(%ZEN.Auxiliary.jsonSQLProvider).%WriteJSONFromSQL(,sql)
     } catch ex {
-        write $$$ZENJSSTR($System.Status.GetErrorText(ex.AsStatus()))
+        set st = ex.AsStatus()
     }
-    return $$$OK
+    return st
 ]]></Implementation>
 </Method>
 
