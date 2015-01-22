@@ -120,14 +120,14 @@ Get all filters for DeepSee Cube in JSON format.<br>
 <b>pCube</b> - name of DeepSee cube.<br>
 <b>values</b> - write all filters' values. Takes time.]]></Description>
 <ClassMethod>1</ClassMethod>
-<FormalSpec>pCube:%String,values:%Boolean=0</FormalSpec>
+<FormalSpec>pCube:%String,pValues:%Boolean=0</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
     set st = ##class(%DeepSee.Dashboard.Utils).%GetFiltersForDataSource(pCube_".cube",.tFilters)
     return:$$$ISERR(st) st 
     return:($d(tFilters)=0) $$$ERROR($$$GeneralError,"Empty Filter values array. Cube does not exist?")
 
-	if (values=1) {
+	if (pValues=1) {
 	set key = $order(tFilters(""))
 		while (key '= "") {
 			set st = ##class(%DeepSee.Dashboard.Utils).%GetMembersForFilter(pCube,$lg(tFilters(key),2),.tMembers,.tDefaultFilterValue,,.tRelatedFilters,0,,.tValueList)
