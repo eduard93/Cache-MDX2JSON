@@ -219,5 +219,35 @@ Using dashboard name get JSON representation (array of ("type","title","mdx")) o
     return st
 ]]></Implementation>
 </Method>
+
+<Method name="GetFormat">
+<Description>
+Get format defaults.</Description>
+<ClassMethod>1</ClassMethod>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	set st = $$$OK
+	set datelist="DD Mmm [YY]YY^MM/DD/[YY]^DD Mmm [YY]YY^YYYY-MM-DD^DD/MM/[YY]YY^Mmm D, YYYY^Mmm D YYYY^Mmm DD [YY]YY^YYYYMMDD^Mmmmmm D, YYYY^W^Www^Wwwwww^[D]D/[M]M/YYYY^nnn"	
+	set timelist="hh:mm:ss,hh:mm,hh:mm:ss[AM/PM],hh:mm[AM/PM]" // lists taken from %CSP.UI.Portal.NLSEdit - DrawProperties
+	set proplist = "AM,DateSeparator,DecimalSeparator,MinusSign,MonthAbbr,MonthName,NumericGroupSeparator,NumericGroupSize,PM,PlusSign,TimePrecision,TimeSeparator,WeekdayAbbr,WeekdayName"
+	set obj = ##class(%ZEN.proxyObject).%New()
+	
+    try {
+		for i = 1:1:$L(proplist, ",") {
+			set property = $P(proplist, ",", i)
+		    do obj.%DispatchSetProperty(property,##class(%SYS.NLS.Format).GetFormatItem(property))
+		}
+		
+		// that's why we cant just do ##class(%ZEN.Auxiliary.jsonProvider).%ObjectToJSON()
+		set obj.DateFormat = $P(datelist, "^",##class(%SYS.NLS.Format).GetFormatItem("DateFormat"))
+		set obj.TimeFormat = $P(timelist, ",",##class(%SYS.NLS.Format).GetFormatItem("TimeFormat"))
+		
+		do obj.%ToJSON()	   
+    } catch ex {
+        set st = ex.AsStatus()
+    }
+    return st
+]]></Implementation>
+</Method>
 </Class>
 </Export>

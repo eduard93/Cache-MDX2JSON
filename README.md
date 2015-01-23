@@ -39,6 +39,7 @@ These are the possible requests to web application (add param ?Namespace={Desire
 | FilterValues/:cube          | GET  |                             | JSON      | All filters for DeepSee Cube   |
 | FilterValues                | POST |{ "Cube":"Cube Name","Values":1}| JSON   | All filters for DeepSee Cube with values (if Values = 1, set to 0 or omit otherwise)|
 | FilterValues/:cube/:filter  | GET  |                             | JSON      | All possible values for filter |
+| Format                      | GET  |                             | JSON      | Default formatting             |
 | Test                        | GET  |                             | JSON      | Test info                      |
 
 Example
