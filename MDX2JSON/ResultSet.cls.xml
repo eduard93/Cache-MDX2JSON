@@ -58,6 +58,8 @@ Returns meta-information about ResultSet.</Description>
 	set tCubeIndex = ..%CubeKey
 	set tQueryKey = ..%QueryKey
 	set tCubeName = $$$UPPER(..%Cube)
+	
+
 
 	set tAxisCount = ..%GetAxisCount()
 	for a = 1:1:tAxisCount {
@@ -78,7 +80,8 @@ Returns meta-information about ResultSet.</Description>
 	set info.cubeName = tCubeName
 	set info.cubeClass = tCubeClass
 	set info.rowCount = tRowCount
-	set info.colCount = tColCount																																	 
+	set info.colCount = tColCount
+	set info.defaultFormat = ..GetDefaultFormat()																															 
 														    
     return info
 ]]></Implementation>
@@ -145,7 +148,7 @@ Returns array of Axes</Description>
 	set cell.caption = $LG(tNode,5) // text caption
     set cell.format = $LG(tNode,12) // format for numbers, eg: $## ###.## 
     set cell.total = $LG(tNode,8) //COUNT,AVG function
-    set cell.type = $LG(tNode,1) // mbr,cmbr,lit
+    set cell.type = $LG(tNode,1) // mbr,cmbr,lit,exp
     set cell.valueID = $LG(tNode,6) // id in mdx dimension for mbr, path for cmbr
     set cell.path = ##class(%DeepSee.Query.Engine).%GetSpecForAxisNode(CubeName, QueryKey, AxisNumber, Node) // MDX cell path
     
@@ -267,6 +270,13 @@ Returns array of cells (left-to-right, up-to-down)</Description>
 	}
 
 	return data
+]]></Implementation>
+</Method>
+
+<Method name="GetDefaultFormat">
+<ClassMethod>1</ClassMethod>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[		return "#"_##class(%SYS.NLS.Format).GetFormatItem("NumericGroupSeparator")_$TR($J("",##class(%SYS.NLS.Format).GetFormatItem("NumericGroupSize"))," ","#")
 ]]></Implementation>
 </Method>
 </Class>
