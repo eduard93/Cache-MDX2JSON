@@ -276,7 +276,11 @@ Returns array of cells (left-to-right, up-to-down)</Description>
 <Method name="GetDefaultFormat">
 <ClassMethod>1</ClassMethod>
 <ReturnType>%String</ReturnType>
-<Implementation><![CDATA[		return "#"_##class(%SYS.NLS.Format).GetFormatItem("NumericGroupSeparator")_$TR($J("",##class(%SYS.NLS.Format).GetFormatItem("NumericGroupSize"))," ","#")
+<Implementation><![CDATA[
+	set ngs = ##class(%SYS.NLS.Format).GetFormatItem("NumericGroupSeparator")
+	set size = ##class(%SYS.NLS.Format).GetFormatItem("NumericGroupSize")
+	set ds = ##class(%SYS.NLS.Format).GetFormatItem("DecimalSeparator")
+	return "#"_ngs_$TR($J("",size)," ","#")_ds_"##"
 ]]></Implementation>
 </Method>
 </Class>
