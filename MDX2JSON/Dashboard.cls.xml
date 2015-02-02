@@ -18,7 +18,7 @@ Folder, from which we get Dashboards.</Description>
 Get SQL for folder, from which we get Dashboards. </Description>
 <ClassMethod>1</ClassMethod>
 <ReturnType>%String</ReturnType>
-<Implementation><![CDATA[	return "SELECT title, fullName As path FROM %DeepSee_Dashboard.Definition WHERE folderName = '" _..#folderName _"'"
+<Implementation><![CDATA[	return "SELECT title, fullName As path FROM %DeepSee_Dashboard.Definition WHERE folderName %STARTSWITH '" _..#folderName _"'"
 ]]></Implementation>
 </Method>
 
