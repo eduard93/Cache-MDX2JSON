@@ -18,7 +18,24 @@ Folder, from which we get Dashboards.</Description>
 Get SQL for folder, from which we get Dashboards. </Description>
 <ClassMethod>1</ClassMethod>
 <ReturnType>%String</ReturnType>
-<Implementation><![CDATA[	return "SELECT title, fullName As path FROM %DeepSee_Dashboard.Definition WHERE folderName %STARTSWITH '" _..#folderName _"'"
+<Implementation><![CDATA[	return "SELECT MDX2JSON.Dashboard_ResolveText(title) As title, fullName As path FROM %DeepSee_Dashboard.Definition WHERE folderName %STARTSWITH '" _..#folderName _"'"
+]]></Implementation>
+</Method>
+
+<Method name="ResolveText">
+<Description><![CDATA[
+Resolve a localized text string at run time.
+A localized string can take the following forms:<br>
+"String" -- not localized.<br>
+"$$$String" -- equivalent to $$$Text("String","DeepSeeUser")<br>
+"$$$String/Domain" -- equivalent to $$$Text("String","Domain")<br>
+Equivalent to ##class(%DeepSee.UserPortal.Utils).%ResolveText(), but in SQL context<br>
+Usage: Select MDX2JSON.Dashboard_ResolveText(title) FROM %DeepSee_Dashboard.Definition]]></Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>Text:%String</FormalSpec>
+<ReturnType>%String</ReturnType>
+<SqlProc>1</SqlProc>
+<Implementation><![CDATA[    return ##class(%DeepSee.UserPortal.Utils).%ResolveText(Text)
 ]]></Implementation>
 </Method>
 
