@@ -183,7 +183,7 @@ Returns MDX string used to create pivot.<br>
 	set pStatus = tPivotTable.%GetFilterInfo(.tFilterInfo,.tAdvancedFilters)
 	return:$$$ISERR(pStatus)
 	
-	if (($d(tFilterInfo)=0) &&($d(pAdvancedFilters)=0)) {
+	if (($d(tFilterInfo)=0) &&($d(tAdvancedFilters)=0)) {
 		set MDX = BaseNDX // no filters, so we're good
 	} else {
 		set rs = tPivotTable.%CreateResultSet(.pStatus,.tParms,.tFilterInfo,.tAdvancedFilters,.MDX) // returns tQueryText - mdx with filters
