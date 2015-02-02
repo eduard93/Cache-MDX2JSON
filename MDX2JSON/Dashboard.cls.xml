@@ -87,7 +87,7 @@ Converts relevant parts of %DeepSee.Dashboard.Widget object into %ZEN.proxyObjec
 	set obj.mdx = mdx
 	set obj.basemdx = basemdx
 	set obj.type =Widget.subtype
-	set obj.title = Widget.title
+	set obj.title = ##class(%DeepSee.UserPortal.Utils).%ResolveText(Widget.title) /// $$$ support
 	set obj.key =  Widget.key 
 	set obj.dataSource = Widget.dataSource
 	set obj.drillDownDataSource = Widget.drillDownDataSource
