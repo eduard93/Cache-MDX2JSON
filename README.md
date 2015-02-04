@@ -87,4 +87,4 @@ Use with postconditional expressions, or other flow control statements:
 		w:$$$Debug "debugging"
 		if $$$Debug { w "debugging" } else { w "not debugging"}
 		
-Also available are $$$Public and $$$Private macros. Evaluates to true based on request port (80 and 443 is public, private otherwise).
+Also available are $$$Public and $$$Private macros. Evaluates to true based on request port (80 and 443 are public, private otherwise).
