@@ -82,7 +82,9 @@ Use $$$Debug macro. It would evaluate as true only if there is a "Debug" URL par
 
         http://localhost:57772/MDX2JSON/MDX?Namespace=Samples&Debug
 		
-Use with postconditional expressions, or other flow control statements
+Use with postconditional expressions, or other flow control statements:
 
 		w:$$$Debug "debugging"
 		if $$$Debug { w "debugging" } else { w "not debugging"}
+		
+Also available are $$$Public and $$$Private macros. Evaluates to true based on request port (80 and 443 is public, private otherwise).
