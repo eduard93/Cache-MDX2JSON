@@ -123,7 +123,9 @@ Get all filters for DeepSee Cube in JSON format.<br>
 <FormalSpec>pCube:%String,pValues:%Boolean=0</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-    set st = ##class(%DeepSee.Dashboard.Utils).%GetFiltersForDataSource(pCube_".cube",.tFilters)
+	set st = ##class(%DeepSee.Utils).%CubeExists(pCube)
+	set:$$$ISOK(st) pCube = pCube _ ".cube" 
+    set st = ##class(%DeepSee.Dashboard.Utils).%GetFiltersForDataSource(pCube,.tFilters)
     return:$$$ISERR(st) st 
     return:($d(tFilters)=0) $$$ERROR($$$GeneralError,"Empty Filter values array. Cube does not exist?")
 
