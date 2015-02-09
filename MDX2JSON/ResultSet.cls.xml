@@ -122,12 +122,29 @@ Returns array of Axes</Description>
     set tQueryKey = ..%QueryKey
 	
     set axis=##class(%ZEN.proxyObject).%New()
-    //d ##class(%DeepSee.Utils).%GetDimensionCaption(tCubeName,1, tHierNo,tLevelNo, .tAxisCaption)
+    set axis.tuples = ##class(%ListOfObjects).%New()
     
-    //set axis.caption = $zobjclassmethod($G($$$DeepSeeMetaGLVN("cubes",tCubeName)),"%GetMemberCaption",$$$UPPER(tDimName))
-    //set axis.spec = $G($$$DeepSeeAxisGLVN(CubeIndex,AxisKey,"spec"))
+    do ..%GetAxisMembers(AxisNumber,.pKey) // Fills ^||DeepSee.AxisMembers(pKey) global
     
-    set axis.tuples = ..ProcessOneAxisCell(CubeIndex, AxisKey, tCubeName, tQueryKey, AxisNumber, 1)
+    set nodekey = 1 // this is the number of the top node
+    set startnode=-1 // initial node number for ^DeepSee.Cache.Axis(CubeIndex,AxisKey,"axes",startnode)
+    do {
+	    set startnodelist = ^||DeepSee.AxisMembers(pKey,AxisNumber,nodekey,0) // 1 - start, 0 - level    
+	    
+	    if (startnode '= $lg(startnodelist,1)) {    
+	    	set startnode = $lg(startnodelist,1)
+	    } else {
+		    // we're here if we have several same top-level cells
+		    // for example year on the zero level and several months on the first
+		    // the year cell would be repeated as many times as there are months
+		    set nodekey = $o(^||DeepSee.AxisMembers(pKey,AxisNumber,nodekey))
+		    CONTINUE
+	    }
+	        
+	    do axis.tuples.Insert(..ProcessOneAxisCell(CubeIndex, AxisKey, tCubeName, tQueryKey, AxisNumber, startnode))
+	    
+	    set nodekey = $o(^||DeepSee.AxisMembers(pKey,AxisNumber,nodekey)) // get next top-level cell
+    } while (nodekey'="")
        
     return axis
 ]]></Implementation>
@@ -139,7 +156,7 @@ Returns array of Axes</Description>
 <ReturnType>%ZEN.proxyObject</ReturnType>
 <Implementation><![CDATA[
     set cell=##class(%ZEN.proxyObject).%New()
-        
+
     set tNode = $G($$$DeepSeeAxisGLVN(CubeIndex,AxisKey,"axes",Node))
     set tDimNo = $LG(tNode,9)
     set tHierNo = $LG(tNode,10)
@@ -192,31 +209,9 @@ Returns array of Axes</Description>
             
             set key = $O($$$DeepSeeAxisGLVN(CubeIndex, AxisKey, "axes", Node, "ch", key))
         }
-        
-
-        // To filter out invisible top-level сells
-        if (..IsCellNull(cell.caption, cell.path)=1) {
-            return cell.children    
-        }
     } 
 
     return cell
-]]></Implementation>
-</Method>
-
-<Method name="IsCellNull">
-<Description>
-Determine if cell is an invisyble system cell.</Description>
-<ClassMethod>1</ClassMethod>
-<FormalSpec>caption,path</FormalSpec>
-<ReturnType>%Boolean</ReturnType>
-<Implementation><![CDATA[
-	return:(caption=0) 1
-	return:(caption=1) 1
-	return:(caption="") 1
-	return:(caption'="") 0
-	return:(path="") 1
-	return 0
 ]]></Implementation>
 </Method>
 
