@@ -14,7 +14,7 @@ todo add optional parameter WEBAPP to Alter web app name if it needs to have ano
 <Log Text="Creating namespace ${Namespace}" Level="0"/>
 <Namespace Name="${Namespace}" Create="yes" Code="${Namespace}" Data="${Namespace}">
 <Configuration>
-<Database Name="${Namespace}" Dir="${MGRDIR}/${Namespace}" Create="yes" MountRequired="true" MountAtStartup="true"/>
+<Database Name="${Namespace}" Dir="${MGRDIR}/${Namespace}" Create="yes" MountRequired="true" Resource="%DB_${Namespace}" PublicPermissions="RW" MountAtStartup="true"/>
 </Configuration>
 </Namespace>
  <Log Text="End Creating namespace ${Namespace}" Level="0"/>

@@ -17,14 +17,17 @@ Add param Namespace to a request to execute MDX in desired namespace.]]></Descri
 	#dim %response As %CSP.Response
 	#dim %request As %CSP.Request
 	#dim %session As %CSP.Session
-	 
-	set %response.ContentType="text/json"
-	set %session.Language=$$MatchLanguage^%occMessages(%request.GetCgiEnv("HTTP_ACCEPT_LANGUAGE"),"%CSP","+s") // Localization support
-	set %response.Language=%session.Language
 	
-    //do %response.SetHeader("Access-Control-Allow-Origin","*")
-    //do %response.SetHeader("Access-Control-Allow-Headers","Authorization")
-    //return:($ZCVT(pMethod,"U") = "OPTIONS") $$$OK
+	Do %response.SetHeader("Access-Control-Allow-Origin","*")
+	Do %response.SetHeader("Access-Control-Allow-Methods","GET, PUT, POST, DELETE, OPTIONS")
+	Do %response.SetHeader("Access-Control-Max-Age","10000")
+	Do %response.SetHeader("Access-Control-Allow-Headers","Content-Type, Authorization, Accept-Language") 
+	
+	Set %response.CharSet = "utf-8"
+	Set %response.ContentType="application/json"
+
+	Set %session.Language=$$MatchLanguage^%occMessages(%request.GetCgiEnv("HTTP_ACCEPT_LANGUAGE"),"%CSP","+s") // Localization support
+	Set %response.Language=%session.Language
     
     #dim tSC As %Status = $$$OK
     #dim e As %Exception.AbstractException
@@ -38,8 +41,8 @@ Add param Namespace to a request to execute MDX in desired namespace.]]></Descri
     
     Try {
 	    // Desired execusion namespace
-	    set Namespace = $get(%request.Data("Namespace",1))
-	    set st = ..CheckNamespace(.Namespace)
+	    Set Namespace = $get(%request.Data("Namespace",1))
+	    Set st = ..CheckNamespace(.Namespace)
 	    If $$$ISERR(st) Do ..Http500(st) Quit
 	    
         #; Check that the effective user ( could be unknown user ) can access this resource
@@ -105,18 +108,18 @@ Add param Namespace to a request to execute MDX in desired namespace.]]></Descri
                 If tTarget[":" Set tClass=$Piece(tTarget,":"),tTarget=$Piece(tTarget,":",2)
                 
                 #; Validate input
-                set tBody = $List(tMapEntry,4) 
-                set tSC = ..ValidateRequest(pMethod,tBody)
+                Set tBody = $List(tMapEntry,4) 
+                Set tSC = ..ValidateRequest(pMethod,tBody)
                 If $$$ISERR(tSC) Do ..Http500(tSC) Quit
                 
                 #; Dispatch                
-                if (Namespace'=$Namespace) {
-                    set oldNS = $Namespace
+                If (Namespace'=$Namespace) {
+                    Set oldNS = $Namespace
                     zn Namespace
-                    set tSC=$zobjclassmethod(tClass,tTarget,tArgs...)
+                    Set tSC=$zobjclassmethod(tClass,tTarget,tArgs...)
                     zn oldNS
-                } else {
-                    set tSC=$zobjclassmethod(tClass,tTarget,tArgs...)
+                } Else {
+                    Set tSC=$zobjclassmethod(tClass,tTarget,tArgs...)
                 }
                 If $$$ISERR(tSC) Do ..Http500(tSC)
                 
@@ -154,6 +157,30 @@ Converts request into UTF8. Converts request into proxyObject. ]]></Description>
 ]]></Implementation>
 </Method>
 
+<Method name="Login">
+<Description>
+Called for a REST page in the event of a login being required</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>skipheader:%Boolean=1</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	Do %response.SetHeader("Access-Control-Allow-Origin","*")
+	Do %response.SetHeader("Access-Control-Allow-Methods","GET, PUT, POST, DELETE, OPTIONS")
+	Do %response.SetHeader("Access-Control-Max-Age","10000")
+	Do %response.SetHeader("Access-Control-Allow-Headers","Content-Type, Authorization, Accept-Language")
+	
+	Set %response.CharSet = "utf-8"
+	Set %response.ContentType="application/json"
+	
+	If (%request.GetCgiEnv("REQUEST_METHOD") = "OPTIONS"){
+		Do %response.WriteHTTPHeader()
+		Return $$$OK
+	}
+	
+    Quit ##super(skipheader)
+]]></Implementation>
+</Method>
+
 <Method name="Http500">
 <Description><![CDATA[
 Issue an '500' error and give some indication as to what occurred.<br>
@@ -166,7 +193,7 @@ Issue an '500' error and give some indication as to what occurred.<br>
     Set %response.Status="500 Internal Server Error"
     
     #; Return a helpful error string
-    Write "{Error:"_$$$ZENJSSTR($System.Status.GetErrorText(pStatus,%session.Language))_"}"
+    Write "{""Error"":"_$$$ZENJSSTR($System.Status.GetErrorText(pStatus,%session.Language))_"}"
 ]]></Implementation>
 </Method>
 
@@ -278,7 +305,7 @@ This project creates the DispatchMethod used to dispatch the Url and Method to t
             }
             $$$GENERATE(" Quit """"")
                 
-        } else {
+        } Else {
             
             #; The specified class must have an XDATA Block named UrlMap
             Set tSC=$$$ERROR($$$XDataBlockMissing,tClassName,"UrlMap")
