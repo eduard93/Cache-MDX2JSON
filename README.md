@@ -9,7 +9,7 @@ Installation
 1. Download Installer.cls.xml (from repository MDX2JSON folder or releases page) into Caché manager directory.
 2. Run in terminal (any namespace): 
 
-        do ##class(%Installer.Installer).InstallFromCommandLine(##class(%File).ManagerDirectory()_"Installer.cls.xml","Namespace={Namespace}",0)
+        do ##class(%Installer.Installer).InstallFromCommandLine(##class(%File).ManagerDirectory()_"Installer.cls.xml","Namespace={Namespace}")
 
   where: 
   
@@ -25,7 +25,7 @@ Offline Installation
 1. Download zip and unpack it.
 2. Run in terminal (any namespace): 
 
-        do ##class(%Installer.Installer).InstallFromCommandLine("{SourceDir}\Installer.cls.xml","Namespace={Namespace},SourceDir={SourceDir}",0)
+        do ##class(%Installer.Installer).InstallFromCommandLine("{SourceDir}\Installer.cls.xml","Namespace={Namespace},SourceDir={SourceDir}")
 
   where: 
   
