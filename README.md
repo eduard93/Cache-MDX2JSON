@@ -6,6 +6,23 @@ RESTful web api for MDX2JSON transformation (also JSONP and XML/A). Also support
 Installation
 -----------
 
+1. Download MDX2JSON/Installer.cls.xml (from repository or releases page).
+2. Run in terminal (any namespace): 
+
+        do ##class(%Installer.Installer).InstallFromCommandLine("{SourceDir}\Installer.cls.xml","Namespace={Namespace}",0)
+
+  where: 
+  
+      {Namespace} is a namespace you want to install to. If it does not exist it would be created automatically. If it does exist only MDX2JSON package would be overwritten. 
+  
+On this step installer would create (if needed) Namespace and corresponding database, download source code from GitHub and compile it, create required web application (named /{Namespace}) if one does not exist (skipping web application creation process if one does exist), and map MDX2JSON package to %All namespace (which will be created if does not exist).
+3. Give the correct roles to /{Namespace} webapplication for it to be able to query desired cubes.
+
+
+
+Offline Installation
+-----------
+
 1. Download zip and unpack it.
 2. Run in terminal (any namespace): 
 
@@ -21,6 +38,15 @@ On this step installer would create (if needed) Namespace and corresponding data
 
 
 For information on how to work with this RESTful web API please refer to included documentation.
+
+Update
+-----------
+
+1.  Run in terminal (namespace where you installed MDX2JSON): 
+
+      do ##class(MDX2JSON.Installer).Update()
+	  
+You can also supply parameters such as fork, desired branch/commit, target namespace, authorization information. Please refer to Caché documentation of MDX2JSON.Installer for correct syntax. 
 
 Requests
 -----------
@@ -70,7 +96,7 @@ If something goes wrong, server must report an error in the following format {Er
 | Problem                     | Solution                         | 
 |-----------------------------|----------------------------------|
 | CSP Error                   | User does not have enough rights. Configure User or Webapplication roles  | 
-| Authenticated access        | Guideline to configure [here](https://github.com/intersystems-ru/Cache-MDX2JSON/issues/24)|
+| Authenticated access        | Web application must have password access, resource for database with MDX2JSON must have public RW rights enabled|
 | No dashboards               | Configure roles. Change [dashboard scope](https://github.com/intersystems-ru/Cache-MDX2JSON/issues/10)|
 | DeepSee errors              | Build and compile DeepSee cube(s)|
 | MDX errors                  | Don't forget to escape JSON strings [here](http://json.org/string.gif) |
