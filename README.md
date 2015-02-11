@@ -14,7 +14,6 @@ Installation
   where: 
   
       {Namespace} is a namespace you want to install to. If it does not exist it would be created automatically. If it does exist only MDX2JSON package would be overwritten. 
-  
 On this step installer would create (if needed) Namespace and corresponding database, download source code from GitHub and compile it, create required web application (named /{Namespace}) if one does not exist (skipping web application creation process if one does exist), and map MDX2JSON package to %All namespace (which will be created if does not exist).
 3. Give the correct roles to /{Namespace} webapplication for it to be able to query desired cubes.
 
