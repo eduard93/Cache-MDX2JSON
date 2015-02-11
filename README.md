@@ -6,10 +6,10 @@ RESTful web api for MDX2JSON transformation (also JSONP and XML/A). Also support
 Installation
 -----------
 
-1. Download MDX2JSON/Installer.cls.xml (from repository or releases page).
+1. Download Installer.cls.xml (from repository MDX2JSON folder or releases page) into Caché manager directory.
 2. Run in terminal (any namespace): 
 
-        do ##class(%Installer.Installer).InstallFromCommandLine("{SourceDir}\Installer.cls.xml","Namespace={Namespace}",0)
+        do ##class(%Installer.Installer).InstallFromCommandLine(##class(%File).ManagerDirectory()_"Installer.cls.xml","Namespace={Namespace}",0)
 
   where: 
   
