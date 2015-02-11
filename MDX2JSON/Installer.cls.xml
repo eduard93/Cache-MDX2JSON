@@ -81,7 +81,12 @@ do ##class(MDX2JSON.Installer).setup(.pVars)</Description>
 <Implementation><![CDATA[
     Set Namespace=tInstaller.Evaluate("${Namespace}")
     Do tInstaller.PushNS("%SYS")
-    Set cspProperties("AutheEnabled") = 64 
+    Do ##class(Security.System).GetInstallationSecuritySetting(.security)
+    If (security="None") {
+    	Set cspProperties("AutheEnabled") = 64 // Unauthenticated
+    } Else {
+	    Set cspProperties("AutheEnabled") = 32 // Password
+    }
     Set cspProperties("NameSpace") = Namespace
     Set cspProperties("IsNameSpaceDefault") = 1
     Set cspProperties("DispatchClass")="MDX2JSON.REST"
