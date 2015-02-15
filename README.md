@@ -6,7 +6,7 @@ RESTful web api for MDX2JSON transformation (also JSONP and XML/A). Also support
 Installation
 -----------
 
-1. Download Installer.cls.xml (from repository MDX2JSON folder or releases page) into Caché manager directory.
+1. Download Installer.cls.xml (from MDX2JSON folder in repository or releases page) into Caché manager directory.
 2. Run in terminal (any namespace): 
 
         do ##class(%Installer.Installer).InstallFromCommandLine(##class(%File).ManagerDirectory()_"Installer.cls.xml","Namespace={Namespace}")
@@ -14,7 +14,7 @@ Installation
   where: 
   
       {Namespace} is a namespace you want to install to. If it does not exist it would be created automatically. If it does exist only MDX2JSON package would be overwritten. 
-On this step installer would create (if needed) Namespace and corresponding database, download source code from GitHub and compile it, create required web application (named /{Namespace}) if one does not exist (skipping web application creation process if one does exist), and map MDX2JSON package to %All namespace (which will be created if does not exist).
+On this step installer would create (if needed) Namespace and corresponding database, download source code from GitHub and compile it, create required web application (named /{Namespace}) if one does not exist (skipping web application creation process if one does exist), and map MDX2JSON package to %All namespace (which will be created if it does not exist).
 3. Give the correct roles to /{Namespace} webapplication for it to be able to query desired cubes.
 
 
@@ -32,7 +32,7 @@ Offline Installation
       {Namespace} is a namespace you want to install to. If it does not exist it would be created automatically. If it does exist only MDX2JSON package would be overwritten.
   
       {SourceDir} is a directory where you unpacked zip \ MDX2JSON (see 1).
-On this step installer would create (if needed) Namespace and corresponding database, import source code and compile it, create required web application (named /{Namespace}) if one does not exist (skipping web application creation process if one does exist), and map MDX2JSON package to %All namespace (which will be created if does not exist).
+On this step installer would create (if needed) Namespace and corresponding database, import source code and compile it, create required web application (named /{Namespace}) if one does not exist (skipping web application creation process if one does exist), and map MDX2JSON package to %All namespace (which will be created if it does not exist).
 3. Give the correct roles to /{Namespace} webapplication for it to be able to query desired cubes.
 
 
@@ -43,9 +43,9 @@ Update
 
 1.  Run in terminal (namespace where you installed MDX2JSON): 
 
-      do ##class(MDX2JSON.Installer).Update()
+        do ##class(MDX2JSON.Installer).Update()
 	  
-You can also supply parameters such as fork, desired branch/commit, target namespace, authorization information. Please refer to Caché documentation of MDX2JSON.Installer for correct syntax. 
+You can also supply parameters such as fork, desired branch/commit, target namespace, authorization information. Please refer to Caché documentation of MDX2JSON.Installer class for correct syntax. 
 
 Requests
 -----------
