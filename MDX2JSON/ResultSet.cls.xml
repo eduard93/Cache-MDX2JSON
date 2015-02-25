@@ -83,8 +83,8 @@ Returns meta-information about ResultSet.</Description>
 	set info.colCount = tColCount
 	set info.defaultFormat = ..GetDefaultFormat()	
 	set info.queryKey = tQueryKey
-	set info.colKey = tAxisKeys(1)
-	set info.rowKey = tAxisKeys(2)																														 
+	set info.colKey = $G(tAxisKeys(1))
+	set info.rowKey = $G(tAxisKeys(2))																													 
 														    
     return info
 ]]></Implementation>
