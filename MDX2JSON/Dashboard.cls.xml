@@ -94,7 +94,7 @@ Converts relevant parts of %DeepSee.Dashboard.Widget object into %ZEN.proxyObjec
 <ReturnType>%ZEN.proxyObject</ReturnType>
 <Implementation><![CDATA[
     set obj = ##class(%ZEN.proxyObject).%New()
-            
+    
     &sql(SELECT cubeName into :cube FROM %DeepSee_Dashboard.Pivot WHERE fullName=:Widget.dataSource)
 	set:(SQLCODE'=0) cube=""
 	
@@ -113,7 +113,7 @@ Converts relevant parts of %DeepSee.Dashboard.Widget object into %ZEN.proxyObjec
 
 	for i=1:1:Widget.controls.Count()
 	{
-		do obj.controls.Insert(..WidgetControlToProxyObject(Widget.controls.GetAt(i)))
+		do obj.controls.Insert(..WidgetControlToProxyObject(Widget.controls.GetAt(i),cube))
 	}
 	return obj
 ]]></Implementation>
@@ -124,7 +124,7 @@ Converts relevant parts of %DeepSee.Dashboard.Widget object into %ZEN.proxyObjec
 Converts %DeepSee.Dashboard.Control object into %ZEN.proxyObject, handles run-time DeepSee variables.</Description>
 <Internal>1</Internal>
 <ClassMethod>1</ClassMethod>
-<FormalSpec>Control:%DeepSee.Dashboard.Control</FormalSpec>
+<FormalSpec>Control:%DeepSee.Dashboard.Control,Cube:%String</FormalSpec>
 <ReturnType>%ZEN.proxyObject</ReturnType>
 <Implementation><![CDATA[
 	set obj = ##class(%ZEN.proxyObject).%New()
@@ -154,6 +154,7 @@ Converts %DeepSee.Dashboard.Control object into %ZEN.proxyObject, handles run-ti
 		set obj.value = Control.value 
 	}  
 	set obj.valueList = Control.valueList
+	set:((Control.action="applyFilter") || (Control.action="setFilter")) obj.values = ..GetMembersForFilter(Cube,obj.targetProperty)	
 	return obj
 ]]></Implementation>
 </Method>
@@ -164,33 +165,57 @@ Returns MDX string used to create pivot.<br>
 <b>pPivotName</b> - fullname of pivot. Eg: "KPIs & Plugins/HoleFoods.pivot". Case insensitive.<br>
 <b>pStatus</b> - Status of query execution.<br>]]></Description>
 <ClassMethod>1</ClassMethod>
-<FormalSpec>pPivotName:%String,*MDX,*BaseNDX</FormalSpec>
+<FormalSpec>pPivotName:%String,*MDX,*BaseMDX</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
 	#dim tPivot As %DeepSee.Dashboard.Pivot
 	#dim tPivotTable As %DeepSee.Component.pivotTable
     set tPivot = ##class(%DeepSee.UserLibrary.Utils).%OpenFolderItem(pPivotName,.pStatus)
 
-    return:$$$ISERR(pStatus)
+    return:$$$ISERR(pStatus) pStatus
 
     set tPivotTable = ##class(%DeepSee.Component.pivotTable).%New()
     set pStatus = tPivot.%CopyToComponent(tPivotTable)
-    return:$$$ISERR(pStatus)
+    return:$$$ISERR(pStatus) pStatus
     
-    set rs = tPivotTable.%CreateResultSet(.pStatus,.tParms,.tFilterInfo,.tAdvancedFilters,.BaseNDX) // returns tQueryText - mdx without filters
-	return:$$$ISERR(pStatus)
-	
+    set rs = tPivotTable.%CreateResultSet(.pStatus,.tParms,.tFilterInfo,.tAdvancedFilters,.BaseMDX) // returns tQueryText - mdx without filters
+	return:$$$ISERR(pStatus) pStatus
+
 	set pStatus = tPivotTable.%GetFilterInfo(.tFilterInfo,.tAdvancedFilters)
-	return:$$$ISERR(pStatus)
-	
+	//return:$$$ISERR(pStatus) pStatus
+
 	if (($d(tFilterInfo)=0) &&($d(tAdvancedFilters)=0)) {
-		set MDX = BaseNDX // no filters, so we're good
+		set MDX = BaseMDX // no filters, so we're good
 	} else {
 		set rs = tPivotTable.%CreateResultSet(.pStatus,.tParms,.tFilterInfo,.tAdvancedFilters,.MDX) // returns tQueryText - mdx with filters
-		return:$$$ISERR(pStatus)		
+		return:$$$ISERR(pStatus) pStatus		
 	} 
         
     return pStatus
+]]></Implementation>
+</Method>
+
+<Method name="GetMembersForFilter">
+<Description><![CDATA[
+Return list of possible filter member values for a given dashboard data source and filter.
+Returns list of %ZEN.proxyObject:<br/>]]></Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>DataSource:%String,Filter:%String</FormalSpec>
+<ReturnType>%ListOfObjects</ReturnType>
+<Implementation><![CDATA[
+	set st = ##class(%DeepSee.Dashboard.Utils).%GetMembersForFilter(DataSource,Filter,.tMembers,.tDefaultFilterValue,,.tRelatedFilters,0,,.tValueList)
+	set members = ##class(%ListOfObjects).%New()
+			
+	set key = $order(tMembers("")) 
+	while (key '= "") {
+		set member = ##class(%ZEN.proxyObject).%New()
+		set member.name = $lg(tMembers(key),1)
+		set member.path = $lg(tMembers(key),2)
+		set member.info = $lg(tMembers(key),3)
+		set key = $order(tMembers(key))
+		do members.Insert(member)
+	}
+	return members
 ]]></Implementation>
 </Method>
 
