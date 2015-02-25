@@ -81,7 +81,10 @@ Returns meta-information about ResultSet.</Description>
 	set info.cubeClass = tCubeClass
 	set info.rowCount = tRowCount
 	set info.colCount = tColCount
-	set info.defaultFormat = ..GetDefaultFormat()																															 
+	set info.defaultFormat = ..GetDefaultFormat()	
+	set info.queryKey = tQueryKey
+	set info.colKey = tAxisKeys(1)
+	set info.rowKey = tAxisKeys(2)																														 
 														    
     return info
 ]]></Implementation>
@@ -122,30 +125,8 @@ Returns array of Axes</Description>
     set tQueryKey = ..%QueryKey
 	
     set axis=##class(%ZEN.proxyObject).%New()
-    set axis.tuples = ##class(%ListOfObjects).%New()
-    
-    do ..%GetAxisMembers(AxisNumber,.pKey) // Fills ^||DeepSee.AxisMembers(pKey) global
-    
-    set nodekey = 1 // this is the number of the top node
-    set startnode=-1 // initial node number for ^DeepSee.Cache.Axis(CubeIndex,AxisKey,"axes",startnode)
-    do {
-	    set startnodelist = ^||DeepSee.AxisMembers(pKey,AxisNumber,nodekey,0) // 1 - start, 0 - level    
-	    
-	    if (startnode '= $lg(startnodelist,1)) {    
-	    	set startnode = $lg(startnodelist,1)
-	    } else {
-		    // we're here if we have several same top-level cells
-		    // for example year on the zero level and several months on the first
-		    // the year cell would be repeated as many times as there are months
-		    set nodekey = $o(^||DeepSee.AxisMembers(pKey,AxisNumber,nodekey))
-		    CONTINUE
-	    }
-	        
-	    do axis.tuples.Insert(..ProcessOneAxisCell(CubeIndex, AxisKey, tCubeName, tQueryKey, AxisNumber, startnode))
-	    
-	    set nodekey = $o(^||DeepSee.AxisMembers(pKey,AxisNumber,nodekey)) // get next top-level cell
-    } while (nodekey'="")
-       
+    set axis.tuples = ..ProcessOneAxisCell(CubeIndex, AxisKey, tCubeName, tQueryKey, AxisNumber, 1)
+           
     return axis
 ]]></Implementation>
 </Method>
@@ -168,7 +149,7 @@ Returns array of Axes</Description>
     set cell.type = $LG(tNode,1) // mbr,cmbr,lit,exp
     set cell.valueID = $LG(tNode,6) // id in mdx dimension for mbr, path for cmbr
     set cell.path = ##class(%DeepSee.Query.Engine).%GetSpecForAxisNode(CubeName, QueryKey, AxisNumber, Node) // MDX cell path
-    
+        
     set info = $LG(tNode,18)
 	set cell.info = info // expected structure is property1:value1;property2:value2;...;propertyN:valueN;
 	
@@ -199,19 +180,56 @@ Returns array of Axes</Description>
         while (key'="") {
             set children = ..ProcessOneAxisCell(CubeIndex, AxisKey, CubeName, QueryKey, AxisNumber, key)
             // Append children to cell
-            if (children.%IsA("%ZEN.proxyObject")) {
-                do cell.children.Insert(children)
-            } elseif (children.%IsA("%Collection.AbstractList")) {
-                for i=1:1:children.Count() {
-                    do cell.children.Insert(children.GetAt(i))
-                }
+            if $isobject(children) {
+	            if (children.%IsA("%ZEN.proxyObject")) {
+	                do cell.children.Insert(children)
+	            } elseif (children.%IsA("%Collection.AbstractList")) {
+	                for i=1:1:children.Count() {
+	                    do cell.children.Insert(children.GetAt(i))
+	                }
+	            }
             }
             
             set key = $O($$$DeepSeeAxisGLVN(CubeIndex, AxisKey, "axes", Node, "ch", key))
         }
     } 
+    
+    //To filter out invisible сells
+	if (..IsCellNull(cell, AxisNumber, Node)=1) {
+		return cell.children
+	}
+	
+	set:$$$Debug cell.visible = '..IsCellNull(cell,AxisNumber,Node)
+    set:$$$Debug cell.node = Node
 
     return cell
+]]></Implementation>
+</Method>
+
+<Method name="IsCellNull">
+<Description>
+Determine if cell is an invisyble system cell.</Description>
+<FormalSpec>Cell,AxisNumber,Node</FormalSpec>
+<Implementation><![CDATA[
+	return:((Cell.type = "axis") || (Cell.type = "set")) 1 // for top-level cells
+	
+	return:(Cell.caption=0) 1
+	return:(Cell.caption=1) 1
+	return:(Cell.caption="") 1
+	//return:(caption'="") 0
+	//return:(path="") 1
+	set children = Cell.children
+	return:($isobject(children)) 0
+	
+	if (Cell.type'="lit") {
+		set key = $O($$$DeepSeeResultsGLVN(..%CubeKey, ..%QueryKey, "leaf", AxisNumber, ""))
+		while (key'="") {
+			return:(Node=$$$DeepSeeResultsGLVN(..%CubeKey, ..%QueryKey, "leaf", AxisNumber, key)) 0 //for leafs
+			set key = $O($$$DeepSeeResultsGLVN(..%CubeKey, ..%QueryKey, "leaf", AxisNumber, key))
+		}
+	}
+	
+	return 1
 ]]></Implementation>
 </Method>
 
