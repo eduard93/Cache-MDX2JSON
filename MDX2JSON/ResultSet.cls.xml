@@ -255,7 +255,9 @@ Returns array of cells (left-to-right, up-to-down)</Description>
 
 	set tNodeNo = ""
 	
-	if (tAxisCount = 1) {
+	if (tAxisCount = 0) {
+		do data.Insert(..%GetValue())
+	} elseif (tAxisCount = 1) {
 		set tRowCount = 1
 		set c = 0
 		while (tItemNo(1)'="") {
@@ -264,8 +266,7 @@ Returns array of cells (left-to-right, up-to-down)</Description>
 			set tItemNo(1) = $O($$$DeepSeeResultsGLVN(tCubeIndex,tQueryKey,"leaf",1,tItemNo(1)),1,tNodeNo)
 			set tAddr(1) = tNodeNo
 		}
-	}
-	else {
+	} else {
 		set tCellCount = 0
 		while(tItemNo(2)'="") {
 				set tItemNo(1) = $O($$$DeepSeeResultsGLVN(tCubeIndex,tQueryKey,"leaf",1,""),1,tNodeNo)
@@ -280,7 +281,7 @@ Returns array of cells (left-to-right, up-to-down)</Description>
 			set tItemNo(2) = $O($$$DeepSeeResultsGLVN(tCubeIndex,tQueryKey,"leaf",2,tItemNo(2)),1,tNodeNo)
 			set tAddr(2) = tNodeNo
 		}
-	}
+	} 
 
 	return data
 ]]></Implementation>
