@@ -320,11 +320,13 @@ Returns array of cells (left-to-right, up-to-down)</Description>
     set cell.valueID = ""
     set cell.path = ""
 	set cell.info = ""
-	set cell.dimension = ""
+	set cell.dimension = "Count"
 	
 	set cell2=cell.%ConstructClone()
 	set cell2.type = "mbr"
-	set cell2.caption = $$$Text("%Search","%DeepSee")
+	set cell2.total = ""
+	set cell2.caption = ""
+	set cell2.dimension = "%Search"
 	
 	set axis = ##class(%ZEN.proxyObject).%New() // one axis
 	set axis.tuples = ##class(%ListOfObjects).%New() //array of cells for one axis
