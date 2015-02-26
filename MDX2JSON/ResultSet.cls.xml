@@ -67,24 +67,21 @@ Returns meta-information about ResultSet.</Description>
 	    set tAxisKeys(a) = $G($$$DeepSeeResultsGLVN(tCubeIndex,tQueryKey,"axis",a))
 	}
 	
-	set tColCount = $G(tAxisSize(1))
-	set tRowCount = $G(tAxisSize(2))
+	set info=##class(%ZEN.proxyObject).%New()
+	set info.queryKey = tQueryKey
+	set info.rowCount = $G(tAxisSize(1))
+	set info.colCount = $G(tAxisSize(2))
+	set info.colKey = $G(tAxisKeys(1))
+	set info.rowKey = $G(tAxisKeys(2))	
+	
 
 	// find name of cube in original case
 	set tCubeClass = $G($$$DeepSeeMetaGLVN("cubes",tCubeName))
-	set tCubeName = $G($$$DeepSeeMetaGLVN("classes",tCubeClass))
-																	
-																	
-	set info=##class(%ZEN.proxyObject).%New()
-	
+	set tCubeName = $G($$$DeepSeeMetaGLVN("classes",tCubeClass))														
 	set info.cubeName = tCubeName
 	set info.cubeClass = tCubeClass
-	set info.rowCount = tRowCount
-	set info.colCount = tColCount
-	set info.defaultFormat = ..GetDefaultFormat()	
-	set info.queryKey = tQueryKey
-	set info.colKey = $G(tAxisKeys(1))
-	set info.rowKey = $G(tAxisKeys(2))																													 
+
+	set info.defaultFormat = ..GetDefaultFormat()																													 
 														    
     return info
 ]]></Implementation>
@@ -97,13 +94,13 @@ Returns array of Axes</Description>
 <Implementation><![CDATA[
     set tCubeIndex = ..%CubeKey
     set tQueryKey = ..%QueryKey
+    set tAxisCount = ..%GetAxisCount()
     
-    if ($System.Version.GetMajor() >=2015) {
-    	set tAxisCount = ..%GetAxisCount()
-    } else {
-	    set tAxisCount = 2 //because filters count as axes before 2015.1
+    if (($System.Version.GetMajor() <2015) && (tAxisCount>2)) {
+    	set tAxisCount = 2 //because filters count as axes before 2015.1
     }
-
+    
+    
     set axes=##class(%ListOfObjects).%New()
     
 	for a = 1:1:tAxisCount {
@@ -111,7 +108,46 @@ Returns array of Axes</Description>
         set tAxisKeys(a) = $G($$$DeepSeeResultsGLVN(tCubeIndex,tQueryKey,"axis",a))
         do axes.Insert(..ProcessOneAxis(tCubeIndex,tAxisKeys(a),a))
     }
+    
+    if (axes.Count()=0) {
+	    set axes = ..GetDefaultAxes()
+    }
 
+    return axes
+]]></Implementation>
+</Method>
+
+<Method name="GetDefaultAxes">
+<Internal>1</Internal>
+<ClassMethod>1</ClassMethod>
+<ReturnType>%ListOfObjects</ReturnType>
+<Implementation><![CDATA[
+	set axes=##class(%ListOfObjects).%New() // all axes
+		
+	set cell=##class(%ZEN.proxyObject).%New()
+	set cell.caption = $$$Text("Count","%DeepSee")
+    set cell.format = ""
+    set cell.total = "COUNT"
+    set cell.type = "msr"
+    set cell.valueID = ""
+    set cell.path = ""
+	set cell.info = ""
+	set cell.dimension = ""
+	
+	set cell2=cell.%ConstructClone()
+	set cell2.type = "mbr"
+	set cell2.caption = $$$Text("%Search","%DeepSee")
+	
+	set axis = ##class(%ZEN.proxyObject).%New() // one axis
+	set axis.tuples = ##class(%ListOfObjects).%New() //array of cells for one axis
+	do axis.tuples.Insert(cell)		
+	do axes.Insert(axis)
+
+	set axis2 = ##class(%ZEN.proxyObject).%New()
+	set axis2.tuples = ##class(%ListOfObjects).%New()
+	do axis2.tuples.Insert(cell2)
+	do axes.Insert(axis2)
+	           
     return axes
 ]]></Implementation>
 </Method>
