@@ -117,41 +117,6 @@ Returns array of Axes</Description>
 ]]></Implementation>
 </Method>
 
-<Method name="GetDefaultAxes">
-<Internal>1</Internal>
-<ClassMethod>1</ClassMethod>
-<ReturnType>%ListOfObjects</ReturnType>
-<Implementation><![CDATA[
-	set axes=##class(%ListOfObjects).%New() // all axes
-		
-	set cell=##class(%ZEN.proxyObject).%New()
-	set cell.caption = $$$Text("Count","%DeepSee")
-    set cell.format = ""
-    set cell.total = "COUNT"
-    set cell.type = "msr"
-    set cell.valueID = ""
-    set cell.path = ""
-	set cell.info = ""
-	set cell.dimension = ""
-	
-	set cell2=cell.%ConstructClone()
-	set cell2.type = "mbr"
-	set cell2.caption = $$$Text("%Search","%DeepSee")
-	
-	set axis = ##class(%ZEN.proxyObject).%New() // one axis
-	set axis.tuples = ##class(%ListOfObjects).%New() //array of cells for one axis
-	do axis.tuples.Insert(cell)		
-	do axes.Insert(axis)
-
-	set axis2 = ##class(%ZEN.proxyObject).%New()
-	set axis2.tuples = ##class(%ListOfObjects).%New()
-	do axis2.tuples.Insert(cell2)
-	do axes.Insert(axis2)
-	           
-    return axes
-]]></Implementation>
-</Method>
-
 <Method name="ProcessOneAxis">
 <Internal>1</Internal>
 <FormalSpec>CubeIndex,AxisKey,AxisNumber</FormalSpec>
@@ -337,6 +302,41 @@ Returns array of cells (left-to-right, up-to-down)</Description>
 	set format.int = "#"_ngs_$TR($J("",size)," ","#")
 	
 	return format
+]]></Implementation>
+</Method>
+
+<Method name="GetDefaultAxes">
+<Internal>1</Internal>
+<ClassMethod>1</ClassMethod>
+<ReturnType>%ListOfObjects</ReturnType>
+<Implementation><![CDATA[
+	set axes=##class(%ListOfObjects).%New() // all axes
+		
+	set cell=##class(%ZEN.proxyObject).%New()
+	set cell.caption = $$$Text("Count","%DeepSee")
+    set cell.format = ""
+    set cell.total = "COUNT"
+    set cell.type = "msr"
+    set cell.valueID = ""
+    set cell.path = ""
+	set cell.info = ""
+	set cell.dimension = ""
+	
+	set cell2=cell.%ConstructClone()
+	set cell2.type = "mbr"
+	set cell2.caption = $$$Text("%Search","%DeepSee")
+	
+	set axis = ##class(%ZEN.proxyObject).%New() // one axis
+	set axis.tuples = ##class(%ListOfObjects).%New() //array of cells for one axis
+	do axis.tuples.Insert(cell)		
+	do axes.Insert(axis)
+
+	set axis2 = ##class(%ZEN.proxyObject).%New()
+	set axis2.tuples = ##class(%ListOfObjects).%New()
+	do axis2.tuples.Insert(cell2)
+	do axes.Insert(axis2)
+	           
+    return axes
 ]]></Implementation>
 </Method>
 </Class>
