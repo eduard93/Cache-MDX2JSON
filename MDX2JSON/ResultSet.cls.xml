@@ -80,8 +80,10 @@ Returns meta-information about ResultSet.</Description>
 	set tCubeName = $G($$$DeepSeeMetaGLVN("classes",tCubeClass))														
 	set info.cubeName = tCubeName
 	set info.cubeClass = tCubeClass
-
-	set info.defaultFormat = ..GetDefaultFormat()																													 
+ 	
+ 	set info.numericGroupSeparator = ##class(%SYS.NLS.Format).GetFormatItem("NumericGroupSeparator")
+    set info.numericGroupSize = ##class(%SYS.NLS.Format).GetFormatItem("NumericGroupSize")
+    set info.decimalSeparator = ##class(%SYS.NLS.Format).GetFormatItem("DecimalSeparator")
 														    
     return info
 ]]></Implementation>
@@ -285,23 +287,6 @@ Returns array of cells (left-to-right, up-to-down)</Description>
 	} 
 
 	return data
-]]></Implementation>
-</Method>
-
-<Method name="GetDefaultFormat">
-<ClassMethod>1</ClassMethod>
-<ReturnType>%ZEN.proxyObject</ReturnType>
-<Implementation><![CDATA[
-	set format = ##class(%ZEN.proxyObject).%New()
-	
-	set ngs = ##class(%SYS.NLS.Format).GetFormatItem("NumericGroupSeparator")
-	set size = ##class(%SYS.NLS.Format).GetFormatItem("NumericGroupSize")
-	set ds = ##class(%SYS.NLS.Format).GetFormatItem("DecimalSeparator")
-	
-	set format.double = "#"_ngs_$TR($J("",size)," ","#")_ds_"##"
-	set format.int = "#"_ngs_$TR($J("",size)," ","#")
-	
-	return format
 ]]></Implementation>
 </Method>
 
