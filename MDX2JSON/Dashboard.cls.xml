@@ -18,7 +18,22 @@ Folder, from which we get Dashboards.</Description>
 Get SQL for folder, from which we get Dashboards. </Description>
 <ClassMethod>1</ClassMethod>
 <ReturnType>%String</ReturnType>
-<Implementation><![CDATA[	return "SELECT MDX2JSON.Dashboard_ResolveText(title) As title, fullName As path FROM %DeepSee_Dashboard.Definition WHERE folderName %STARTSWITH '" _..#folderName _"'"
+<Implementation><![CDATA[	return "SELECT MDX2JSON.Dashboard_ResolveText(title) As title, fullName As path, MDX2JSON.Dashboard_GetDashCover(bookCover) As Cover FROM %DeepSee_Dashboard.Definition WHERE folderName %STARTSWITH '" _..#folderName _"'"
+]]></Implementation>
+</Method>
+
+<Method name="GetDashCover">
+<Description><![CDATA[
+Extracts dashboard cover from %DeepSee.Dashboard.Definition class bookCover property.<br>
+Usage: Select MDX2JSON.Dashboard_GetDashCover(bookCover)  FROM %DeepSee_Dashboard.Definition]]></Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>bookCover:%String=""</FormalSpec>
+<ReturnType>%String</ReturnType>
+<SqlProc>1</SqlProc>
+<Implementation><![CDATA[
+	do ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(bookCover,,.obj,1)
+	return:$isobject(obj) obj.background.src
+    return ""
 ]]></Implementation>
 </Method>
 
