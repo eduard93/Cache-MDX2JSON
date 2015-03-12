@@ -25,7 +25,7 @@ Get SQL for folder, from which we get Dashboards. </Description>
 <Method name="GetDashCover">
 <Description><![CDATA[
 Extracts dashboard cover from %DeepSee.Dashboard.Definition class bookCover property.<br>
-Usage: Select MDX2JSON.Dashboard_GetDashCover(bookCover)  FROM %DeepSee_Dashboard.Definition]]></Description>
+Usage: Select MDX2JSON.Dashboard_GetDashCover(bookCover) FROM %DeepSee_Dashboard.Definition]]></Description>
 <ClassMethod>1</ClassMethod>
 <FormalSpec>bookCover:%String=""</FormalSpec>
 <ReturnType>%String</ReturnType>
