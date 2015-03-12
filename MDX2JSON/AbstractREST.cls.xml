@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Export generator="Cache" version="25">
 <Class name="MDX2JSON.AbstractREST">
+<Description>
+All logic related to the proceccing of http requests.</Description>
 <IncludeCode>MDX2JSON.MDX2JSON</IncludeCode>
 <Super>%CSP.REST</Super>
 <TimeCreated>63572,78432.426689</TimeCreated>
