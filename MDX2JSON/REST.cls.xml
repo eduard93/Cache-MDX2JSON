@@ -71,6 +71,7 @@ Example: send HTTP GET request to web application with Dispatch class <b>MDX2JSO
 
    <!-- Test method-->
    <Route Url="/Test" Method="GET" Call="Test"/>
+   <Route Url="/Logout" Method="GET" Call="Logout"/>
  </Routes>
 ]]></Data>
 </XData>
@@ -99,6 +100,17 @@ Converts request body into UTF8 proxyObject. ]]></Description>
 	
 	set %request.Content = obj // obj here is a valid UTF8 proxyObject with required property
 	return $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="Logout">
+<ClassMethod>1</ClassMethod>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	#dim %session As %CSP.Session
+	set st = %session.Logout(1)
+	set %session.EndSession = 1
+	return st
 ]]></Implementation>
 </Method>
 
