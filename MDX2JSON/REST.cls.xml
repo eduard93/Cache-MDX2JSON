@@ -76,33 +76,6 @@ Example: send HTTP GET request to web application with Dispatch class <b>MDX2JSO
 ]]></Data>
 </XData>
 
-<Method name="ValidateRequest">
-<Description><![CDATA[
-Validates incoming request body against Body Route attribute.<br>
-Converts request body into UTF8 proxyObject. ]]></Description>
-<ClassMethod>1</ClassMethod>
-<FormalSpec>pMethod:%String,pBody:%String</FormalSpec>
-<ReturnType>%Status</ReturnType>
-<Implementation><![CDATA[
-	#dim %request As %CSP.Request
-	#dim obj As %ZEN.proxyObject
-	
-	return:(pMethod'="POST") $$$OK
-	
-	// Convert request body into UTF8 proxyObject
-	set content = %request.Content.Read($$$MaxStringLength)
-	set content = $ZCVT(content,"I","UTF8") 
-	set st = ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(content,,.obj,1)
-	return:$$$ISERR(st) st
-	return:'$IsObject(obj) $$$ERROR($$$ArgumentIsNotAnObject,"Body")
-
-	return:'$d(obj.%data(pBody)) $$$ERROR($$$PropertyRequired,pBody)
-	
-	set %request.Content = obj // obj here is a valid UTF8 proxyObject with required property
-	return $$$OK
-]]></Implementation>
-</Method>
-
 <Method name="Logout">
 <ClassMethod>1</ClassMethod>
 <ReturnType>%Status</ReturnType>

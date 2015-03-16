@@ -48,6 +48,10 @@ Add param Namespace to a request to execute MDX in desired namespace.]]></Descri
     #dim tMethodMatched As %Boolean
     
     Try {
+	    
+	    Set st = ..ConvertRequestBody()
+	    If $$$ISERR(st) Do ..Http500(st) Quit
+	    
 	    // Desired execusion namespace
 	    Set Namespace = $get(%request.Data("Namespace",1))
 	    Set st = ..CheckNamespace(.Namespace)
@@ -155,13 +159,40 @@ Add param Namespace to a request to execute MDX in desired namespace.]]></Descri
 </Method>
 
 <Method name="ValidateRequest">
-<Description><![CDATA[
-Validates incoming request against Body Route attribute.<br>
-Converts request into UTF8. Converts request into proxyObject. ]]></Description>
+<Description>
+Validates incoming request body against Body Route attribute.</Description>
 <ClassMethod>1</ClassMethod>
 <FormalSpec>pMethod:%String,pBody:%String</FormalSpec>
 <ReturnType>%Status</ReturnType>
-<Implementation><![CDATA[	return $$$OK
+<Implementation><![CDATA[
+	#dim %request As %CSP.Request
+	
+	return:(pMethod'="POST") $$$OK
+	return:'$d(%request.Content.%data(pBody)) $$$ERROR($$$PropertyRequired,pBody)
+	return $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="ConvertRequestBody">
+<Description>
+Converts request into UTF8. Converts request into proxyObject. </Description>
+<ClassMethod>1</ClassMethod>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	#dim %request As %CSP.Request
+	#dim obj As %ZEN.proxyObject
+
+	return:'$isobject(%request.Content) $$$OK //empty request body - nothing to do
+	
+	// Convert request body into UTF8 proxyObject
+	set content = %request.Content.Read($$$MaxStringLength)
+	set content = $ZCVT(content,"I","UTF8") 
+	set st = ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(content,,.obj,1)
+	return:$$$ISERR(st) st
+	return:'$IsObject(obj) $$$ERROR($$$ArgumentIsNotAnObject,"Body")
+	
+	set %request.Content = obj // obj here is a valid UTF8 proxyObject with required property
+	return $$$OK
 ]]></Implementation>
 </Method>
 
