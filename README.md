@@ -7,7 +7,7 @@ Installation
 -----------
 
 1. Download Installer.cls.xml (from MDX2JSON folder in repository or releases page) into Caché manager directory.
-2. Run in terminal (any namespace): 
+2. Run in terminal (any namespace) under %user with %All role: 
 
         do ##class(%Installer.Installer).InstallFromCommandLine(##class(%File).ManagerDirectory()_"Installer.cls.xml","Namespace={Namespace}")
 
@@ -99,6 +99,8 @@ If something goes wrong, server must report an error in the following format {Er
 | No dashboards               | Configure roles. Change [dashboard scope](https://github.com/intersystems-ru/Cache-MDX2JSON/issues/10)|
 | DeepSee errors              | Build and compile DeepSee cube(s)|
 | MDX errors                  | Don't forget to escape JSON strings [here](http://json.org/string.gif) |
+| Installation errors		  | Usually problems arise when installation is run under user without %All permissions. To repair the install rerun it under correct user. If the error persists then file an issue with installation log (terminal output) attached|
+
 
 Debugging
 -----------
