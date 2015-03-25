@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="MDX2JSON.Tests">
+<Description>
+Classes with support methods for testing MDX2JSON</Description>
+<IncludeCode>MDX2JSON.MDX2JSON</IncludeCode>
+<TimeCreated>63636,71862.541637</TimeCreated>
+
+<Method name="ProjectLength">
+<Description>
+Count project length in loc
+do ##class(MDX2JSON.Tests).ProjectLength()</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>Mask:%String="MDX2JSON"</FormalSpec>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[
+	 Set rset = ##class(%ResultSet).%New("%DynamicQuery:SQL")
+	 Do rset.Prepare("SELECT Name FROM %Dictionary.ClassDefinition WHERE Name [ '"_Mask_"'")
+	 Do rset.Execute()
+	 Set count=0
+
+	 While (rset.Next()) {
+	     Set class = rset.Data("Name")
+	     Do ##class(%Compiler.UDL.TextServices).GetTextAsArray($Namespace,class,.raw)
+		 Set lines = $O(raw($C(0)),-1)
+		 W class , " " , lines,!
+		 Set count = count + lines 
+	 }
+	 W "Total ",count
+]]></Implementation>
+</Method>
+
+<Method name="MoveFoldersIntoMobile">
+<Description><![CDATA[
+Entry point to move dashboards into mobile folder<br>
+Moves all DeepSee folders into Mobile folder (creates folder, if required)]]></Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>Namespace=$Namespace</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	Set mobileid =..CreateMobileFolder(Namespace)
+	Set ns =$namespace
+	Zn Namespace
+	&sql(UPDATE %DeepSee_UserLibrary.Folder SET folder=:mobileid WHERE folder is null AND name != 'Mobile')
+	Zn ns
+	Do ##class(MDX2JSON.Tests).MoveWidgetsDSIntoMobile(Namespace)
+	Return SQLCODE
+]]></Implementation>
+</Method>
+
+<Method name="CreateMobileFolder">
+<Description><![CDATA[
+Creates DeepSee folder Mobile in <b>Namespace</b><br>]]></Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>Namespace=$Namespace</FormalSpec>
+<ReturnType>%Integer</ReturnType>
+<Implementation><![CDATA[
+	Set ns =$namespace
+	Zn Namespace
+	&sql(SELECT ID into :ID FROM %DeepSee_UserLibrary.Folder WHERE folder is null AND name = 'Mobile')
+	Zn ns
+	Return:$ISVALIDNUM(ID) ID
+	
+	Set folder = ##class(%DeepSee.UserLibrary.Folder).%New()
+	Set folder.name = "Mobile"
+	W $System.Status.GetErrorText(folder.%Save())
+	
+	Return folder.%Id()
+]]></Implementation>
+</Method>
+
+<Method name="MoveWidgetsDSIntoMobile">
+<Description>
+Moves widgets datasources into Mobile folder</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>Namespace=$Namespace</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	Set ns =$namespace
+	Zn Namespace
+		&sql(DECLARE sql1 CURSOR FOR
+		SELECT ID INTO :ID FROM %DeepSee_Dashboard.Definition)
+
+	&sql(OPEN sql1)
+	&sql(FETCH sql1)
+	While (SQLCODE = 0) {
+		Set Dashboard = ##class(%DeepSee.Dashboard.Definition).%OpenId(ID,,.st)
+		For i=1:1:Dashboard.widgets.Count() {
+			Set pivot = Dashboard.widgets.GetAt(i).dataSource
+			If ((##class(%DeepSee.UserLibrary.Utils).%FolderItemExists(pivot)=0) && (##class(%DeepSee.UserLibrary.Utils).%FolderItemExists("Mobile/"_pivot)=1))
+			{
+				Set Dashboard.widgets.GetAt(i).dataSource = "Mobile/"_pivot
+			}
+        }  
+        Do Dashboard.%Save()
+        Set Dashboard=""
+		&sql(FETCH sql1)
+	}
+	&sql(CLOSE sql1)
+
+	Zn ns
+	Return $$$OK
+]]></Implementation>
+</Method>
+</Class>
+</Export>
