@@ -193,6 +193,8 @@ Wrapper for ##class(MDX2JSON.Utils).WriteFilterValues(pCupe, pFilter)</Descripti
 <Implementation><![CDATA[
 	set Cube = %request.Content.Cube
     set Values = %request.Content.Values
+	
+	set:(Cube = "") Cube = %request.Content.DataSource
     
    	set st = ##class(MDX2JSON.Utils).WriteFiltersForCube(Cube,Values)
   	return st
