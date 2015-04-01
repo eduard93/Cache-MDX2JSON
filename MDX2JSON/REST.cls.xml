@@ -52,7 +52,7 @@ Example: send HTTP GET request to web application with Dispatch class <b>MDX2JSO
 
    <!-- Get info about availible filters and their values -->
    <Route Url="/FilterValues/:cube" Method="GET" Call="WriteFiltersForCube"/>
-   <Route Url="/FilterValues" Method="POST" Call="WriteFilterValuesForCube" Body="Cube"/>
+   <Route Url="/FilterValues" Method="POST" Call="WriteFilterValuesForCube"/>
    <Route Url="/FilterValues/:cube/:filter" Method="GET" Call="WriteFilterValues"/> 
    
    <!-- Get info about widgets-->
