@@ -162,12 +162,13 @@ Add param Namespace to a request to execute MDX in desired namespace.]]></Descri
 <Description>
 Validates incoming request body against Body Route attribute.</Description>
 <ClassMethod>1</ClassMethod>
-<FormalSpec>pMethod:%String,pBody:%String</FormalSpec>
+<FormalSpec>pMethod:%String,pBody:%String=""</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
 	#dim %request As %CSP.Request
 	
 	return:(pMethod'="POST") $$$OK
+	return:(pBody="") $$$OK
 	return:'$d(%request.Content.%data(pBody)) $$$ERROR($$$PropertyRequired,pBody)
 	return $$$OK
 ]]></Implementation>
