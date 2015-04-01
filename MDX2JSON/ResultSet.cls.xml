@@ -39,8 +39,8 @@ Converts ResultSet to %ZEN.proxyObject.<br>
 	
 	try {                                       
 	    set obj.Info = ..InfoToProxyObject() // basic info about cube and query
-	    set obj.Cols = ..AxesToProxyObject() // all axes
-	    set obj.Data = ..DataToProxyObject() // array of all cells, left-to-right, up-to-down
+	    set obj.Cols = ..AxesToListOfObjects() // all axes
+	    set obj.Data = ..DataToListOfDataTypes() // array of all cells, left-to-right, up-to-down
 	} catch ex {
 		set pStatus = ex.AsStatus()
 		return ""
@@ -89,7 +89,7 @@ Returns meta-information about ResultSet.</Description>
 ]]></Implementation>
 </Method>
 
-<Method name="AxesToProxyObject">
+<Method name="AxesToListOfObjects">
 <Description>
 Returns array of Axes</Description>
 <ReturnType>%ListOfObjects</ReturnType>
@@ -236,7 +236,7 @@ Determine if cell is an invisyble system cell.</Description>
 ]]></Implementation>
 </Method>
 
-<Method name="DataToProxyObject">
+<Method name="DataToListOfDataTypes">
 <Description>
 Returns array of cells (left-to-right, up-to-down)</Description>
 <ReturnType>%ListOfDataTypes</ReturnType>
