@@ -61,9 +61,7 @@ These are the possible requests to web application (add param ?Namespace={Desire
 | Dashboards                  | GET  |                             | JSON      | All dashboards                 |
 | Widgets                     | POST | {Dashboard:"DashboardName"} | JSON      | All widgets in a dashboard     |
 | DataSource                  | POST |{DataSource:"Pivot fullname"}| JSON      | All info about Pivot           |
-| FilterValues/:cube          | GET  |                             | JSON      | All filters for DeepSee Cube   |
-| FilterValues                | POST |{ "Cube":"Cube Name","Values":1}| JSON   | All filters for DeepSee Cube with values (if Values = 1, set to 0 or omit otherwise)|
-| FilterValues/:cube/:filter  | GET  |                             | JSON      | All possible values for filter |
+| Filters                     | POST |{ "DataSource":"DataSourceName.ext","Values":1}| JSON   | All filters for DeepSee DataSource (cube, pivot, kpi, metric) with values (if Values = 1, set to 0 or omit otherwise)|
 | Format                      | GET  |                             | JSON      | Default formatting             |
 | Test                        | GET  |                             | JSON      | Test info                      |
 

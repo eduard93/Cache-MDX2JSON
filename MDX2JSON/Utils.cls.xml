@@ -114,25 +114,23 @@ Gets filters for MDX expression.<br>
 ]]></Implementation>
 </Method>
 
-<Method name="WriteFiltersForCube">
+<Method name="WriteFiltersForDataSource">
 <Description><![CDATA[
-Get all filters for DeepSee Cube in JSON format.<br>
-<b>pCube</b> - name of DeepSee cube.<br>
-<b>values</b> - write all filters' values. Takes time.]]></Description>
+Get all filters for DeepSee DataSource in JSON format.<br>
+<b>pDataSource</b> - name of DeepSee datasource (cube, pivot, kpi, metric).<br>
+<b>pValues</b> - write all filters' values. Takes time.]]></Description>
 <ClassMethod>1</ClassMethod>
-<FormalSpec>pCube:%String,pValues:%Boolean=0</FormalSpec>
+<FormalSpec>pDataSource:%String,pValues:%Boolean=0</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-	set st = ##class(%DeepSee.Utils).%CubeExists(pCube)
-	set:$$$ISOK(st) pCube = pCube _ ".cube" 
-    set st = ##class(%DeepSee.Dashboard.Utils).%GetFiltersForDataSource(pCube,.tFilters)
+    set st = ##class(%DeepSee.Dashboard.Utils).%GetFiltersForDataSource(pDataSource,.tFilters)
     return:$$$ISERR(st) st 
-    return:($d(tFilters)=0) $$$ERROR($$$GeneralError,"Empty Filter values array. Cube does not exist?")
+    return:($d(tFilters)=0) $$$ERROR($$$GeneralError,"Empty Filter values array. DataSource does not exist?")
 
 	if (pValues=1) {
 	set key = $order(tFilters(""))
 		while (key '= "") {
-			set st = ##class(%DeepSee.Dashboard.Utils).%GetMembersForFilter(pCube,$lg(tFilters(key),2),.tMembers,.tDefaultFilterValue,,.tRelatedFilters,0,,.tValueList)
+			set st = ##class(%DeepSee.Dashboard.Utils).%GetMembersForFilter(pDataSource,$lg(tFilters(key),2),.tMembers,.tDefaultFilterValue,,.tRelatedFilters,0,,.tValueList)
 			return:$$$ISERR(st) st 
 			merge tFilters(key) = tMembers // merge filter values
 			set key = $order(tFilters(key))
@@ -140,24 +138,6 @@ Get all filters for DeepSee Cube in JSON format.<br>
 	}
    	
    	set st = ##class(%ZEN.Auxiliary.jsonProvider).%ArrayToJSON($lb("name","path","info"),.tFilters)
-
-    return st
-]]></Implementation>
-</Method>
-
-<Method name="WriteFilterValues">
-<Description><![CDATA[
-Get all values for Filter for DeepSee Cube in JSON format.<br>
-<b>pCube</b> - name of DeepSee cube.<br>
-<b>pFilter</b> - path of filter. For example: [DateOfSale].[Actual].[MonthSold]]]></Description>
-<ClassMethod>1</ClassMethod>
-<FormalSpec>pCube:%String,pFilter:%String</FormalSpec>
-<ReturnType>%Status</ReturnType>
-<Implementation><![CDATA[
-    set st = ##class(%DeepSee.Dashboard.Utils).%GetMembersForFilter(pCube,pFilter,.tFilters,.tDefaultFilterValue,,.tRelatedFilters,0,,.tValueList)
-    return:$$$ISERR(st) st 
-    
-    set st = ##class(%ZEN.Auxiliary.jsonProvider).%ArrayToJSON($lb("name","value"),.tFilters)
 
     return st
 ]]></Implementation>
