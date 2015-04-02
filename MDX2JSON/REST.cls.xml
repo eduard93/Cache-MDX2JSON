@@ -101,7 +101,7 @@ Test method, outputs <b>%request</b>, <b>%response</b> and <b>%session</b> objec
 <Method name="GetDataSource">
 <ClassMethod>1</ClassMethod>
 <ReturnType>%Status</ReturnType>
-<Implementation><![CDATA[    return ##class(MDX2JSON.Utils).GetDataSource(%request.Content.DataSource)
+<Implementation><![CDATA[    return ##class(MDX2JSON.Utils).GetDataSource($$$R("DataSource"))
 ]]></Implementation>
 </Method>
 
@@ -111,7 +111,7 @@ Wrapper for ##class(MDX2JSON.Utils).GetWidgetsList()<br>
 Converts incoming request object (JSON: {Dashboard:"Dashboard Full Name"} and calls abovementioned method.]]></Description>
 <ClassMethod>1</ClassMethod>
 <ReturnType>%Status</ReturnType>
-<Implementation><![CDATA[    return ##class(MDX2JSON.Utils).GetWidgetsList(%request.Content.Dashboard)
+<Implementation><![CDATA[    return ##class(MDX2JSON.Utils).GetWidgetsList($$$R("Dashboard"))
 ]]></Implementation>
 </Method>
 
@@ -138,7 +138,7 @@ Wrapper for ##class(MDX2JSON.Utils).WriteDrillthroughJSON(pMDX).<br>
 Converts incoming request object and calls abovementioned method.]]></Description>
 <ClassMethod>1</ClassMethod>
 <ReturnType>%Status</ReturnType>
-<Implementation><![CDATA[    return ##class(MDX2JSON.Utils).WriteDrillthroughJSON(%request.Content.MDX)
+<Implementation><![CDATA[    return ##class(MDX2JSON.Utils).WriteDrillthroughJSON($$$R("MDX"))
 ]]></Implementation>
 </Method>
 
@@ -191,10 +191,10 @@ Wrapper for ##class(MDX2JSON.Utils).WriteFilterValues(pCupe, pFilter)</Descripti
 <ClassMethod>1</ClassMethod>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-	set Cube = %request.Content.Cube
-    set Values = %request.Content.Values
+	set Cube = $$$R("Cube")
+    set Values = $$$R("Values")
 	
-	set:(Cube = "") Cube = %request.Content.DataSource
+	set:(Cube = "") Cube = $$$R("DataSource")
     
    	set st = ##class(MDX2JSON.Utils).WriteFiltersForCube(Cube,Values)
   	return st
@@ -223,7 +223,7 @@ Converts incoming request object and calls abovementioned method.]]></Descriptio
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
     try {
-        set st = ##class(MDX2JSON.Utils).WriteJSONfromMDX(%request.Content.MDX)
+        set st = ##class(MDX2JSON.Utils).WriteJSONfromMDX($$$R("MDX"))
     } catch ex {
         set st=ex.AsStatus()
     }
@@ -238,7 +238,7 @@ Wrapper for ##class(MDX2JSON.Utils).WriteJSONPfromMDX(pMDX)<br>
 Converts incoming request object and calls abovementioned method.]]></Description>
 <ClassMethod>1</ClassMethod>
 <ReturnType>%Status</ReturnType>
-<Implementation><![CDATA[    return ##class(MDX2JSON.Utils).WriteJSONPfromMDX(%request.Content.MDX)
+<Implementation><![CDATA[    return ##class(MDX2JSON.Utils).WriteJSONPfromMDX($$$R("MDX"))
 ]]></Implementation>
 </Method>
 
@@ -248,7 +248,7 @@ Wrapper for ##class(MDX2JSON.Utils).WriteXMLAfromMDX(pMDX)<br>
 Converts incoming request object and calls abovementioned method.]]></Description>
 <ClassMethod>1</ClassMethod>
 <ReturnType>%Status</ReturnType>
-<Implementation><![CDATA[    return ##class(MDX2JSON.Utils).WriteXMLAfromMDX(%request.Content.MDX)
+<Implementation><![CDATA[    return ##class(MDX2JSON.Utils).WriteXMLAfromMDX($$$R("MDX"))
 ]]></Implementation>
 </Method>
 
