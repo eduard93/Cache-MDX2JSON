@@ -113,3 +113,18 @@ Use with postconditional expressions, or other flow control statements:
 		if $$$Debug { w "debugging" } else { w "not debugging"}
 		
 Also available are $$$Public and $$$Private macros. Evaluates to true based on request port (80 and 443 are public, private otherwise).
+
+Querying
+-----------
+
+Querying this project is done via REST web client. It may be a standalone application or a browser plug-in, a number of different solutions are available.
+
+For Google Chrome, install [Advanced REST client](https://chrome.google.com/webstore/detail/advanced-rest-client/hgmloofddffdnphfgcellkdfbfbjeloo?hl=en) extension.
+Open installed extension and set the following parameters:
+-URL to required web api methood, eg: `http://serverip:port3/mdx2json/Dashboard?Namespace=Samples`
+-Request type to `GET` or `POST`
+-Payload to `{"Dashboard":"Listing with Filters.dashboard"}`
+-Content-Type to `applicatio/json`
+Press Send button to view results.
+
+
