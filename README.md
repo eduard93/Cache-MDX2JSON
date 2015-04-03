@@ -122,10 +122,10 @@ Querying this project is done via REST web client. It may be a standalone applic
 For Google Chrome, install [Advanced REST client](https://chrome.google.com/webstore/detail/advanced-rest-client/hgmloofddffdnphfgcellkdfbfbjeloo?hl=en) extension.
 Open installed extension and set the following parameters:
 
-- URL to required web api methood, eg: `http://serverip:port3/mdx2json/Dashboard?Namespace=Samples`
+- URL to required web api method, eg: `http://serverip:port3/mdx2json/Dashboard?Namespace=Samples`
 - Request type to `GET` or `POST`
 - Payload to `{"Dashboard":"Listing with Filters.dashboard"}`
-- Content-Type to `applicatio/json`
+- Content-Type to `application/json`
 
 Press Send button to view results.
 
