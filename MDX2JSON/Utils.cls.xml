@@ -202,6 +202,30 @@ Using dashboard name get JSON representation (array of ("type","title","mdx")) o
 ]]></Implementation>
 </Method>
 
+<Method name="GetDashboard">
+<Description><![CDATA[
+Using dashboard name get JSON representation of all its' widgets and filters.<br>
+<b>pDashName</b> - fullname of dashboard. Eg: "KPIs & Plugins/KPI with Listing.dashboard". Case insensitive.]]></Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>pDashName:%String</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+    try {
+        set st = ##class(MDX2JSON.DashboardFilters).OpenDashboardByName(pDashName, .dash)
+		return:($$$ISERR(st)) st
+		
+		set st = ##class(MDX2JSON.DashboardFilters).WidgetsToProxyObject(dash, .widgetlist)
+		return:($$$ISERR(st)) st
+		
+		do widgetlist.%ToJSON()
+    } catch ex {
+        set st = ex.AsStatus()
+        do ex.Log() 
+    }
+    return st
+]]></Implementation>
+</Method>
+
 <Method name="GetFormat">
 <Description>
 Get format defaults.</Description>
