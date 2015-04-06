@@ -121,13 +121,14 @@ Querying
 Querying this project is done via REST web client. It may be a standalone application or a browser plug-in, a number of different solutions are available.
 
 For Google Chrome, install [Advanced REST client](https://chrome.google.com/webstore/detail/advanced-rest-client/hgmloofddffdnphfgcellkdfbfbjeloo?hl=en) extension.
+For Firefox, install [REST client](https://addons.mozilla.org/en-US/firefox/addon/restclient/) extension.
 Open installed extension and set the following parameters:
 
-- URL to required web api method, eg: `http://serverip:port3/mdx2json/Dashboard?Namespace=Samples`
+- URL to required web api method, eg: `http://serverip:port/mdx2json/Dashboard?Namespace=Samples`
 - Request type to `GET` or `POST`
 - Payload to `{"Dashboard":"Listing with Filters.dashboard"}`
-- Content-Type to `application/json`
+- Content-Type to `application/json` (only in Advanced REST client)
 
-Press Send button to view results.
+Press Send button to view results (depending on your server configuration you may be asked to provide valid login/password to access MDX2JSON api).
 
 
