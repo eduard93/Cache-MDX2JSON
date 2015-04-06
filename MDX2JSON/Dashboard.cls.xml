@@ -117,6 +117,7 @@ Converts relevant parts of %DeepSee.Dashboard.Widget object into %ZEN.proxyObjec
 	//return:($$$ISERR(st)) st //all checks passed beforehand
 	
 	set obj.mdx = mdx
+	set obj.name = Widget.name
 	set obj.basemdx = basemdx
 	set obj.type =Widget.subtype
 	set obj.title = ##class(%DeepSee.UserPortal.Utils).%ResolveText(Widget.title) /// $$$ support
@@ -128,7 +129,8 @@ Converts relevant parts of %DeepSee.Dashboard.Widget object into %ZEN.proxyObjec
 
 	for i=1:1:Widget.controls.Count()
 	{
-		do obj.controls.Insert(..WidgetControlToProxyObject(Widget.controls.GetAt(i),cube))
+		set control = ..WidgetControlToProxyObject(Widget,i,cube)
+		do:$IsObject(control) obj.controls.Insert(control)
 	}
 	return obj
 ]]></Implementation>
@@ -139,26 +141,29 @@ Converts relevant parts of %DeepSee.Dashboard.Widget object into %ZEN.proxyObjec
 Converts %DeepSee.Dashboard.Control object into %ZEN.proxyObject, handles run-time DeepSee variables.</Description>
 <Internal>1</Internal>
 <ClassMethod>1</ClassMethod>
-<FormalSpec>Control:%DeepSee.Dashboard.Control,Cube:%String</FormalSpec>
+<FormalSpec>Widget:%DeepSee.Dashboard.Widget,Number:%Integer,Cube:%String</FormalSpec>
 <ReturnType>%ZEN.proxyObject</ReturnType>
 <Implementation><![CDATA[
+	#dim control As %DeepSee.Dashboard.Control
+	set control = Widget.controls.GetAt(Number)
 	set obj = ##class(%ZEN.proxyObject).%New()
-	set obj.action = Control.action 
-	set obj.label = Control.label  
-	set obj.location = Control.location  
-	set obj.readOnly = Control.readOnly  
-	set obj.name = Control.name  
-	set obj.size = Control.size  
-	set obj.target = Control.target  
-	set obj.targetProperty = Control.targetProperty   
-	set obj.targetPropertyDisplay = Control.targetPropertyDisplay   
-	set obj.text = Control.text 
-	set obj.timeout = Control.timeout 
-	set obj.title = Control.title 
-	set obj.type = Control.type 
-	set obj.typeDisplay = Control.typeDisplay 
-	if ($e(Control.value)="@") {
-		set name = $e(Control.value,2,*)
+	set obj.action = control.action 
+	set obj.label = control.label  
+	set obj.location = control.location  
+	set obj.readOnly = control.readOnly  
+	set obj.name = control.name  
+	set obj.size = control.size  
+	set obj.target = control.target
+	set:(obj.target="") obj.target = Widget.name 
+	set obj.targetProperty = control.targetProperty   
+	set obj.targetPropertyDisplay = control.targetPropertyDisplay   
+	set obj.text = control.text 
+	set obj.timeout = control.timeout 
+	set obj.title = control.title 
+	set obj.type = control.type 
+	set obj.typeDisplay = control.typeDisplay 
+	if ($e(control.value)="@") {
+		set name = $e(control.value,2,*)
 		set value = ##class(%DeepSee.UserPortal.Utils).%GetUserSetting(name,.st)
 		if $e(value,1,2)="&[" {
 			set obj.value = value
@@ -166,10 +171,10 @@ Converts %DeepSee.Dashboard.Control object into %ZEN.proxyObject, handles run-ti
 			set obj.value = "&[" _ value _ "]"
 		}
 	} else {
-		set obj.value = Control.value 
+		set obj.value = control.value 
 	}  
-	set obj.valueList = Control.valueList
-	set:((Control.action="applyFilter") || (Control.action="setFilter")) obj.values = ..GetMembersForFilter(Cube,obj.targetProperty)	
+	set obj.valueList = control.valueList
+	set:((control.action="applyFilter") || (control.action="setFilter")) obj.values = ..GetMembersForFilter(Cube,obj.targetProperty)	
 	return obj
 ]]></Implementation>
 </Method>
@@ -220,7 +225,7 @@ Returns list of %ZEN.proxyObject:<br/>]]></Description>
 <Implementation><![CDATA[
 	set st = ##class(%DeepSee.Dashboard.Utils).%GetMembersForFilter(DataSource,Filter,.tMembers,.tDefaultFilterValue,,.tRelatedFilters,0,,.tValueList)
 	set members = ##class(%ListOfObjects).%New()
-			
+	
 	set key = $order(tMembers("")) 
 	while (key '= "") {
 		set member = ##class(%ZEN.proxyObject).%New()
