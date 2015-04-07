@@ -153,6 +153,7 @@ Converts %DeepSee.Dashboard.Control object into %ZEN.proxyObject, handles run-ti
 	set obj.readOnly = control.readOnly  
 	set obj.name = control.name  
 	set obj.size = control.size  
+	set obj.source = Widget.name
 	set obj.target = control.target
 	set:(obj.target="") obj.target = Widget.name 
 	set obj.targetProperty = control.targetProperty   
