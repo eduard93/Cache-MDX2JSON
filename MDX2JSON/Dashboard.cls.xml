@@ -132,6 +132,22 @@ Converts relevant parts of %DeepSee.Dashboard.Widget object into %ZEN.proxyObjec
 		set control = ..WidgetControlToProxyObject(Widget,i,cube)
 		do:$IsObject(control) obj.controls.Insert(control)
 	}
+	
+	if Widget.subtype = "comboChart" {
+		set obj.seriesTypes = ##class(%ListOfDataTypes).%New()
+		for i=1:1:Widget.dataSeries.Count()
+		{
+			do obj.seriesTypes.Insert(Widget.dataSeries.GetAt(i).type)
+		}
+		
+		set obj.overrides = ##class(%ListOfObjects).%New()
+		do {
+			set overridestr = Widget.overrides.GetNext(.key)
+			do ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(overridestr,,.override,1)
+			do:$IsObject(override) obj.overrides.Insert(override)
+		} while key'=""	
+	}
+	
 	return obj
 ]]></Implementation>
 </Method>
