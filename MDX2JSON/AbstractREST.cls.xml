@@ -128,10 +128,10 @@ Add param Namespace to a request to execute MDX in desired namespace.]]></Descri
                 If (Namespace'=$Namespace) {
                     Set oldNS = $Namespace
                     zn Namespace
-                    Set tSC=$zobjclassmethod(tClass,tTarget,tArgs...)
+                    Set tSC=$classmethod(tClass,tTarget,tArgs...)
                     zn oldNS
                 } Else {
-                    Set tSC=$zobjclassmethod(tClass,tTarget,tArgs...)
+                    Set tSC=$classmethod(tClass,tTarget,tArgs...)
                 }
                 If $$$ISERR(tSC) Do ..Http500(tSC)
                 

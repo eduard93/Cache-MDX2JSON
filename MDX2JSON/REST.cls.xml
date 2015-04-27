@@ -18,6 +18,7 @@ You can send requests to:<br> <ul>
 Dashboard related requests are:
  <ul>
     <li>webapplication/Dashboards - get all dashboards in a namespace (GET request).</li>
+    <li>webapplication/Dashboards - get folder specific (recursively) dashboards in a namespace (POST request with {Folder:"FolderName"} body) ).</li>
     <li>webapplication/Dashboard - get all dashboard widgets (POST request with {Dashboard:"DashboardName"} body) with filters as part of dashboard.</li>
     <li>webapplication/Widgets - get all dashboard widgets (POST request with {Dashboard:"DashboardName"} body) with filters as part of widgets.</li>
 </ul>
@@ -55,6 +56,7 @@ Example: send HTTP GET request to web application with Dispatch class <b>MDX2JSO
    
    <!-- Get info about widgets-->
    <Route Url="/Dashboards" Method="GET" Call="GetDashboardList"/> 
+   <Route Url="/Dashboards" Method="POST" Call="GetDashboardList" Body="Folder"/> 
    <Route Url="/Dashboard" Method="POST" Call="GetDashboard" Body="Dashboard"/>
    <Route Url="/Widgets" Method="POST" Call="GetWidgetsList" Body="Dashboard"/>
    
@@ -131,7 +133,13 @@ Returns JSON array of (title, path) for all dashboards in namespace (accessible 
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
     set st = $$$OK
-    set sql = ##class(MDX2JSON.Dashboard).GetDashboardListSQL()
+    if %request.Method = "POST" {
+	    set folderName = $$$R("Folder")
+    } else {
+    	set folderName = ##class(MDX2JSON.Dashboard).#folderName
+    }
+    return:'$IsObject(##class(%DeepSee.UserLibrary.Utils).%FindFolder(folderName)) $$$ERROR($$$GeneralError,"Folder " _ folderName _ " does not exist")
+    set sql = ##class(MDX2JSON.Dashboard).GetDashboardListSQL(folderName)
     try {        
         do ##class(%ZEN.Auxiliary.jsonSQLProvider).%WriteJSONFromSQL(,sql)
     } catch ex {

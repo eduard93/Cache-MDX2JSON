@@ -59,6 +59,7 @@ These are the possible requests to web application (add param ?Namespace={Desire
 | MDXDrillthrough             | POST | { "MDX":"QUERY" }           | JSON      | Results of MDX execution       |
 | MDX2XMLA                    | POST | { "MDX":"QUERY" }           | XMLA      | Results of MDX execution       |
 | Dashboards                  | GET  |                             | JSON      | All dashboards                 |
+| Dashboards                  | POST | {Folder:"FolderName"}       | JSON      | All dashboards in FolderName. Empty FolderName for root scope.|
 | Dashboard                   | POST | {Dashboard:"DashboardName"} | JSON      | All widgets in a dashboard, with filters as part of dashboard|
 | Widgets                     | POST | {Dashboard:"DashboardName"} | JSON      | All widgets in a dashboard, with filters as part of widgets  |
 | DataSource                  | POST |{DataSource:"Pivot fullname"}| JSON      | All info about Pivot           |

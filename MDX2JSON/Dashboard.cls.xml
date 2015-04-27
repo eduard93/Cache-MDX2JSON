@@ -17,8 +17,13 @@ Folder, from which we get Dashboards.</Description>
 <Description>
 Get SQL for folder, from which we get Dashboards. </Description>
 <ClassMethod>1</ClassMethod>
+<FormalSpec>folderName:%String=..#folderName</FormalSpec>
 <ReturnType>%String</ReturnType>
-<Implementation><![CDATA[	return "SELECT MDX2JSON.Dashboard_ResolveText(title) As title, fullName As path, MDX2JSON.Dashboard_GetDashCover(bookCover) As Cover FROM %DeepSee_Dashboard.Definition WHERE folderName %STARTSWITH '" _..#folderName _"'"
+<Implementation><![CDATA[
+	set basesql = "SELECT MDX2JSON.Dashboard_ResolveText(title) As title, fullName As path, MDX2JSON.Dashboard_GetDashCover(bookCover) As Cover FROM %DeepSee_Dashboard.Definition "
+	return:folderName="" basesql
+	set filter = "WHERE folderName %STARTSWITH '" _ folderName _"'"
+	return basesql_filter
 ]]></Implementation>
 </Method>
 
