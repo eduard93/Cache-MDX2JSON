@@ -268,7 +268,9 @@ Wrapper for ##class(MDX2JSON.Users).GetConfig()</Description>
 Wrapper for ##class(MDX2JSON.Users).GetConfig()</Description>
 <ClassMethod>1</ClassMethod>
 <ReturnType>%Status</ReturnType>
-<Implementation><![CDATA[    return ##class(MDX2JSON.Users).SetConfig($$$R("Application"),$$$R("Config"))
+<Implementation><![CDATA[
+	w "{""Config"":"""_##class(MDX2JSON.Users).SetConfig($$$R("Application"),$$$R("Config"))_"""}"
+    return $$$OK
 ]]></Implementation>
 </Method>
 </Class>
