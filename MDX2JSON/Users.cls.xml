@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="MDX2JSON.Users">
+<Super>%RegisteredObject</Super>
+<TimeCreated>63669,64053.502396</TimeCreated>
+
+<Method name="SetConfig">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>App:%String,Config:%String</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	set ns = $Namespace
+	zn "%SYS"
+	set Properties("Attributes",App)= $lb(Config)
+	set st =##class(Security.Users).Modify($Username,.Properties)
+	zn ns
+	return st
+]]></Implementation>
+</Method>
+
+<Method name="GetConfig">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>App:%String</FormalSpec>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[
+	set ns = $Namespace
+	zn "%SYS"
+	set st =##class(Security.Users).Get($Username,.Properties)
+	zn ns
+	return $lg(Properties("Attributes",App))
+]]></Implementation>
+</Method>
+</Class>
+</Export>

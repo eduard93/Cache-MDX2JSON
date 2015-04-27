@@ -64,7 +64,11 @@ Example: send HTTP GET request to web application with Dispatch class <b>MDX2JSO
    <Route Url="/Format" Method="GET" Call="GetFormat"/> 
        
    <!-- Get info about pivot-->
-   <Route Url="/DataSource" Method="POST" Call="GetDataSource" Body="DataSource"/>   
+   <Route Url="/DataSource" Method="POST" Call="GetDataSource" Body="DataSource"/>  
+   
+   <!-- Get info about user config-->
+   <Route Url="/Config" Method="POST" Call="SetConfig" Body="Application"/> 
+   <Route Url="/Config/:Application" Method="GET" Call="GetConfig" />       
      
    <!-- Valid but illicit, do not use-->
    <Route Url="/MDX/:query" Method="GET" Call="WriteJSONfromMDXURL"/>  
@@ -246,6 +250,25 @@ Wrapper for ##class(MDX2JSON.Utils).GetFormat()</Description>
 <ClassMethod>1</ClassMethod>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[    return ##class(MDX2JSON.Utils).GetFormat()
+]]></Implementation>
+</Method>
+
+<Method name="GetConfig">
+<Description>
+Wrapper for ##class(MDX2JSON.Users).GetConfig()</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>Application</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[    return ##class(MDX2JSON.Users).GetConfig(Application)
+]]></Implementation>
+</Method>
+
+<Method name="SetConfig">
+<Description>
+Wrapper for ##class(MDX2JSON.Users).GetConfig()</Description>
+<ClassMethod>1</ClassMethod>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[    return ##class(MDX2JSON.Users).SetConfig($$$R("Application"),$$$R("Config"))
 ]]></Implementation>
 </Method>
 </Class>
