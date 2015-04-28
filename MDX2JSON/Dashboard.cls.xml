@@ -153,6 +153,12 @@ Converts relevant parts of %DeepSee.Dashboard.Widget object into %ZEN.proxyObjec
 		} while key'=""	
 	}
 	
+	set obj.properties = ##class(%ArrayOfDataTypes).%New()
+	do {
+		set property = Widget.properties.GetNext(.key)
+		do:(key'="") obj.properties.SetAt(property,key)
+	} while key'=""
+	
 	return obj
 ]]></Implementation>
 </Method>
