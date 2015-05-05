@@ -20,10 +20,11 @@ Get SQL for folder, from which we get Dashboards. </Description>
 <FormalSpec>folderName:%String=..#folderName</FormalSpec>
 <ReturnType>%String</ReturnType>
 <Implementation><![CDATA[
-	set basesql = "SELECT MDX2JSON.Dashboard_ResolveText(title) As title, fullName As path, MDX2JSON.Dashboard_GetDashCover(bookCover) As Cover FROM %DeepSee_Dashboard.Definition "
-	return:folderName="" basesql
-	set filter = "WHERE folderName %STARTSWITH '" _ folderName _"'"
-	return basesql_filter
+	set basesql = "SELECT MDX2JSON.Dashboard_ResolveText(title) AS title, fullName AS path, MDX2JSON.Dashboard_GetDashCover(bookCover) AS Cover FROM %DeepSee_Dashboard.Definition "
+	set basefilter = "WHERE (NOT (foldername %STARTSWITH '$TRASH' or foldername %STARTSWITH 'HIDDEN')) "
+	return:folderName="" basesql _ basefilter
+	set filter = "AND folderName %STARTSWITH '" _ folderName _"'"
+	return basesql _ basefilter _ filter
 ]]></Implementation>
 </Method>
 
