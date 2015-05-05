@@ -178,7 +178,7 @@ Converts %DeepSee.Dashboard.Control object into %ZEN.proxyObject, handles run-ti
 	set control = Widget.controls.GetAt(Number)
 	set obj = ##class(%ZEN.proxyObject).%New()
 	set obj.action = control.action 
-	set obj.label = control.label  
+	set obj.label = ##class(%DeepSee.UserPortal.Utils).%ResolveText(control.label)
 	set obj.location = control.location  
 	set obj.readOnly = control.readOnly  
 	set obj.name = control.name  
