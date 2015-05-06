@@ -4,6 +4,10 @@
 <Super>%DeepSee.Component.Portlet.abstractPortlet</Super>
 <TimeCreated>63677,67001.020851</TimeCreated>
 
+<Parameter name="USECOMMONDIRECTORY">
+<Default>1</Default>
+</Parameter>
+
 <Method name="%OnGetPortletName">
 <ClassMethod>1</ClassMethod>
 <ReturnType>%String</ReturnType>
