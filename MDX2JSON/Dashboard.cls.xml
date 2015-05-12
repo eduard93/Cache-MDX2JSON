@@ -92,6 +92,7 @@ Converts %DeepSee.Dashboard.Definition widgets into %ZEN.proxyObject.</Descripti
     #Dim widget As %DeepSee.Dashboard.Widget
     set Widgetlist = ##class(%ZEN.proxyObject).%New()
     set Widgetlist.children = ##class(%ListOfObjects).%New()
+    set Widgetlist.displayInfo = ..GetDashboardDisplayInfo(Dashboard)
     
     set st = $$$OK
     try {
@@ -131,6 +132,7 @@ Converts relevant parts of %DeepSee.Dashboard.Widget object into %ZEN.proxyObjec
 	set obj.dataSource = Widget.dataSource
 	set obj.drillDownDataSource = Widget.drillDownDataSource
 	set obj.cube = cube
+	set obj.displayInfo = ..GetWidgetDisplayInfo(Widget)
 	set obj.controls = ##class(%ListOfObjects).%New()
 
 	for i=1:1:Widget.controls.Count()
@@ -267,6 +269,44 @@ Returns list of %ZEN.proxyObject:<br/>]]></Description>
 		do members.Insert(member)
 	}
 	return members
+]]></Implementation>
+</Method>
+
+<Method name="GetDashboardDisplayInfo">
+<Description>
+Converts %DeepSee.Dashboard.Definition display information into %ZEN.proxyObject.</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>Dashboard:%DeepSee.Dashboard.Definition</FormalSpec>
+<ReturnType>%ZEN.proxyObject</ReturnType>
+<Implementation><![CDATA[
+    set DisplayInfo = ##class(%ZEN.proxyObject).%New()
+    set DisplayInfo.snapToGrid = Dashboard.snapTo // Dashboard is in "snap to grid" mode.
+    set DisplayInfo.gridMode = Dashboard.snapGrid // Dashboard uses the new snapGrid layout mode.
+    set DisplayInfo.gridRows = Dashboard.gridRows
+    set DisplayInfo.gridCols = Dashboard.gridCols
+    return DisplayInfo
+]]></Implementation>
+</Method>
+
+<Method name="GetWidgetDisplayInfo">
+<Description>
+Converts %DeepSee.Dashboard.Widget display information into %ZEN.proxyObject.</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>Widget:%DeepSee.Dashboard.Widget</FormalSpec>
+<ReturnType>%ZEN.proxyObject</ReturnType>
+<Implementation><![CDATA[
+    set DisplayInfo = ##class(%ZEN.proxyObject).%New()
+
+	set DisplayInfo.top = Widget.top
+	set DisplayInfo.left = Widget.left
+	set DisplayInfo.width = Widget.width
+	set DisplayInfo.height = Widget.height
+	set DisplayInfo.topCol = Widget.homeColL
+	set DisplayInfo.leftRow = Widget.homeRowL
+	set DisplayInfo.colWidth = Widget.colSpanL
+    set DisplayInfo.rowHeight = Widget.rowSpanL
+    
+    return DisplayInfo
 ]]></Implementation>
 </Method>
 
