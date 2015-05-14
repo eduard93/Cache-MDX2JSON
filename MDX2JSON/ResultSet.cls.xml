@@ -15,6 +15,7 @@ Converts ResultSet to %ZEN.proxyObject.<br>
 <FormalSpec>*pStatus:%Status</FormalSpec>
 <ReturnType>%ZEN.proxyObject</ReturnType>
 <Implementation><![CDATA[
+	set ^DeepSee.QueryLog($UserName,$I(^DeepSee.QueryLog($UserName))) = ..%GetQueryText()
     set status = $$$ERROR($$$GeneralError,"Error occured while executing ##class(MDX2JSON.ResultSet).ToProxyObject() method")
        
     set obj=##class(%ZEN.proxyObject).%New()
