@@ -93,6 +93,7 @@ Converts %DeepSee.Dashboard.Definition widgets into %ZEN.proxyObject.</Descripti
     set Widgetlist = ##class(%ZEN.proxyObject).%New()
     set Widgetlist.children = ##class(%ListOfObjects).%New()
     set Widgetlist.displayInfo = ..GetDashboardDisplayInfo(Dashboard)
+    set Widgetlist.info = ..GetDashboardInfo(Dashboard)
     
     set st = $$$OK
     try {
@@ -307,6 +308,20 @@ Converts %DeepSee.Dashboard.Widget display information into %ZEN.proxyObject.</D
     set DisplayInfo.rowHeight = Widget.rowSpanL
     
     return DisplayInfo
+]]></Implementation>
+</Method>
+
+<Method name="GetDashboardInfo">
+<Description>
+Converts %DeepSee.Dashboard.Definition display information into %ZEN.proxyObject.</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>Dashboard:%DeepSee.Dashboard.Definition</FormalSpec>
+<ReturnType>%ZEN.proxyObject</ReturnType>
+<Implementation><![CDATA[
+    set Info = ##class(%ZEN.proxyObject).%New()
+    set Info.title = Dashboard.title
+
+    return Info
 ]]></Implementation>
 </Method>
 

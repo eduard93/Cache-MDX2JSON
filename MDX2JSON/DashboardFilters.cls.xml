@@ -19,6 +19,7 @@ Converts %DeepSee.Dashboard.Definition widgets into %ZEN.proxyObject.</Descripti
     set Widgetlist.widgets = ##class(%ListOfObjects).%New()
     set Widgetlist.filters = ##class(%ListOfObjects).%New()
     set Widgetlist.displayInfo = ..GetDashboardDisplayInfo(Dashboard)
+    set Widgetlist.info = ..GetDashboardInfo(Dashboard)
     
     set st = $$$OK
     try {
