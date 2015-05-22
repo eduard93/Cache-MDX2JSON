@@ -10,6 +10,10 @@ todo add optional parameter WEBAPP to Alter web app name if it needs to have ano
 <XMLNamespace>INSTALLER</XMLNamespace>
 <Data><![CDATA[
 <Manifest>
+<IfNotDef Var="Namespace">
+<Var Name="Namespace" Value="MDX2JSON"/>
+<Log Text="Set namespace to ${Namespace}" Level="0"/>
+</IfNotDef>
 <If Condition='(##class(Config.Namespaces).Exists("${Namespace}")=0)'>
 <Log Text="Creating namespace ${Namespace}" Level="0"/>
 <Namespace Name="${Namespace}" Create="yes" Code="${Namespace}" Data="${Namespace}">
