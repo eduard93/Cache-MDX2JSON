@@ -23,8 +23,8 @@ Installation without fs access to server
 1. Download Installer.cls.xml (from MDX2JSON folder in repository or releases page) into Caché Studio (any namespace)
 2. Run in terminal (any namespace) under user with %All role: 
 
-       set pVars("Namespace")="{Namespace}"
-       do ##class(MDX2JSON.Installer).setup(.pVars)
+        set pVars("Namespace")="{Namespace}"
+        do ##class(MDX2JSON.Installer).setup(.pVars)
 
   where: 
   
