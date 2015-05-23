@@ -7,7 +7,7 @@ Installation
 -----------
 
 1. Download Installer.cls.xml (from MDX2JSON folder in repository or releases page) into Caché manager directory.
-2. Run in terminal (any namespace) under %user with %All role: 
+2. Run in terminal (any namespace) under user with %All role: 
 
         do ##class(%Installer.Installer).InstallFromCommandLine(##class(%File).ManagerDirectory()_"Installer.cls.xml","Namespace={Namespace}")
 
@@ -17,13 +17,26 @@ Installation
 On this step installer would create (if needed) Namespace and corresponding database, download source code from GitHub and compile it, create required web application (named /{Namespace}) if one does not exist (skipping web application creation process if one does exist), and map MDX2JSON package to %All namespace (which will be created if it does not exist).
 3. Give the correct roles to /{Namespace} webapplication for it to be able to query desired cubes.
 
+Installation without fs access to server
+-----------
 
+1. Download Installer.cls.xml (from MDX2JSON folder in repository or releases page) into Caché Studio (any namespace)
+2. Run in terminal (any namespace) under user with %All role: 
+
+       set pVars("Namespace")="{Namespace}"
+       do ##class(MDX2JSON.Installer).setup(.pVars)
+
+  where: 
+  
+      {Namespace} is a namespace you want to install to. If it does not exist it would be created automatically. If it does exist only MDX2JSON package would be overwritten. 
+On this step installer would create (if needed) Namespace and corresponding database, download source code from GitHub and compile it, create required web application (named /{Namespace}) if one does not exist (skipping web application creation process if one does exist), and map MDX2JSON package to %All namespace (which will be created if it does not exist).
+3. Give the correct roles to /{Namespace} webapplication for it to be able to query desired cubes.
 
 Offline Installation
 -----------
 
 1. Download zip and unpack it.
-2. Run in terminal (any namespace): 
+2. Run in terminal (any namespace) under user with %All role: 
 
         do ##class(%Installer.Installer).InstallFromCommandLine("{SourceDir}\Installer.cls.xml","Namespace={Namespace},SourceDir={SourceDir}")
 
