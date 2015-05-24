@@ -21,7 +21,7 @@ Get SQL for folder, from which we get Dashboards. </Description>
 <ReturnType>%String</ReturnType>
 <Implementation><![CDATA[
 	set basesql = "SELECT MDX2JSON.Dashboard_ResolveText(title) AS title, fullName AS path, MDX2JSON.Dashboard_GetDashCover(bookCover) AS Cover FROM %DeepSee_Dashboard.Definition "
-	set basefilter = "WHERE (NOT (foldername %STARTSWITH '$TRASH' or foldername %STARTSWITH 'HIDDEN')) "
+	set basefilter = "WHERE (NOT (foldername %STARTSWITH '$TRASH' or foldername %STARTSWITH 'HIDDEN')) OR foldername IS NULL"
 	return:folderName="" basesql _ basefilter
 	set filter = "AND folderName %STARTSWITH '" _ folderName _"'"
 	return basesql _ basefilter _ filter
