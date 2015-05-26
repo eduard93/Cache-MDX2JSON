@@ -121,8 +121,15 @@ Converts relevant parts of %DeepSee.Dashboard.Widget object into %ZEN.proxyObjec
     &sql(SELECT cubeName into :cube FROM %DeepSee_Dashboard.Pivot WHERE fullName=:Widget.dataSource)
 	set:(SQLCODE'=0) cube=""
 	
-	set st = ..GetMdx(Widget.dataSource, .mdx, .basemdx)
-	//return:($$$ISERR(st)) st //all checks passed beforehand
+	if (Widget.dataSource'="") {
+		set st = ..GetMdx(Widget.dataSource, .mdx, .basemdx)
+	} else {
+		// Linked widgets processing
+		set mdx = ""
+		set basemdx = ""
+		set obj.Link = Widget.dataLink
+
+	}
 	
 	set obj.mdx = mdx
 	set obj.name = Widget.name
