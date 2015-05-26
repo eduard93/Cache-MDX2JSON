@@ -128,7 +128,6 @@ Converts relevant parts of %DeepSee.Dashboard.Widget object into %ZEN.proxyObjec
 		set mdx = ""
 		set basemdx = ""
 		set obj.Link = Widget.dataLink
-
 	}
 	
 	set obj.mdx = mdx
