@@ -23,7 +23,7 @@ Dashboard related requests are:
     <li>webapplication/Widgets - get all dashboard widgets (POST request with {Dashboard:"DashboardName"} body) with filters as part of widgets.</li>
 </ul>
 To get information about possible datasource (cube, pivot, kpi, metric) filters and filters' values:<br><ul>
-    <li>webapplication/Filters - Same but with POST { "DataSource":"DataSourceName.ext","Values":0} body. If values = 1, then filters' values would also be provided.</li> 
+    <li>webapplication/Filters - Same but with POST { "DataSource":"DataSourceName.ext","Values":0, Search:"SearchTerm"} body. If values = 1, then filters' values would also be provided. If Search is not empty only filter values, containing search term would be returned.</li> 
 </ul> 
         
 To get information about pivot:<br><ul>
@@ -195,14 +195,15 @@ Do not use.</Description>
 
 <Method name="WriteFiltersForDataSource">
 <Description>
-Wrapper for ##class(MDX2JSON.Utils).WriteFiltersForDataSource(pDataSource, pValues)</Description>
+Wrapper for ##class(MDX2JSON.Utils).WriteFiltersForDataSource(pDataSource, pValues, pSearchKey)</Description>
 <ClassMethod>1</ClassMethod>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
 	set DataSource = $$$R("DataSource")
     set Values = $$$R("Values")
+    set Search = $$$R("Search")
     
-   	set st = ##class(MDX2JSON.Utils).WriteFiltersForDataSource(DataSource,Values)
+   	set st = ##class(MDX2JSON.Utils).WriteFiltersForDataSource(DataSource,Values,Search)
   	return st
 ]]></Implementation>
 </Method>

@@ -76,7 +76,7 @@ These are the possible requests to web application (add param ?Namespace={Desire
 | Dashboard                   | POST | {Dashboard:"DashboardName"} | JSON      | All widgets in a dashboard, with filters as part of dashboard|
 | Widgets                     | POST | {Dashboard:"DashboardName"} | JSON      | All widgets in a dashboard, with filters as part of widgets  |
 | DataSource                  | POST |{DataSource:"Pivot fullname"}| JSON      | All info about Pivot           |
-| Filters                     | POST |{ "DataSource": "DataSourceName.ext", "Values":1}| JSON   | All filters for DeepSee DataSource (cube, pivot, kpi, metric) with values (if Values = 1, set to 0 or omit otherwise)|
+| Filters                     | POST |{ "DataSource": "DataSourceName.ext", "Values":1, Search:"SearchTerm"}| JSON   | All filters for DeepSee DataSource (cube, pivot, kpi, metric) with values (if Values = 1, set to 0 or omit otherwise). If Search is not empty only filter values, containing search term would be returned.|
 | Format                      | GET  |                             | JSON      | Default formatting             |
 | Test                        | GET  |                             | JSON      | Test info                      |
 
