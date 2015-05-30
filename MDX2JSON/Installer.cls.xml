@@ -97,7 +97,64 @@ do ##class(MDX2JSON.Installer).setup(.pVars)</Description>
     Set tSC = ##class(Security.Applications).Create("/"_Namespace, .cspProperties)
     Do tInstaller.PopNS()
     If $$$ISERR(tSC) Throw ##class(%Installer.Exception).CreateFromStatus(tSC)
-    quit $$$OK
+    Quit $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="DeleteNamespace">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>Namespace=$Namespace</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+    // Based on %CSP.UI.Portal.Dialog.NamespaceDelete:SaveData
+    Try {
+	    Set st = ##class(MDX2JSON.AbstractREST).CheckNamespace(.Namespace)
+    	Return:$$$ISERR(st) st
+	    
+	    Set ns=$Namespace
+	    zn:ns'="%SYS" "%SYS"
+		Set st = ##class(Config.Namespaces).Delete(Namespace)
+		Return:$$$ISERR(st) st
+		
+		#; clear application
+		/*&sql(DECLARE C1 CURSOR FOR SELECT Name,Path INTO :Name,:Path FROM Security.Applications)
+		&sql(OPEN C1)
+		&sql(FETCH C1)
+
+		While (SQLCODE = 0) {
+		    #; delete csp application from security
+			Set st = ##Class(Security.Applications).Delete(Name)
+			#; delete csp pages and physical path
+			If (Path '= "") {
+				#; delete csp pages in this directory
+				Set RS = ##class(%ResultSet).%New("%File:FileSet")
+				Do RS.Execute(cspPath,"*.csp")
+				While RS.Next() {
+					Do ##class(%File).Delete(RS.Get("Name"))
+				}
+				#; delete this directory - If there are no files left and no subdirectory, then it's deleted.
+				Do ##class(%File).RemoveDirectory(Path)
+			}
+			    
+		    &sql(FETCH C1)
+		}
+    
+ 		&sql(CLOSE C1)*/
+		
+		#; remove Ensemble namespace
+	 	If ((##class(%Library.EnsembleMgr).IsEnsembleInstalled() || ##class(%Library.EnsembleMgr).IsHealthShareInstalled())) {
+	 		Set tSC = ##class(%Library.EnsembleMgr).DisableNamespace(Namespace)
+	 		Return:$$$ISERR(st) st
+	 	}
+	 	
+		#; remove the session data so System link (from locator bar) will not have the old namespace built into URL.
+		Kill %session.Data("$NAMESPACE")
+	} catch Error {
+		Set st = er.AsStatus()
+	}
+	zn:((ns'="%SYS") && (ns'=Namespace)) ns
+
+    Quit st
 ]]></Implementation>
 </Method>
 
