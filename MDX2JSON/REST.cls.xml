@@ -68,7 +68,12 @@ Example: send HTTP GET request to web application with Dispatch class <b>MDX2JSO
    
    <!-- Get info about user config-->
    <Route Url="/Config" Method="POST" Call="SetConfig" Body="Application"/> 
-   <Route Url="/Config/:Application" Method="GET" Call="GetConfig" />       
+   <Route Url="/Config/:Application" Method="GET" Call="GetConfig" />     
+   
+   <!-- Get info about user favorites-->
+   <Route Url="/Favorites" Method="GET" Call="GetFavotites"/> 
+   <Route Url="/Favorites/:Item" Method="POST" Call="AddFavorite" />   
+   <Route Url="/Favorites/:Item" Method="DELETE" Call="RemoveFavorite" /> 
      
    <!-- Valid but illicit, do not use-->
    <Route Url="/MDX/:query" Method="GET" Call="WriteJSONfromMDXURL"/>  
@@ -272,6 +277,35 @@ Wrapper for ##class(MDX2JSON.Users).GetConfig()</Description>
 <Implementation><![CDATA[
 	w "{""Config"":"""_##class(MDX2JSON.Users).SetConfig($$$R("Application"),$$$R("Config"))_"""}"
     return $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="GetFavorites">
+<ClassMethod>1</ClassMethod>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[
+	do ##class(MDX2JSON.Users).GetFavorites()
+	return 1
+]]></Implementation>
+</Method>
+
+<Method name="AddFavorite">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>Name:%String</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	do ##class(MDX2JSON.Users).AddFavorite(Name)
+	return 1
+]]></Implementation>
+</Method>
+
+<Method name="RemoveFavorite">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>Name:%String</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	do ##class(MDX2JSON.Users).RemoveFavorite(Name)
+	return 1
 ]]></Implementation>
 </Method>
 </Class>
