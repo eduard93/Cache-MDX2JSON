@@ -20,8 +20,8 @@ Get SQL for folder, from which we get Dashboards. </Description>
 <FormalSpec>folderName:%String=..#folderName</FormalSpec>
 <ReturnType>%String</ReturnType>
 <Implementation><![CDATA[
-	set basesql = "SELECT MDX2JSON.Dashboard_ResolveText(title) AS title, fullName AS path, MDX2JSON.Dashboard_GetDashCover(bookCover) AS Cover FROM %DeepSee_Dashboard.Definition "
-	set basefilter = "WHERE (NOT (foldername %STARTSWITH '$TRASH' or foldername %STARTSWITH 'HIDDEN')) OR foldername IS NULL"
+	set basesql = "SELECT MDX2JSON.Dashboard_ResolveText(title) AS title, fullName AS path, MDX2JSON.GetDashCover(bookCover) AS Cover FROM %DeepSee_Dashboard.Definition "
+	set basefilter = "WHERE ((NOT (foldername %STARTSWITH '$TRASH' or foldername %STARTSWITH 'HIDDEN')) OR foldername IS NULL) AND (MDX2JSON.IsItemVisible(fullName) = 1) "
 	return:folderName="" basesql _ basefilter
 	set filter = "AND folderName %STARTSWITH '" _ folderName _"'"
 	return basesql _ basefilter _ filter
@@ -35,11 +35,28 @@ Usage: Select MDX2JSON.Dashboard_GetDashCover(bookCover) FROM %DeepSee_Dashboard
 <ClassMethod>1</ClassMethod>
 <FormalSpec>bookCover:%String=""</FormalSpec>
 <ReturnType>%String</ReturnType>
+<SqlName>GetDashCover</SqlName>
 <SqlProc>1</SqlProc>
 <Implementation><![CDATA[
 	do ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(bookCover,,.obj,1)
 	return:$isobject(obj) obj.background.src
     return ""
+]]></Implementation>
+</Method>
+
+<Method name="IsItemVisible">
+<Description><![CDATA[
+Check visibility of folder item to user.<br>
+Usage: Select fullname, MDX2JSON.IsItemVisible(fullname) FROM %DeepSee_Dashboard.Definition]]></Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>fullName:%String=""</FormalSpec>
+<ReturnType>%String</ReturnType>
+<SqlName>IsItemVisible</SqlName>
+<SqlProc>1</SqlProc>
+<Implementation><![CDATA[
+	set visible = ##class(%DeepSee.UserLibrary.Utils).%FolderItemExists(fullName)
+    return:visible=1 1
+    return 0
 ]]></Implementation>
 </Method>
 
