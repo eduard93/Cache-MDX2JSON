@@ -190,6 +190,9 @@ Using dashboard name get JSON representation (array of ("type","title","mdx")) o
         set st = ##class(MDX2JSON.Dashboard).OpenDashboardByName(pDashName, .dash)
 		return:($$$ISERR(st)) st
 		
+		set canaaccess = dash.%CheckResource()
+		return:canaaccess=0 $$$ERROR($$$GeneralError,"Access denied to " _ pDashName)
+		
 		set st = ##class(MDX2JSON.Dashboard).WidgetsToProxyObject(dash, .widgetlist)
 		return:($$$ISERR(st)) st
 		
