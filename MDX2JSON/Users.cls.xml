@@ -30,5 +30,28 @@
 	return $lg(Properties("Attributes",App))
 ]]></Implementation>
 </Method>
+
+<Method name="GetFavorites">
+<ClassMethod>1</ClassMethod>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[	return 1
+]]></Implementation>
+</Method>
+
+<Method name="AddFavorite">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>Name:%String</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[	return 1
+]]></Implementation>
+</Method>
+
+<Method name="RemoveFavorite">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>Name:%String</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[	return 1
+]]></Implementation>
+</Method>
 </Class>
 </Export>
