@@ -71,7 +71,7 @@ Example: send HTTP GET request to web application with Dispatch class <b>MDX2JSO
    <Route Url="/Config/:Application" Method="GET" Call="GetConfig" />     
    
    <!-- Get info about user favorites-->
-   <Route Url="/Favorites" Method="GET" Call="GetFavotites"/> 
+   <Route Url="/Favorites" Method="GET" Call="GetFavorites"/> 
    <Route Url="/Favorites/:Item" Method="POST" Call="AddFavorite" />   
    <Route Url="/Favorites/:Item" Method="DELETE" Call="RemoveFavorite" /> 
      
@@ -282,10 +282,10 @@ Wrapper for ##class(MDX2JSON.Users).GetConfig()</Description>
 
 <Method name="GetFavorites">
 <ClassMethod>1</ClassMethod>
-<ReturnType>%String</ReturnType>
+<ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-	do ##class(MDX2JSON.Users).GetFavorites()
-	return 1
+	set st = ##class(MDX2JSON.Users).GetFavorites()
+	return st
 ]]></Implementation>
 </Method>
 
@@ -294,8 +294,8 @@ Wrapper for ##class(MDX2JSON.Users).GetConfig()</Description>
 <FormalSpec>Name:%String</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-	do ##class(MDX2JSON.Users).AddFavorite(Name)
-	return 1
+	set Name = $ZCONVERT($ZCONVERT(Name ,"I","URL") ,"I","UTF8")
+	return ##class(%DeepSee.UserLibrary.Utils).%AddFavorite(Name)
 ]]></Implementation>
 </Method>
 
@@ -304,8 +304,8 @@ Wrapper for ##class(MDX2JSON.Users).GetConfig()</Description>
 <FormalSpec>Name:%String</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-	do ##class(MDX2JSON.Users).RemoveFavorite(Name)
-	return 1
+	set Name = $ZCONVERT($ZCONVERT(Name ,"I","URL") ,"I","UTF8")
+	return ##class(%DeepSee.UserLibrary.Utils).%RemoveFavorite(Name)
 ]]></Implementation>
 </Method>
 </Class>

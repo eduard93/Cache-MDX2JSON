@@ -34,23 +34,12 @@
 <Method name="GetFavorites">
 <ClassMethod>1</ClassMethod>
 <ReturnType>%String</ReturnType>
-<Implementation><![CDATA[	return 1
-]]></Implementation>
-</Method>
-
-<Method name="AddFavorite">
-<ClassMethod>1</ClassMethod>
-<FormalSpec>Name:%String</FormalSpec>
-<ReturnType>%Status</ReturnType>
-<Implementation><![CDATA[	return 1
-]]></Implementation>
-</Method>
-
-<Method name="RemoveFavorite">
-<ClassMethod>1</ClassMethod>
-<FormalSpec>Name:%String</FormalSpec>
-<ReturnType>%Status</ReturnType>
-<Implementation><![CDATA[	return 1
+<Implementation><![CDATA[
+	set st = ##class(%DeepSee.UserPortal.Utils).%GetFavoritesForUser(.Favorites)
+	return:$$$ISERR(st) st
+	set st = ##class(%ZEN.Auxiliary.jsonProvider).%ArrayToJSON($lb("FullName","ShortName","Folder","Tip","Type","Icon","AddDate","URL"),.Favorites)
+	return:$$$ISERR(st) st
+	return $$$OK
 ]]></Implementation>
 </Method>
 </Class>
