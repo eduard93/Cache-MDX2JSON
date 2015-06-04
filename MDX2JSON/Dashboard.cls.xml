@@ -247,8 +247,11 @@ Returns MDX string used to create pivot.<br>
 <Implementation><![CDATA[
 	#dim tPivot As %DeepSee.Dashboard.Pivot
 	#dim tPivotTable As %DeepSee.Component.pivotTable
+	set MDX = ""
+	set BaseMDX = ""
+    
     set tPivot = ##class(%DeepSee.UserLibrary.Utils).%OpenFolderItem(pPivotName,.pStatus)
-
+    return:'$IsObject(tPivot) $$$OK
     return:$$$ISERR(pStatus) pStatus
 
     set tPivotTable = ##class(%DeepSee.Component.pivotTable).%New()
