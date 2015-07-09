@@ -303,5 +303,24 @@ Download list of files on https://raw.githubusercontent.com/ server.<br>
 	Return st
 ]]></Implementation>
 </Method>
+
+<Method name="RevokePublicPriveleges">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>NamespacesList:%String="*"</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	set st1=$SYSTEM.SQL.RevokeObjPriv("SELECT","*","TABLE","_PUBLIC",,,"_SYSTEM")
+	set st2=$SYSTEM.SQL.RevokeObjPriv("SELECT","*","VIEW","_PUBLIC",,,"_SYSTEM")
+	set st3=$SYSTEM.SQL.RevokeObjPriv("SELECT","*","CUBES","_PUBLIC",,,"_SYSTEM")
+	set st4=$SYSTEM.SQL.RevokeObjPriv("SELECT","*","STORED PROCEDURES","_PUBLIC",,,"_SYSTEM")
+	return $$$ADDSC(st1, $$$ADDSC(st2, $$$ADDSC(st3,st4)))
+]]></Implementation>
+</Method>
+
+<Method name="GetNSList">
+<ClassMethod>1</ClassMethod>
+<Implementation><![CDATA[	do ##class(%CSP.Portal.Utils).%GetNamespaceList(.NspList)
+]]></Implementation>
+</Method>
 </Class>
 </Export>
