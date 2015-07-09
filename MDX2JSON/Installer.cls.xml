@@ -322,5 +322,11 @@ Download list of files on https://raw.githubusercontent.com/ server.<br>
 <Implementation><![CDATA[	do ##class(%CSP.Portal.Utils).%GetNamespaceList(.NspList)
 ]]></Implementation>
 </Method>
+
+<Method name="AddSelectToUser">
+<ClassMethod>1</ClassMethod>
+<Implementation><![CDATA[	set st1=$SYSTEM.SQL.GrantObjPriv()
+]]></Implementation>
+</Method>
 </Class>
 </Export>
