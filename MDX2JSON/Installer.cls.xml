@@ -344,6 +344,7 @@ Revokes all access of _PUBLIC user to everything in comma-separated list of name
 <Description>
 Returns comma-separated list of all local availible namespaces</Description>
 <ClassMethod>1</ClassMethod>
+<ReturnType>%String</ReturnType>
 <Implementation><![CDATA[
 	set st=##class(%CSP.Portal.Utils).%GetNamespaceList(.nsarrary)
 	return:$$$ISERR(st) st
