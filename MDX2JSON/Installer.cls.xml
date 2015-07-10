@@ -318,8 +318,23 @@ Download list of files on https://raw.githubusercontent.com/ server.<br>
 </Method>
 
 <Method name="GetNSList">
+<Description>
+Returns comma-separated list of all local availible namespaces</Description>
 <ClassMethod>1</ClassMethod>
-<Implementation><![CDATA[	do ##class(%CSP.Portal.Utils).%GetNamespaceList(.NspList)
+<Implementation><![CDATA[
+	set st=##class(%CSP.Portal.Utils).%GetNamespaceList(.nsarrary)
+	return:$$$ISERR(st) st
+	set namespace = $O(nsarrary(""))
+	set nslist=""
+	while namespace '= "" {
+		set enabled = $lg(nsarrary(namespace),1)
+		set remote = $lg(nsarrary(namespace),2)
+		if ((enabled = 1) && (remote=0)) {
+			set nslist=nslist _ namespace _ ","	
+		}
+		set namespace = $O(nsarrary(namespace))
+	}
+	return $e(nslist,1,*-1)
 ]]></Implementation>
 </Method>
 
