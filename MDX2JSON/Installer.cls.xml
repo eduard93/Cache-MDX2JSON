@@ -338,9 +338,16 @@ Returns comma-separated list of all local availible namespaces</Description>
 ]]></Implementation>
 </Method>
 
-<Method name="AddSelectToUser">
+<Method name="GrantSelectToUser">
 <ClassMethod>1</ClassMethod>
-<Implementation><![CDATA[	set st1=$SYSTEM.SQL.GrantObjPriv()
+<FormalSpec>User:%String,NamespacesList:%String="*"</FormalSpec>
+<Implementation><![CDATA[
+	set:NamespacesList="*" NamespacesList=..GetNSList()
+	set basens=$Namespace
+	for i=1:1:$l(NamespacesList,",") {
+		zn $p(NamespacesList,",",i)
+		set st=$SYSTEM.SQL.GrantObjPriv("SELECT","*","TABLE",User)	
+	}
 ]]></Implementation>
 </Method>
 </Class>
