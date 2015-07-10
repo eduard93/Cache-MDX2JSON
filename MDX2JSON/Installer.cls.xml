@@ -305,15 +305,25 @@ Download list of files on https://raw.githubusercontent.com/ server.<br>
 </Method>
 
 <Method name="RevokePublicPriveleges">
+<Description>
+Revokes all access of _PUBLIC user to everything in comma-separated list of namespaces</Description>
 <ClassMethod>1</ClassMethod>
 <FormalSpec>NamespacesList:%String="*"</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-	set st1=$SYSTEM.SQL.RevokeObjPriv("SELECT","*","TABLE","_PUBLIC",,,"_SYSTEM")
-	set st2=$SYSTEM.SQL.RevokeObjPriv("SELECT","*","VIEW","_PUBLIC",,,"_SYSTEM")
-	set st3=$SYSTEM.SQL.RevokeObjPriv("SELECT","*","CUBES","_PUBLIC",,,"_SYSTEM")
-	set st4=$SYSTEM.SQL.RevokeObjPriv("SELECT","*","STORED PROCEDURES","_PUBLIC",,,"_SYSTEM")
-	return $$$ADDSC(st1, $$$ADDSC(st2, $$$ADDSC(st3,st4)))
+	set:NamespacesList="*" NamespacesList=..GetNSList()
+	set basens=$Namespace
+	set st = $$$OK
+	for i=1:1:$l(NamespacesList,",") {
+		zn $p(NamespacesList,",",i)
+		set st1=$SYSTEM.SQL.RevokeObjPriv("SELECT","*","TABLE","_PUBLIC",,,"_SYSTEM")
+		set st2=$SYSTEM.SQL.RevokeObjPriv("SELECT","*","VIEW","_PUBLIC",,,"_SYSTEM")
+		set st3=$SYSTEM.SQL.RevokeObjPriv("SELECT","*","CUBES","_PUBLIC",,,"_SYSTEM")
+		set st4=$SYSTEM.SQL.RevokeObjPriv("SELECT","*","STORED PROCEDURES","_PUBLIC",,,"_SYSTEM")
+		set st = $$$ADDSC(st, $$$ADDSC(st1, $$$ADDSC(st2, $$$ADDSC(st3,st4))))
+	}
+	zn basens
+	return st
 ]]></Implementation>
 </Method>
 
@@ -339,15 +349,20 @@ Returns comma-separated list of all local availible namespaces</Description>
 </Method>
 
 <Method name="GrantSelectToUser">
+<Description>
+Grant select access to User to all tables in comma-separated list of namespaces</Description>
 <ClassMethod>1</ClassMethod>
 <FormalSpec>User:%String,NamespacesList:%String="*"</FormalSpec>
 <Implementation><![CDATA[
 	set:NamespacesList="*" NamespacesList=..GetNSList()
 	set basens=$Namespace
+	set st = $$$OK
 	for i=1:1:$l(NamespacesList,",") {
 		zn $p(NamespacesList,",",i)
-		set st=$SYSTEM.SQL.GrantObjPriv("SELECT","*","TABLE",User)	
+		set st = $$$ADDSC(st,$SYSTEM.SQL.GrantObjPriv("SELECT","*","TABLE",User))	
 	}
+	zn basens
+	return st
 ]]></Implementation>
 </Method>
 </Class>
