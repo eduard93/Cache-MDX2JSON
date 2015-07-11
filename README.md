@@ -51,6 +51,15 @@ On this step installer would create (if needed) Namespace and corresponding data
 
 For information on how to work with this RESTful web API please refer to included documentation.
 
+Additional installation parameters
+-----------
+
+As a second parameter to `do ##class(%Installer.Installer).InstallFromCommandLine()` you can supply a comma-separated list of additional variables. Eg: User=MDX2JSON,Password=123456
+
+      User is a Caché user to create or modify. He will be given SELECT access to all tables in {Namespace} 
+
+      Password must be supplied alongside User parameters
+ 
 Update
 -----------
 
