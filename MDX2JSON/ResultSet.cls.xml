@@ -223,7 +223,7 @@ Determine if cell is an invisyble system cell.</Description>
 	//return:(caption'="") 0
 	//return:(path="") 1
 	set children = Cell.children
-	return:($isobject(children)) 0
+	return:(($isobject(children)) && (children.Count()>0)) 0
 	
 	if (Cell.type'="lit") {
 		set key = $O($$$DeepSeeResultsGLVN(..%CubeKey, ..%QueryKey, "leaf", AxisNumber, ""))
