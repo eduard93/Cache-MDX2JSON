@@ -1,10 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Export generator="Cache" version="25">
 <Class name="MDX2JSON.Users">
+<Description><![CDATA[
+Class for Setting/Getting User <b>settings</b> for various <b>apps</b>.<br>
+Can also export/import dettings to/from <b>files</b>.]]></Description>
 <Super>%RegisteredObject</Super>
 <TimeCreated>63669,64053.502396</TimeCreated>
 
 <Method name="SetConfig">
+<Description><![CDATA[
+Set <b>App</b> configuration for <b>User</b> equal to <b>Config</b>]]></Description>
 <ClassMethod>1</ClassMethod>
 <FormalSpec>App:%String,Config:%String,User:%String=$Username</FormalSpec>
 <ReturnType>%Status</ReturnType>
@@ -19,6 +24,8 @@
 </Method>
 
 <Method name="GetConfig">
+<Description><![CDATA[
+Get <b>App</b> configuration for <b>User</b>]]></Description>
 <ClassMethod>1</ClassMethod>
 <FormalSpec>App:%String,User:%String=$Username</FormalSpec>
 <ReturnType>%String</ReturnType>
@@ -32,10 +39,10 @@
 </Method>
 
 <Method name="ExportConfig">
-<Description>
-do ##class(MDX2JSON.Users).ExportConfig()</Description>
+<Description><![CDATA[
+Export <b>App</b> configuration for <b>User</b> to <b>File</b>]]></Description>
 <ClassMethod>1</ClassMethod>
-<FormalSpec>App:%String,User:%String=$Username,FileName:%String=##class(%File).TempFilename("txt")</FormalSpec>
+<FormalSpec>App:%String,User:%String=$Username,FileName:%String</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
 	
@@ -52,6 +59,8 @@ do ##class(MDX2JSON.Users).ExportConfig()</Description>
 </Method>
 
 <Method name="ImportConfig">
+<Description><![CDATA[
+Import <b>App</b> configuration for <b>User</b> from <b>File</b>]]></Description>
 <ClassMethod>1</ClassMethod>
 <FormalSpec>App:%String,User:%String=$Username,FileName:%String</FormalSpec>
 <ReturnType>%String</ReturnType>
@@ -70,6 +79,8 @@ do ##class(MDX2JSON.Users).ExportConfig()</Description>
 </Method>
 
 <Method name="GetFavorites">
+<Description>
+Get Current user favorites</Description>
 <ClassMethod>1</ClassMethod>
 <ReturnType>%String</ReturnType>
 <Implementation><![CDATA[
