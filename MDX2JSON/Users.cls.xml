@@ -32,9 +32,23 @@
 </Method>
 
 <Method name="ExportConfig">
+<Description>
+do ##class(MDX2JSON.Users).ExportConfig()</Description>
 <ClassMethod>1</ClassMethod>
 <FormalSpec>App:%String,User:%String=$Username,FileName:%String=##class(%File).TempFilename("txt")</FormalSpec>
-<ReturnType>%String</ReturnType>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	
+	set config = ..GetConfig(App,User)
+	set stream=##class(%Stream.FileCharacter).%New()
+	Set stream.TranslateTable="UTF8"
+	set st=stream.LinkToFile(FileName)
+	return:$$$ISERR(st) st
+	set st=stream.Write(config)
+	return:$$$ISERR(st) st
+	set st=stream.%Save()
+	return st
+]]></Implementation>
 </Method>
 
 <Method name="ImportConfig">
