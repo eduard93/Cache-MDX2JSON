@@ -41,7 +41,7 @@ do ##class(MDX2JSON.Users).ExportConfig()</Description>
 	
 	set config = ..GetConfig(App,User)
 	set stream=##class(%Stream.FileCharacter).%New()
-	Set stream.TranslateTable="UTF8"
+	set stream.TranslateTable="UTF8"
 	set st=stream.LinkToFile(FileName)
 	return:$$$ISERR(st) st
 	set st=stream.Write(config)
@@ -55,6 +55,18 @@ do ##class(MDX2JSON.Users).ExportConfig()</Description>
 <ClassMethod>1</ClassMethod>
 <FormalSpec>App:%String,User:%String=$Username,FileName:%String</FormalSpec>
 <ReturnType>%String</ReturnType>
+<Implementation><![CDATA[
+	set stream=##class(%Stream.FileCharacter).%New()
+	set stream.TranslateTable="UTF8"
+	set st=stream.LinkToFile(FileName)
+	return:$$$ISERR(st) st
+	set config = ""
+	while 'stream.AtEnd {
+		set config = config _stream.Read()
+	}
+	set st = ..SetConfig(App,config,User)
+	return st
+]]></Implementation>
 </Method>
 
 <Method name="GetFavorites">
