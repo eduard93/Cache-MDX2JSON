@@ -31,6 +31,18 @@
 ]]></Implementation>
 </Method>
 
+<Method name="ExportConfig">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>App:%String,User:%String=$Username,FileName:%String=##class(%File).TempFilename("txt")</FormalSpec>
+<ReturnType>%String</ReturnType>
+</Method>
+
+<Method name="ImportConfig">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>App:%String,User:%String=$Username,FileName:%String</FormalSpec>
+<ReturnType>%String</ReturnType>
+</Method>
+
 <Method name="GetFavorites">
 <ClassMethod>1</ClassMethod>
 <ReturnType>%String</ReturnType>
