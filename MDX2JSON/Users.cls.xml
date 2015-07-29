@@ -6,13 +6,13 @@
 
 <Method name="SetConfig">
 <ClassMethod>1</ClassMethod>
-<FormalSpec>App:%String,Config:%String</FormalSpec>
+<FormalSpec>App:%String,Config:%String,User:%String=$Username</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
 	set ns = $Namespace
 	zn "%SYS"
 	set Properties("Attributes",App)= $lb(Config)
-	set st =##class(Security.Users).Modify($Username,.Properties)
+	set st =##class(Security.Users).Modify(User,.Properties)
 	zn ns
 	return st
 ]]></Implementation>
@@ -20,12 +20,12 @@
 
 <Method name="GetConfig">
 <ClassMethod>1</ClassMethod>
-<FormalSpec>App:%String</FormalSpec>
+<FormalSpec>App:%String,User:%String=$Username</FormalSpec>
 <ReturnType>%String</ReturnType>
 <Implementation><![CDATA[
 	set ns = $Namespace
 	zn "%SYS"
-	set st =##class(Security.Users).Get($Username,.Properties)
+	set st =##class(Security.Users).Get(User,.Properties)
 	zn ns
 	return $lg(Properties("Attributes",App))
 ]]></Implementation>
