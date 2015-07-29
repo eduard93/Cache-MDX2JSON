@@ -165,19 +165,8 @@ Converts relevant parts of %DeepSee.Dashboard.Widget object into %ZEN.proxyObjec
 		do:$IsObject(control) obj.controls.Insert(control)
 	}
 	
-	if Widget.subtype = "comboChart" {
-		set obj.seriesTypes = ##class(%ListOfDataTypes).%New()
-		for i=1:1:Widget.dataSeries.Count()
-		{
-			do obj.seriesTypes.Insert(Widget.dataSeries.GetAt(i).type)
-		}
-		
-		set obj.overrides = ##class(%ListOfObjects).%New()
-		do {
-			set overridestr = Widget.overrides.GetNext(.key)
-			do ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(overridestr,,.override,1)
-			do:$IsObject(override) obj.overrides.Insert(override)
-		} while key'=""	
+	if ##class(%Dictionary.CompiledMethod).%ExistsId("MDX2JSON.Dashboard||Process"_Widget.subtype) {
+		do $ClassMethod("MDX2JSON.Dashboard", "Process"_Widget.subtype, Widget, obj)
 	}
 	
 	if (Widget.properties.Count()>0) {
@@ -189,6 +178,39 @@ Converts relevant parts of %DeepSee.Dashboard.Widget object into %ZEN.proxyObjec
 	}
 	
 	return obj
+]]></Implementation>
+</Method>
+
+<Method name="ProcesscomboChart">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>Widget,Obj:%ZEN.proxyObject</FormalSpec>
+<Implementation><![CDATA[
+	set Obj.seriesTypes = ##class(%ListOfDataTypes).%New()
+	for i=1:1:Widget.dataSeries.Count()
+	{
+		do Obj.seriesTypes.Insert(Widget.dataSeries.GetAt(i).type)
+	}
+	
+	set Obj.overrides = ##class(%ListOfObjects).%New()
+	do {
+		set overridestr = Widget.overrides.GetNext(.key)
+		do ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(overridestr,,.override,1)
+		do:$IsObject(override) Obj.overrides.Insert(override)
+	} while key'=""
+]]></Implementation>
+</Method>
+
+<Method name="ProcesstextMeter">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>Widget:%DeepSee.Dashboard.Widget,Obj:%ZEN.proxyObject</FormalSpec>
+<Implementation><![CDATA[
+	set Obj.dataProperties = ##class(%ListOfDataTypes).%New()
+	for i=1:1:Widget.dataProperties.Count()
+	{
+		set dataProperty = ##class(%ZEN.proxyObject).%New()
+		do Widget.dataProperties.GetAt(i).%CopyTo(dataProperty)
+		do Obj.dataProperties.Insert(dataProperty)
+	}
 ]]></Implementation>
 </Method>
 
