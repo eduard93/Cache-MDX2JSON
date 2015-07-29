@@ -200,9 +200,8 @@ Converts %DeepSee.Dashboard.Control object into %ZEN.proxyObject, handles run-ti
 <FormalSpec>Widget:%DeepSee.Dashboard.Widget,Number:%Integer,Cube:%String</FormalSpec>
 <ReturnType>%ZEN.proxyObject</ReturnType>
 <Implementation><![CDATA[
-	#dim control As %DeepSee.Dashboard.Control
 	set obj = ##class(%ZEN.proxyObject).%New()
-	set st = Widget.controls.GetAt(Number).%CopyTo(obj)
+	set st = Widget.controls.GetAt(Number).%CopyTo(obj) // copy widget control properties to proxyObj
 	
 	set obj.label = ##class(%DeepSee.UserPortal.Utils).%ResolveText(obj.label)
 	set obj.source = Widget.name
