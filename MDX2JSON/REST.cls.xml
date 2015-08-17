@@ -266,7 +266,7 @@ Wrapper for ##class(MDX2JSON.Users).GetConfig()</Description>
 <FormalSpec>Application</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-    w "{""Config"":""" _ ##class(MDX2JSON.Users).GetConfig(Application) _ """}"
+    w "{""Config"":" _ ##class(MDX2JSON.Users).GetConfig(Application) _ "}"
     return $$$OK
 ]]></Implementation>
 </Method>
@@ -278,8 +278,8 @@ Wrapper for ##class(MDX2JSON.Users).SetConfig()</Description>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
 	set config = $$$R("Config")
-	if (($IsObject(config)) && (config.%IsA("%ZEN.proxyObject"))) {
-		set config = config.%ToJSON()
+	if (($IsObject(config)) && (config.%IsA("%ZEN.proxyObject"))) {					
+		set config = ..POtoStr(config)
 	}
 	return ##class(MDX2JSON.Users).SetConfig($$$R("Application"),config)
 ]]></Implementation>

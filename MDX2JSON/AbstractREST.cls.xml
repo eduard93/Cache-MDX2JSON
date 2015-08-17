@@ -413,5 +413,48 @@ This is the Schema which defines the form of the dispatch map</Description>
 </xs:schema>
 ]]></Data>
 </XData>
+
+<Method name="POtoStr">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>config</FormalSpec>
+<ProcedureBlock>0</ProcedureBlock>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[
+	
+	set str=""
+		
+	//Redirect IO to the current routine - makes use of the labels defined below
+	use $io::("^"_$ZNAME)
+	
+	//Enable redirection
+	do ##class(%Device).ReDirectIO(1)
+
+	do config.%ToJSON()
+	
+    //Disable redirection
+    do ##class(%Device).ReDirectIO(0)
+    
+    quit str	  
+
+    //Labels that allow for IO redirection
+    //Read Character - we don't care about reading
+rchr(c)      quit
+    //Read a string - we don't care about reading
+rstr(sz,to)  quit
+    //Write a character - call the output label
+wchr(s)      do output($char(s))  quit
+    //Write a form feed - call the output label
+wff()        do output($char(12))  quit
+    //Write a newline - call the output label
+wnl()        do output($char(13,10))  quit
+    //Write a string - call the output label
+wstr(s)      do output(s)  quit
+    //Write a tab - call the output label
+wtab(s)      do output($char(9))  quit
+    //Output label - this is where you would handle what you actually want to do.
+    //  in our case, we want to write to myStream
+output(s)    set str=str_s   quit
+]]></Implementation>
+</Method>
 </Class>
 </Export>
