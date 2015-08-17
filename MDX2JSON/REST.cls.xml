@@ -276,7 +276,12 @@ Wrapper for ##class(MDX2JSON.Users).GetConfig()</Description>
 Wrapper for ##class(MDX2JSON.Users).SetConfig()</Description>
 <ClassMethod>1</ClassMethod>
 <ReturnType>%Status</ReturnType>
-<Implementation><![CDATA[	return ##class(MDX2JSON.Users).SetConfig($$$R("Application"),$$$R("Config"))
+<Implementation><![CDATA[
+	set config = $$$R("Config")
+	if (($IsObject(config)) && (config.%IsA("%ZEN.proxyObject"))) {
+		set config = config.%ToJSON()
+	}
+	return ##class(MDX2JSON.Users).SetConfig($$$R("Application"),config)
 ]]></Implementation>
 </Method>
 
