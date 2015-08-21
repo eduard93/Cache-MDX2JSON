@@ -34,7 +34,8 @@ Get <b>App</b> configuration for <b>User</b>]]></Description>
 	zn "%SYS"
 	set st =##class(Security.Users).Get(User,.Properties)
 	zn ns
-	return $lg($g(Properties("Attributes",App)))
+	set setting = $g(Properties("Attributes",App),$lb(""""""))
+	return $lg(setting)
 ]]></Implementation>
 </Method>
 
