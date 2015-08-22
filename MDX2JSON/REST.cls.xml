@@ -266,7 +266,7 @@ Wrapper for ##class(MDX2JSON.Users).GetConfig()</Description>
 <FormalSpec>Application</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-    w "{""Config"":" _ ##class(MDX2JSON.Users).GetConfig(Application) _ "}"
+    w "{"_$$$ZENJSPAIR("Config",##class(MDX2JSON.Users).GetConfig(Application))_"}"
     return $$$OK
 ]]></Implementation>
 </Method>
