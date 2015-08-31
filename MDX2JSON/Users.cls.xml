@@ -25,7 +25,7 @@ Set <b>App</b> configuration for <b>User</b> equal to <b>Config</b>]]></Descript
 
 <Method name="SetConfigForAllUsers">
 <Description><![CDATA[
-Set <b>App</b> configuration for all <b>Users</b> equal to <b>Config</b>]]></Description>
+Set <b>App</b> configuration for all Users equal to <b>Config</b>]]></Description>
 <ClassMethod>1</ClassMethod>
 <FormalSpec>App:%String,Config:%String=""</FormalSpec>
 <ReturnType>%Status</ReturnType>
