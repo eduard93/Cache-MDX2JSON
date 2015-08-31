@@ -11,13 +11,34 @@ Can also export/import dettings to/from <b>files</b>.]]></Description>
 <Description><![CDATA[
 Set <b>App</b> configuration for <b>User</b> equal to <b>Config</b>]]></Description>
 <ClassMethod>1</ClassMethod>
-<FormalSpec>App:%String,Config:%String,User:%String=$Username</FormalSpec>
+<FormalSpec>App:%String,Config:%String="",User:%String=$Username</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
 	set ns = $Namespace
 	zn "%SYS"
 	set Properties("Attributes",App)= $lb(Config)
 	set st =##class(Security.Users).Modify(User,.Properties)
+	zn ns
+	return st
+]]></Implementation>
+</Method>
+
+<Method name="SetConfigForAllUsers">
+<Description><![CDATA[
+Set <b>App</b> configuration for all <b>Users</b> equal to <b>Config</b>]]></Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>App:%String,Config:%String=""</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	set ns = $Namespace
+	zn "%SYS"		
+	return:'($$$IOwnAllRole) $$$ERROR($$$AccessDenied)
+	
+	set rs=##Class(%ResultSet).%New("Security.Users:List")
+	set st = rs.Execute()
+	while rs.Next() { 
+		set st=$$$ADDSC(st,..SetConfig(App, Config, rs.Get("Name")))
+	}
 	zn ns
 	return st
 ]]></Implementation>
