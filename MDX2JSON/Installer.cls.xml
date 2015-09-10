@@ -66,6 +66,8 @@ todo add optional parameter WEBAPP to Alter web app name if it needs to have ano
 </User>
 <RunInstall Class="MDX2JSON.Installer" Method="GrantSelectToUserInstaller"/>
 <Log Text="User modifyed/created and granted SELECT access to all tables in ${Namespace}" Level="0"/>
+<RunInstall Class="MDX2JSON.Installer" Method="GrantExecuteToUserInstaller"/>
+<Log Text="User modifyed/created and granted Execute access to all procedures in ${Namespace}" Level="0"/>
 </IfDef> 
 <IfNotDef Var="Password">
 <Log Text="You specified username but not a password" Level="0"/>
@@ -397,6 +399,38 @@ Grant select access to User to all tables in comma-separated list of namespaces<
 	for i=1:1:$l(NamespacesList,",") {
 		zn $p(NamespacesList,",",i)
 		set st = $$$ADDSC(st,$SYSTEM.SQL.GrantObjPriv("SELECT","*","TABLE",User))	
+	}
+	zn basens
+	return st
+]]></Implementation>
+</Method>
+
+<Method name="GrantExecuteToUserInstaller">
+<Description>
+Grant select access to User to all tables in comma-separated list of namespaces</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>pVars,pLogLevel,tInstaller</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	set user=pVars("User")
+	set namespace= pVars("Namespace")
+	return ..GrantSelectToUser(user,namespace)
+]]></Implementation>
+</Method>
+
+<Method name="GrantExecuteToUser">
+<Description>
+Grant select access to User to all tables in comma-separated list of namespaces</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>User:%String,NamespacesList:%String="*"</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	set:NamespacesList="*" NamespacesList=..GetNSList()
+	set basens=$Namespace
+	set st = $$$OK
+	for i=1:1:$l(NamespacesList,",") {
+		zn $p(NamespacesList,",",i)
+		set st = $$$ADDSC(st,$SYSTEM.SQL.GrantObjPriv("EXECUTE","*","STORED PROCEDURES",User))	
 	}
 	zn basens
 	return st
