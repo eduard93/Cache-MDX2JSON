@@ -27,7 +27,7 @@ todo add optional parameter WEBAPP to Alter web app name if it needs to have ano
 <Namespace Name="${Namespace}" Create="no">
 <IfDef Var="SourceDir">
 <Log Text="SourceDir defined - offline install from ${SourceDir}" Level="0"/>
-<Import Recurse="1" File="${SourceDir}"/>
+<Import File="${SourceDir}"/>
 </IfDef>
 <IfNotDef Var="SourceDir">
 <Log Text="SourceDir undefined - online install from GitHub" Level="0"/>
