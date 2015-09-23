@@ -390,8 +390,8 @@ Grant select access to User to all tables in comma-separated list of namespaces<
 <FormalSpec>pVars,pLogLevel,tInstaller</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-	set user=pVars("User")
-	set namespace= pVars("Namespace")
+	set user = tInstaller.Evaluate("${User}")
+	set namespace = tInstaller.Evaluate("${Namespace}")
 	return ..GrantSelectToUser(user,namespace)
 ]]></Implementation>
 </Method>
@@ -422,8 +422,8 @@ Grant select access to User to all tables in comma-separated list of namespaces<
 <FormalSpec>pVars,pLogLevel,tInstaller</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-	set user=pVars("User")
-	set namespace= pVars("Namespace")
+	set user = tInstaller.Evaluate("${User}")
+	set namespace = tInstaller.Evaluate("${Namespace}")
 	return ..GrantSelectToUser(user,namespace)
 ]]></Implementation>
 </Method>
