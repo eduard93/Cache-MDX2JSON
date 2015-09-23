@@ -63,7 +63,7 @@ todo add optional parameter WEBAPP to Alter web app name if it needs to have ano
 <RunInstall Class="MDX2JSON.Installer" Method="GrantSelectToUserInstaller"/>
 <Log Text="User modifyed/created and granted SELECT access to all tables in ${Namespace}" Level="0"/>
 <RunInstall Class="MDX2JSON.Installer" Method="GrantExecuteToUserInstaller"/>
-<Log Text="User modifyed/created and granted Execute access to all procedures in ${Namespace}" Level="0"/>
+<Log Text="User modifyed/created and granted EXECUTE access to all procedures in ${Namespace}" Level="0"/>
 </IfDef> 
 <IfNotDef Var="Password">
 <Log Text="You specified username but not a password" Level="0"/>
