@@ -252,6 +252,36 @@ Issue an '500' error and give some indication as to what occurred.<br>
 ]]></Implementation>
 </Method>
 
+<Method name="GetMappings">
+<Description>
+Retums info about MDX2JSON package mapping</Description>
+<ClassMethod>1</ClassMethod>
+<ReturnType>%ArrayOfObjects</ReturnType>
+<Implementation><![CDATA[
+	Set result = ##class(%ArrayOfObjects).%New()
+	Set mapped = ##class(%ListOfDataTypes).%New()
+	Set unmapped = ##class(%ListOfDataTypes).%New()
+	Set st = ##class(%CSP.Portal.Utils).%GetNamespaceList(.nslist)
+	If $$$ISERR(st) Quit st
+	Set namespace = $O(nslist(""))
+	While namespace '= "" {
+		Set enabled = $lg(nslist(namespace),1)
+		If enabled = 1 {
+			Set st = ..CheckNamespace(namespace)
+			if $$$ISOK(st) {
+				do mapped.Insert(namespace)
+			} else {
+				do unmapped.Insert(namespace)
+			}	
+		}
+		Set namespace = $O(nslist(namespace))
+	}
+	do result.SetAt(mapped,"Mapped")
+	do result.SetAt(unmapped,"Unmapped")
+	return result
+]]></Implementation>
+</Method>
+
 <Method name="CheckNamespace">
 <Description><![CDATA[
 Returns OK if namespace both exists and contains MDX2JSON package.<br>

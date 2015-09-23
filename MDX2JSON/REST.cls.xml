@@ -103,7 +103,17 @@ Test method, outputs <b>%request</b>, <b>%response</b> and <b>%session</b> objec
 <ClassMethod>1</ClassMethod>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-    write "{"_ $$$ZENJSPAIR("Status","OK") _"," _ $$$ZENJSPAIR("User",$Username) _"}"
+	set obj = ##class(%ZEN.proxyObject).%New()
+	set obj.Status = "OK"
+	set obj.User = $Username
+	set obj.Version = "2.0"
+	if $$$Debug {
+		set obj.Roles = $Roles
+		set obj.Namespace = $Namespace
+		set obj.Mappings = ..GetMappings()
+		set obj.Cache = $zv
+	}
+    do obj.%ToJSON()
     return $$$OK
 ]]></Implementation>
 </Method>
