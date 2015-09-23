@@ -112,5 +112,23 @@ Get Current user favorites</Description>
 	return $$$OK
 ]]></Implementation>
 </Method>
+
+<Method name="GetAccess">
+<Description>
+Retums info about relevant user priveleges</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>User:%String=$Username</FormalSpec>
+<ReturnType>%ArrayOfObjects</ReturnType>
+<Implementation><![CDATA[
+	Set result = ##class(%ArrayOfDataTypes).%New()
+	
+	do result.SetAt($SYSTEM.SQL.CheckPriv(User,"9,MDX2JSON.ResolveText","e"),"MDX2JSON.ResolveText")
+	do result.SetAt($SYSTEM.SQL.CheckPriv(User,"9,MDX2JSON.IsItemVisible","e"),"MDX2JSON.IsItemVisible") 
+	do result.SetAt($SYSTEM.SQL.CheckPriv(User,"9,MDX2JSON.GetDashCover","e"),"MDX2JSON.GetDashCover") 
+	do result.SetAt($SYSTEM.SQL.CheckPriv(User,"1,%DeepSee_Dashboard.Definition","s"),"%DeepSee_Dashboard.Definition") 
+	
+	return result
+]]></Implementation>
+</Method>
 </Class>
 </Export>
