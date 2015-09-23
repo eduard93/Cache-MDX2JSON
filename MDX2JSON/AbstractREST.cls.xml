@@ -59,7 +59,7 @@ Add param Namespace to a request to execute MDX in desired namespace.]]></Descri
 	    
         #; Check that the effective user ( could be unknown user ) can access this resource
         Set tAccess=$SYSTEM.Security.Check($Piece($zu(90,21,$namespace),"^",4))
-        Set tAccess2=$SYSTEM.Security.Check($Piece($zu(90,21,Namespace),"^",4))
+        Set tAccess2=$SYSTEM.Security.Check($Piece($zu(90,21,$ZCVT($Namespace,"U")),"^",4))
         If ((tAccess'["READ,WRITE") || (tAccess2'["READ,WRITE"))
         {
             #; Don't want the session token
