@@ -20,7 +20,7 @@ Get SQL for folder, from which we get Dashboards. </Description>
 <FormalSpec>folderName:%String=..#folderName</FormalSpec>
 <ReturnType>%String</ReturnType>
 <Implementation><![CDATA[
-	set basesql = "SELECT MDX2JSON.Dashboard_ResolveText(title) AS title, fullName AS path, MDX2JSON.GetDashCover(bookCover) AS Cover FROM %DeepSee_Dashboard.Definition "
+	set basesql = "SELECT MDX2JSON.ResolveText(title) AS title, fullName AS path, MDX2JSON.GetDashCover(bookCover) AS Cover FROM %DeepSee_Dashboard.Definition "
 	set basefilter = "WHERE ((NOT (foldername %STARTSWITH '$TRASH' or foldername %STARTSWITH 'HIDDEN')) OR foldername IS NULL) AND (MDX2JSON.IsItemVisible(fullName) = 1) "
 	return:folderName="" basesql _ basefilter
 	set filter = "AND folderName %STARTSWITH '" _ folderName _"'"
@@ -72,6 +72,7 @@ Usage: Select MDX2JSON.Dashboard_ResolveText(title) FROM %DeepSee_Dashboard.Defi
 <ClassMethod>1</ClassMethod>
 <FormalSpec>Text:%String</FormalSpec>
 <ReturnType>%String</ReturnType>
+<SqlName>ResolveText</SqlName>
 <SqlProc>1</SqlProc>
 <Implementation><![CDATA[    return ##class(%DeepSee.UserPortal.Utils).%ResolveText(Text)
 ]]></Implementation>
