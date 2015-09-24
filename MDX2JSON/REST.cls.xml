@@ -66,6 +66,9 @@ Example: send HTTP GET request to web application with Dispatch class <b>MDX2JSO
    <!-- Get info about pivot-->
    <Route Url="/DataSource" Method="POST" Call="GetDataSource" Body="DataSource"/>  
    
+   <!-- Get info about pivot-->
+   <Route Url="/TermList" Method="POST" Call="GetTermList" Body="TermList"/>  
+   
    <!-- Get info about user config-->
    <Route Url="/Config" Method="POST" Call="SetConfig" Body="Application"/> 
    <Route Url="/Config/:Application" Method="GET" Call="GetConfig" />     
@@ -127,6 +130,13 @@ Test method, outputs <b>%request</b>, <b>%response</b> and <b>%session</b> objec
 <ClassMethod>1</ClassMethod>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[    return ##class(MDX2JSON.Utils).GetDataSource($$$R("DataSource"))
+]]></Implementation>
+</Method>
+
+<Method name="GetTermList">
+<ClassMethod>1</ClassMethod>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[    return ##class(MDX2JSON.Utils).GetTermList($$$R("TermList"))
 ]]></Implementation>
 </Method>
 

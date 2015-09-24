@@ -178,6 +178,26 @@ Get information about pivot. <br>
 ]]></Implementation>
 </Method>
 
+<Method name="GetTermList">
+<Description><![CDATA[
+Get information about TermList. <br>
+<b>pTermList</b> - TermList full name (eg.: Patients Pivots) without .termlist extension.]]></Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>pTermList:%String</FormalSpec>
+<Implementation><![CDATA[
+    set st = $$$OK
+    try {
+	    do ##class(%DeepSee.TermList).%GetValueArray(pTermList,.pArray)
+	    set obj = ##class(%ZEN.proxyObject).%New()
+	    m obj.%data = pArray
+	    set st = obj.%ToJSON()
+    } catch ex {
+        set st = ex.AsStatus()
+    }
+    return st
+]]></Implementation>
+</Method>
+
 <Method name="GetWidgetsList">
 <Description><![CDATA[
 Using dashboard name get JSON representation (array of ("type","title","mdx")) of all its' widgets.<br>
