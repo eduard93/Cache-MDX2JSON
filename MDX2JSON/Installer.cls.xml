@@ -440,7 +440,17 @@ Grant select access to User to all tables in comma-separated list of namespaces<
 	set st = $$$OK
 	for i=1:1:$l(NamespacesList,",") {
 		zn $p(NamespacesList,",",i)
-		set st = $$$ADDSC(st,$SYSTEM.SQL.GrantObjPriv("EXECUTE","*","STORED PROCEDURES",User))	
+		/*set st1 = $SYSTEM.SQL.GrantObjPriv("EXECUTE","MDX2JSON.ResolveText","STORED PROCEDURES",User)
+		set st2 = $SYSTEM.SQL.GrantObjPriv("EXECUTE","MDX2JSON.IsItemVisible","STORED PROCEDURES",User)
+		set st3 = $SYSTEM.SQL.GrantObjPriv("EXECUTE","MDX2JSON.GetDashCover","STORED PROCEDURES",User)
+		set st = $$$ADDSC(st1,$$$ADDSC(st2,st3))*/
+		set sql = "GRANT EXECUTE ON MDX2JSON.ResolveText,MDX2JSON.IsItemVisible,MDX2JSON.GetDashCover to " _ User
+		set statement = ##class(%SQL.Statement).%New()
+		set st = statement.%Prepare(sql)
+		return:$$$ISERR(st) st
+		set rset = statement.%Execute()
+		w $System.Status.GetErrorText(st)
+		return:((rset.%SQLCODE'=0) && (rset.%SQLCODE'=100)) $System.Status.Error(5521, rset.%SQLCODE,rset.%Message) 
 	}
 	zn basens
 	return st
