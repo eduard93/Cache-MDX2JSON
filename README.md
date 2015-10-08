@@ -107,7 +107,7 @@ Request body:
 
     {"MDX": "SELECT NON EMPTY [Product].[P1].[Product Category].Members ON 0,NON EMPTY [Outlet].[H1].[Region].Members ON 1 FROM [HoleFoods]"} 
     
-[Result](../../wiki/MDX-output)
+[Result](https://github.com/intersystems-ru/Cache-MDX2JSON/wiki/MDX-output)
 
 Please note that corresponding cube must be compiled and built beforehand.
 

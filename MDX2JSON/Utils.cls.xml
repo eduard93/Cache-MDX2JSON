@@ -165,6 +165,11 @@ Get information about pivot. <br>
             set dataSource = ##class(%DeepSee.Dashboard.Pivot).%OpenId(sourceId,,.st)
             return:($$$ISERR(st)) st
             
+            if (dataSource.mdx="") {
+            	set st = ##class(MDX2JSON.Dashboard).GetMdx(pDataSource, .mdx, .basemdx)
+            	return:($$$ISERR(st)) st
+            	set dataSource.mdx = mdx
+        	}
             set st = ##class(%ZEN.Auxiliary.jsonProvider).%ObjectToJSON(dataSource, .out)
             
         }
