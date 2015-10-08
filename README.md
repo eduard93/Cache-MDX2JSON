@@ -89,7 +89,7 @@ These are the possible requests to web application (add param ?Namespace={Desire
 | Format                      | GET  |                             | JSON      | Default formatting             |
 | TermList                    | POST | {"TermList":"TermListName"} | JSON      | Termlist key-value array       |
 | Config                      | POST |{"Application":"AppName", "Config","value"}| JSON      | Set config for arbitrary application for current user|
-| Config/:Application         | GET  ||{"Application":"AppName"}   | JSON      | Get config for Application for current user|
+| Config/:Application         | GET  | {"Application":"AppName"}   | JSON      | Get config for Application for current user|
 | Favorites                   | GET  |                             | JSON      | Array of current user favorites|
 | Favorites/:Item             | POST |                             | JSON      | Add favorite item              |
 | Favorites/:Item             |DELETE|                             | JSON      | Remove item from favorites     |
