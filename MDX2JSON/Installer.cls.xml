@@ -43,7 +43,9 @@ todo add optional parameter WEBAPP to Alter web app name if it needs to have ano
 
 <If Condition='(##class(Config.Namespaces).Exists("%All")=0)'>
 <Log Text="Creating namespace %All" Level="0"/>
-<RunInstall Class="MDX2JSON.Installer" Method="CreateAllNamespace"/>
+<Namespace Name="%All" Create="yes" Code="CACHETEMP" Data="CACHETEMP" Ensemble="0">
+<Configuration/>
+</Namespace>
 </If>
 
 <Log Text="Mapping MDX2JSON package to %All namespace" Level="0"/>
@@ -144,20 +146,6 @@ do ##class(MDX2JSON.Installer).createuser(.pVars)</Description>
     Do tInstaller.PopNS()
     If $$$ISERR(tSC) Throw ##class(%Installer.Exception).CreateFromStatus(tSC)
     Quit $$$OK
-]]></Implementation>
-</Method>
-
-<Method name="CreateAllNamespace">
-<ClassMethod>1</ClassMethod>
-<FormalSpec>pVars,pLogLevel,tInstaller</FormalSpec>
-<ReturnType>%Status</ReturnType>
-<Implementation><![CDATA[
-	Do tInstaller.PushNS("%SYS")
-	Do tInstaller.CreateNamespace("%All","CACHETEMP","CACHETEMP")
-	Set tSC = (##class(Config.Namespaces).Exists("%All")=1)
-	Do tInstaller.PopNS()	
-	Quit:tSC $$$OK
-	Quit $$$ERROR($$$GeneralError,"Error creating %All Namespace")
 ]]></Implementation>
 </Method>
 
