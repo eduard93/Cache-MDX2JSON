@@ -109,14 +109,14 @@ do ##class(MDX2JSON.Tests).DynamicObjects()</Description>
 <ClassMethod>1</ClassMethod>
 <Implementation><![CDATA[
 	
-	set obj = $$$NewDynObj
+	/*set obj = $$$NewDynObj
 	set obj.prop = "val"
 	$$$DynObjToJSON(obj)
-	
+	*/
 	set dtList = $$$NewDynDTList
 	s a=1
-	$$$Insert(dtList,a)
-	$$$ListToJSON(dtList)
+	$$$Insert(dtList,"a")
+	//$$$ListToJSON(dtList)
 ]]></Implementation>
 </Method>
 </Class>
