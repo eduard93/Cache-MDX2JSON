@@ -104,45 +104,19 @@ Moves widgets datasources into Mobile folder</Description>
 </Method>
 
 <Method name="DynamicObjects">
+<Description>
+do ##class(MDX2JSON.Tests).DynamicObjects()</Description>
 <ClassMethod>1</ClassMethod>
 <Implementation><![CDATA[
-	#define IsNewVersion $S($System.Version.GetMajor()>2015:"1",$System.Version.GetMajor()=2015:$S($System.Version.GetMinor()>=3:"1",1:"0"),1:"0")
-	#define NewDynObj ##Expression($S($$$IsNewVersion=1:"##class(%Object).%New()",1:"##class(%ZEN.proxyObject).%New()"))
-	#define NewDynObjList ##Expression($S($$$IsNewVersion=1:"##class(%Array).%New()",1:"##class(%ListOfObjects).%New()"))
-	#define NewDynDTList ##Expression($S($$$IsNewVersion=1:"##class(%Array).%New()",1:"##class(%ListOfDataTypes).%New()"))
-	//#define Insert(%element) ##Expression($S($$$IsNewVersion=1:%element,1:b))
-	#define InsertWrap(%obj,%element) ##Expression(S($$$IsNewVersion=1:$$$InsertOther(%obj,%element),1:$$$InsertOther(%obj,%element)))
-	#define isq(%element) ##Expression($S($d(%element)=1:1,1:0))
-	#define InsertOther(%obj,%element) $S($$$IsNewVersion=1:"do %obj.$push(%element)",1:"do %obj.Insert(%element)")
-	//#define CallClass(%element) ##Expression(##class(MDX2JSON.Tests).A(%element))
-	#define q(%element) $S($d(%element)="""":"""",1:"")
-	#define Insert(%obj,%element) ##Expression($S($$$IsNewVersion=1:"do %obj.$push(%element)",1:"do %obj.Insert(%element)"))
-
-	 //$$$InsertNew(%element),1:$$$InsertOld(%element)))
-	#define InsertNew(%element) $push(%element)
-	#define InsertOld(%element) Insert(%element)
-	#define DynObjToJSON(%obj) ##Expression($S($$$IsNewVersion=1:"do %obj.$toJSON()",1:"do %obj.%ToJSON()"))
 	
 	set obj = $$$NewDynObj
 	set obj.prop = "val"
 	$$$DynObjToJSON(obj)
 	
 	set dtList = $$$NewDynDTList
-	//do objList.$push("a")
-	//do objList.Insert("a")
-	//do objList.$$$Insert("a")
+	s a=1
 	$$$Insert(dtList,a)
-	//w $$$CallClass("a")
-	//w $$$isq("a")
-]]></Implementation>
-</Method>
-
-<Method name="A">
-<ClassMethod>1</ClassMethod>
-<FormalSpec>a</FormalSpec>
-<Implementation><![CDATA[
-	set ^test($h)=a
-	return "ololo"
+	$$$ListToJSON(dtList)
 ]]></Implementation>
 </Method>
 </Class>

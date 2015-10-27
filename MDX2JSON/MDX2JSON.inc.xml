@@ -8,5 +8,15 @@
 #define R(%property) %request.Content.##Expression(%property)
 #define Public ((%request.GetCgiEnv("SERVER_PORT") = 80) || (%request.GetCgiEnv("SERVER_PORT") = 443))
 #define Private '$$$Public
+
+#; For work with dynamic objects
+#define IsNewVersion $S($System.Version.GetMajor()>2015:"1",$System.Version.GetMajor()=2015:$S($System.Version.GetMinor()>=3:"1",1:"0"),1:"0")
+#define NewDynObj ##Expression($S($$$IsNewVersion=1:"##class(%Object).%New()",1:"##class(%ZEN.proxyObject).%New()"))
+#define NewDynObjList ##Expression($S($$$IsNewVersion=1:"##class(%Array).%New()",1:"##class(%ListOfObjects).%New()"))
+#define NewDynDTList ##Expression($S($$$IsNewVersion=1:"##class(%Array).%New()",1:"##class(%ListOfDataTypes).%New()"))
+#define Insert(%obj,%element) ##Expression($S($$$IsNewVersion=1:"do %obj.$push(%element)",1:"do %obj.Insert(%element)"))
+#define DynObjToJSON(%obj) ##Expression($S($$$IsNewVersion=1:"do %obj.$toJSON()",1:"do %obj.%ToJSON()"))
+#define ListToJSON(%obj) ##Expression($S($$$IsNewVersion=1:"do %obj.$toJSON()",1:"do ##class(%ZEN.Auxiliary.jsonProvider).%ObjectToJSON(%obj)"))
+
 ]]></Routine>
 </Export>
