@@ -18,7 +18,7 @@ Converts ResultSet to %ZEN.proxyObject.<br>
 	set ^DeepSee.QueryLog($UserName,$I(^DeepSee.QueryLog($UserName))) = ..%GetQueryText()
     set status = $$$ERROR($$$GeneralError,"Error occured while executing ##class(MDX2JSON.ResultSet).ToProxyObject() method")
        
-    set obj=##class(%ZEN.proxyObject).%New()
+    set obj=$$$NewDynObj
     
     if (..%Query.queryType = "DRILLTHROUGH") {
         set pStatus = $$$ERROR($$$GeneralError, "DRILLTHROUGH queries are not supported")
@@ -68,7 +68,7 @@ Returns meta-information about ResultSet.</Description>
 	    set tAxisKeys(a) = $G($$$DeepSeeResultsGLVN(tCubeIndex,tQueryKey,"axis",a))
 	}
 	
-	set info=##class(%ZEN.proxyObject).%New()
+	set info=$$$NewDynObj
 	set info.queryKey = tQueryKey
 	set info.rowCount = $G(tAxisSize(1))
 	set info.colCount = $G(tAxisSize(2))
@@ -104,15 +104,15 @@ Returns array of Axes</Description>
     }
     
     
-    set axes=##class(%ListOfObjects).%New()
+    set axes=$$$NewDynObjList
     
 	for a = 1:1:tAxisCount {
         set tAxisSize(a) = ..%GetAxisSize(a)
         set tAxisKeys(a) = $G($$$DeepSeeResultsGLVN(tCubeIndex,tQueryKey,"axis",a))
-        do axes.Insert(..ProcessOneAxis(tCubeIndex,tAxisKeys(a),a))
+        $$$Insert(axes,..ProcessOneAxis(tCubeIndex,tAxisKeys(a),a))
     }
     
-    if (axes.Count()=0) {
+    if ($$$ListSize(axes)=0) {
 	    set axes = ..GetDefaultAxes()
     }
 
@@ -128,7 +128,7 @@ Returns array of Axes</Description>
 	set tCubeName = $$$UPPER(..%Cube)
     set tQueryKey = ..%QueryKey
 	
-    set axis=##class(%ZEN.proxyObject).%New()
+    set axis=$$$NewDynObj
     set axis.tuples = ..ProcessOneAxisCell(CubeIndex, AxisKey, tCubeName, tQueryKey, AxisNumber, 1)
            
     return axis
@@ -140,7 +140,7 @@ Returns array of Axes</Description>
 <FormalSpec>CubeIndex,AxisKey,CubeName,QueryKey,AxisNumber,Node</FormalSpec>
 <ReturnType>%ZEN.proxyObject</ReturnType>
 <Implementation><![CDATA[
-    set cell=##class(%ZEN.proxyObject).%New()
+    set cell=$$$NewDynObj
 
     set tNode = $G($$$DeepSeeAxisGLVN(CubeIndex,AxisKey,"axes",Node))
     set tDimNo = $LG(tNode,9)
@@ -179,17 +179,17 @@ Returns array of Axes</Description>
         
     // now we process cell children, if any exist
     if ($D($$$DeepSeeAxisGLVN(CubeIndex, AxisKey, "axes", Node, "ch")) = 10) {
-        set cell.children = ##class(%ListOfObjects).%New()
+        set cell.children = $$$NewDynObjList
         set key = $O($$$DeepSeeAxisGLVN(CubeIndex, AxisKey, "axes", Node, "ch", ""))
         while (key'="") {
             set children = ..ProcessOneAxisCell(CubeIndex, AxisKey, CubeName, QueryKey, AxisNumber, key)
             // Append children to cell
             if $isobject(children) {
-	            if (children.%IsA("%ZEN.proxyObject")) {
-	                do cell.children.Insert(children)
-	            } elseif (children.%IsA("%Collection.AbstractList")) {
-	                for i=1:1:children.Count() {
-	                    do cell.children.Insert(children.GetAt(i))
+	            if ((children.%IsA("%ZEN.proxyObject")) || (children.%IsA("%Library.Object"))) {
+	                $$$Insert(cell.children,children)
+	            } elseif ((children.%IsA("%Collection.AbstractList")) || (children.%IsA("%Library.Array"))) {
+	                for i=1:1:$$$ListSize(children) {
+	                    $$$Insert(cell.children,$$$ListGet(children,i))
 	                }
 	            }
             }
@@ -223,7 +223,7 @@ Determine if cell is an invisyble system cell.</Description>
 	//return:(caption'="") 0
 	//return:(path="") 1
 	set children = Cell.children
-	return:(($isobject(children)) && (children.Count()>0)) 0
+	return:(($isobject(children)) && ($$$ListSize(children)>0)) 0
 	
 	if (Cell.type'="lit") {
 		set key = $O($$$DeepSeeResultsGLVN(..%CubeKey, ..%QueryKey, "leaf", AxisNumber, ""))
@@ -242,7 +242,7 @@ Determine if cell is an invisyble system cell.</Description>
 Returns array of cells (left-to-right, up-to-down)</Description>
 <ReturnType>%ListOfDataTypes</ReturnType>
 <Implementation><![CDATA[
-	set data = ##class(%ListOfDataTypes).%New()
+	set data = $$$NewDynDTList
 	
 	set tCubeIndex = ..%CubeKey
     set tQueryKey = ..%QueryKey
@@ -260,12 +260,12 @@ Returns array of cells (left-to-right, up-to-down)</Description>
 	set tNodeNo = ""
 	
 	if (tAxisCount = 0) {
-		do data.Insert(..%GetValue())
+		$$$Insert(data,..%GetValue())
 	} elseif (tAxisCount = 1) {
 		set tRowCount = 1
 		set c = 0
 		while (tItemNo(1)'="") {
-			do data.Insert(..%GetValue(tAddr(1)))
+			$$$Insert(data,..%GetValue(tAddr(1)))
 			set c = c + 1
 			set tItemNo(1) = $O($$$DeepSeeResultsGLVN(tCubeIndex,tQueryKey,"leaf",1,tItemNo(1)),1,tNodeNo)
 			set tAddr(1) = tNodeNo
@@ -277,7 +277,7 @@ Returns array of cells (left-to-right, up-to-down)</Description>
 				set tAddr(1) = tNodeNo
 				while (tItemNo(1)'="") {
 					set tValue = ..%GetValue(tAddr...) // for 2 axes ..%GetValue(tAddr(1),tAddr(2))
-					do data.Insert(tValue)
+					$$$Insert(data,tValue)
 
 					set tItemNo(1) = $O($$$DeepSeeResultsGLVN(tCubeIndex,tQueryKey,"leaf",1,tItemNo(1)),1,tNodeNo)
 					set tAddr(1) = tNodeNo
@@ -296,9 +296,9 @@ Returns array of cells (left-to-right, up-to-down)</Description>
 <ClassMethod>1</ClassMethod>
 <ReturnType>%ListOfObjects</ReturnType>
 <Implementation><![CDATA[
-	set axes=##class(%ListOfObjects).%New() // all axes
+	set axes=$$$NewDynObjList // all axes
 		
-	set cell=##class(%ZEN.proxyObject).%New()
+	set cell=$$$NewDynObj
 	set cell.caption = $$$Text("Count","%DeepSee")
     set cell.format = ""
     set cell.total = "COUNT"
@@ -314,15 +314,15 @@ Returns array of cells (left-to-right, up-to-down)</Description>
 	set cell2.caption = ""
 	set cell2.dimension = "%Search"
 	
-	set axis = ##class(%ZEN.proxyObject).%New() // one axis
-	set axis.tuples = ##class(%ListOfObjects).%New() //array of cells for one axis
-	do axis.tuples.Insert(cell)		
-	do axes.Insert(axis)
+	set axis = $$$NewDynObj // one axis
+	set axis.tuples = $$$NewDynObjList //array of cells for one axis
+	$$$Insert(axis.tuples,cell)		
+	$$$Insert(axes,axis)
 
-	set axis2 = ##class(%ZEN.proxyObject).%New()
-	set axis2.tuples = ##class(%ListOfObjects).%New()
-	do axis2.tuples.Insert(cell2)
-	do axes.Insert(axis2)
+	set axis2 = $$$NewDynObj
+	set axis2.tuples = $$$NewDynObjList
+	$$$Insert(axis2.tuples,cell2)
+	$$$Insert(axes,axis2)
 	           
     return axes
 ]]></Implementation>
