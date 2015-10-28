@@ -13,7 +13,9 @@
 #if $$$comClassDefined("%Library.Array")
 	#define NewDynObj ##class(%Object).%New()
 	#define NewDynDTList ##class(%Array).%New()
+	#;define NewDynDTArray $$$NewDynDTList
 	#define NewDynObjList $$$NewDynDTList
+	#;define NewDynObjArray $$$NewDynDTList
 	#define Insert(%obj,%element) do %obj.$push(%element)
 	#define DynObjToJSON(%obj) w %obj.$toJSON()
 	#define ListToJSON(%obj) $$$DynObjToJSON(%obj)
@@ -22,7 +24,9 @@
 #else
 	#define NewDynObj ##class(%ZEN.proxyObject).%New()
 	#define NewDynDTList ##class(%ListOfDataTypes).%New()
+	#;define NewDynDTArray ##class(%ArrayOfDataTypes).%New()
 	#define NewDynObjList ##class(%ListOfObjects).%New()
+	#;define NewDynObjArray ##class(%ArrayOfObjects).%New()
 	#define Insert(%obj,%element) do %obj.Insert(%element)
 	#define DynObjToJSON(%obj) do %obj.%ToJSON()
 	#define ListToJSON(%obj) do ##class(%ZEN.Auxiliary.jsonProvider).%ObjectToJSON(%obj)
