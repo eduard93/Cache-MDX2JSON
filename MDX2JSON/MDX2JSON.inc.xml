@@ -33,6 +33,6 @@
 	#define ListSize(%obj) %obj.Count()
 	#define ListGet(%obj,%i) %obj.Get(%i)
 #endif
-
+#define IsNewJSON ##Expression($$$comClassDefined("%Library.Array"))
 ]]></Routine>
 </Export>

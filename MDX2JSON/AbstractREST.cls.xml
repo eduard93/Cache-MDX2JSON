@@ -446,24 +446,23 @@ This is the Schema which defines the form of the dispatch map</Description>
 
 <Method name="POtoStr">
 <ClassMethod>1</ClassMethod>
-<FormalSpec>config</FormalSpec>
+<FormalSpec>obj:%ZEN.proxyObject</FormalSpec>
 <ProcedureBlock>0</ProcedureBlock>
 <ReturnType>%String</ReturnType>
 <Implementation><![CDATA[
-	
 	set str=""
-		
+
 	//Redirect IO to the current routine - makes use of the labels defined below
 	use $io::("^"_$ZNAME)
 	
 	//Enable redirection
 	do ##class(%Device).ReDirectIO(1)
 
-	do config.%ToJSON()
+	set st = obj.%ToJSON()
 	
     //Disable redirection
     do ##class(%Device).ReDirectIO(0)
-    
+
     quit str	  
 
     //Labels that allow for IO redirection

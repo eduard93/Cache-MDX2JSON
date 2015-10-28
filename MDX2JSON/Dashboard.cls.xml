@@ -108,15 +108,15 @@ Converts %DeepSee.Dashboard.Definition widgets into %ZEN.proxyObject.</Descripti
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
     #Dim widget As %DeepSee.Dashboard.Widget
-    set Widgetlist = ##class(%ZEN.proxyObject).%New()
-    set Widgetlist.children = ##class(%ListOfObjects).%New()
+    set Widgetlist = $$$NewDynObj
+    set Widgetlist.children = $$$NewDynObjList
     set Widgetlist.displayInfo = ..GetDashboardDisplayInfo(Dashboard)
     set Widgetlist.info = ..GetDashboardInfo(Dashboard)
     
     set st = $$$OK
     try {
 	    for i=1:1:Dashboard.widgets.Count() {
-			do Widgetlist.children.Insert(..WidgetToProxyObject(Dashboard.widgets.GetAt(i)))
+			$$$Insert(Widgetlist.children,..WidgetToProxyObject(Dashboard.widgets.GetAt(i)))
         }         
     } catch ex {
         set st = ex.AsStatus()
@@ -134,7 +134,7 @@ Converts relevant parts of %DeepSee.Dashboard.Widget object into %ZEN.proxyObjec
 <FormalSpec>Widget:%DeepSee.Dashboard.Widget</FormalSpec>
 <ReturnType>%ZEN.proxyObject</ReturnType>
 <Implementation><![CDATA[
-    set obj = ##class(%ZEN.proxyObject).%New()
+    set obj = $$$NewDynObj
     
     &sql(SELECT cubeName into :cube FROM %DeepSee_Dashboard.Pivot WHERE fullName=:Widget.dataSource)
 	set:(SQLCODE'=0) cube=""
@@ -158,12 +158,14 @@ Converts relevant parts of %DeepSee.Dashboard.Widget object into %ZEN.proxyObjec
 	set obj.drillDownDataSource = Widget.drillDownDataSource
 	set obj.cube = cube
 	set obj.displayInfo = ..GetWidgetDisplayInfo(Widget)
-	set obj.controls = ##class(%ListOfObjects).%New()
+	set obj.controls = $$$NewDynObjList
 
 	for i=1:1:Widget.controls.Count()
 	{
 		set control = ..WidgetControlToProxyObject(Widget,i,cube)
-		do:$IsObject(control) obj.controls.Insert(control)
+		if $IsObject(control) {
+			$$$Insert(obj.controls,control)
+		}
 	}
 	
 	if ##class(%Dictionary.CompiledMethod).%ExistsId("MDX2JSON.Dashboard||Process"_Widget.subtype) {
@@ -171,10 +173,11 @@ Converts relevant parts of %DeepSee.Dashboard.Widget object into %ZEN.proxyObjec
 	}
 	
 	if (Widget.properties.Count()>0) {
-		set obj.properties = ##class(%ArrayOfDataTypes).%New()
+		set obj.properties = $$$NewDynObj //##class(%ArrayOfDataTypes).%New()
 		do {
 			set property = Widget.properties.GetNext(.key)		
-			do:(key'="") obj.properties.SetAt(property,key)
+			//do:(key'="") obj.properties.SetAt(property,key)
+			do:(key'="") obj.properties.%DispatchSetProperty(key,property)
 		} while key'=""
 	}
 	
@@ -184,19 +187,32 @@ Converts relevant parts of %DeepSee.Dashboard.Widget object into %ZEN.proxyObjec
 
 <Method name="ProcesscomboChart">
 <ClassMethod>1</ClassMethod>
-<FormalSpec>Widget,Obj:%ZEN.proxyObject</FormalSpec>
+<FormalSpec>Widget:%DeepSee.Dashboard.Widget,Obj:%ZEN.proxyObject</FormalSpec>
 <Implementation><![CDATA[
-	set Obj.seriesTypes = ##class(%ListOfDataTypes).%New()
+	
+	set Obj.seriesTypes = $$$NewDynDTList
 	for i=1:1:Widget.dataSeries.Count()
 	{
-		do Obj.seriesTypes.Insert(Widget.dataSeries.GetAt(i).type)
+		$$$Insert(Obj.seriesTypes,Widget.dataSeries.GetAt(i).type)
 	}
 	
-	set Obj.overrides = ##class(%ListOfObjects).%New()
+	set Obj.overrides = $$$NewDynObjList
 	do {
-		set overridestr = Widget.overrides.GetNext(.key)
-		do ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(overridestr,,.override,1)
-		do:$IsObject(override) Obj.overrides.Insert(override)
+		set overridestr = Widget.overrides.GetNext(.key) // we take DeepSee widget override string (in "json" format)
+		return:key=""
+		
+		
+		do ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(overridestr,,.override,1) // convert it into %ZEN.proxyObject
+
+		#if $$$IsNewJSON // if we are on new versions
+			set overridestr = ##class(MDX2JSON.AbstractREST).POtoStr(override) // convert it into valid json 
+			set override = ##class(%Object).$fromJSON(overridestr) // and into %Object
+		#endif
+		
+		if $IsObject(override) {
+			$$$Insert(Obj.overrides,override)
+		}
+		
 	} while key'=""
 ]]></Implementation>
 </Method>
@@ -205,12 +221,12 @@ Converts relevant parts of %DeepSee.Dashboard.Widget object into %ZEN.proxyObjec
 <ClassMethod>1</ClassMethod>
 <FormalSpec>Widget:%DeepSee.Dashboard.Widget,Obj:%ZEN.proxyObject</FormalSpec>
 <Implementation><![CDATA[
-	set Obj.dataProperties = ##class(%ListOfDataTypes).%New()
+	set Obj.dataProperties = $$$NewDynDTList
 	for i=1:1:Widget.dataProperties.Count()
 	{
-		set dataProperty = ##class(%ZEN.proxyObject).%New()
+		set dataProperty = $$$NewDynObj
 		do Widget.dataProperties.GetAt(i).%CopyTo(dataProperty)
-		do Obj.dataProperties.Insert(dataProperty)
+		$$$Insert(Obj.dataProperties,dataProperty)
 	}
 ]]></Implementation>
 </Method>
@@ -223,7 +239,7 @@ Converts %DeepSee.Dashboard.Control object into %ZEN.proxyObject, handles run-ti
 <FormalSpec>Widget:%DeepSee.Dashboard.Widget,Number:%Integer,Cube:%String</FormalSpec>
 <ReturnType>%ZEN.proxyObject</ReturnType>
 <Implementation><![CDATA[
-	set obj = ##class(%ZEN.proxyObject).%New()
+	set obj = $$$NewDynObj
 	set st = Widget.controls.GetAt(Number).%CopyTo(obj) // copy widget control properties to proxyObj
 	
 	set obj.label = ##class(%DeepSee.UserPortal.Utils).%ResolveText(obj.label)
@@ -294,16 +310,16 @@ Returns list of %ZEN.proxyObject:<br/>]]></Description>
 <ReturnType>%ListOfObjects</ReturnType>
 <Implementation><![CDATA[
 	set st = ##class(%DeepSee.Dashboard.Utils).%GetMembersForFilter(DataSource,Filter,.tMembers,.tDefaultFilterValue,,.tRelatedFilters,0,,.tValueList)
-	set members = ##class(%ListOfObjects).%New()
+	set members = $$$NewDynObjList
 	
 	set key = $order(tMembers("")) 
 	while (key '= "") {
-		set member = ##class(%ZEN.proxyObject).%New()
+		set member = $$$NewDynObj
 		set member.name = $lg(tMembers(key),1)
 		set member.path = $lg(tMembers(key),2)
 		set member.info = $lg(tMembers(key),3)
 		set key = $order(tMembers(key))
-		do members.Insert(member)
+		$$$Insert(members,member)
 	}
 	return members
 ]]></Implementation>
@@ -316,7 +332,7 @@ Converts %DeepSee.Dashboard.Definition display information into %ZEN.proxyObject
 <FormalSpec>Dashboard:%DeepSee.Dashboard.Definition</FormalSpec>
 <ReturnType>%ZEN.proxyObject</ReturnType>
 <Implementation><![CDATA[
-    set DisplayInfo = ##class(%ZEN.proxyObject).%New()
+    set DisplayInfo = $$$NewDynObj
     set DisplayInfo.snapToGrid = Dashboard.snapTo // Dashboard is in "snap to grid" mode.
     set DisplayInfo.gridMode = Dashboard.snapGrid // Dashboard uses the new snapGrid layout mode.
     set DisplayInfo.gridRows = Dashboard.gridRows
@@ -332,7 +348,7 @@ Converts %DeepSee.Dashboard.Widget display information into %ZEN.proxyObject.</D
 <FormalSpec>Widget:%DeepSee.Dashboard.Widget</FormalSpec>
 <ReturnType>%ZEN.proxyObject</ReturnType>
 <Implementation><![CDATA[
-    set DisplayInfo = ##class(%ZEN.proxyObject).%New()
+    set DisplayInfo = $$$NewDynObj
 
 	set DisplayInfo.top = Widget.top
 	set DisplayInfo.left = Widget.left
@@ -354,7 +370,7 @@ Converts %DeepSee.Dashboard.Definition display information into %ZEN.proxyObject
 <FormalSpec>Dashboard:%DeepSee.Dashboard.Definition</FormalSpec>
 <ReturnType>%ZEN.proxyObject</ReturnType>
 <Implementation><![CDATA[
-    set Info = ##class(%ZEN.proxyObject).%New()
+    set Info = $$$NewDynObj
     set Info.title = Dashboard.title
 
     return Info

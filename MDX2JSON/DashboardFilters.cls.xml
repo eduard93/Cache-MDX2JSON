@@ -14,22 +14,22 @@ Converts %DeepSee.Dashboard.Definition widgets into %ZEN.proxyObject.</Descripti
 <FormalSpec>Dashboard:%DeepSee.Dashboard.Definition,*Widgetlist:%ZEN.proxyObject</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
+	w "" // weird hack required for 15.3
     #Dim widget As %DeepSee.Dashboard.Widget
-    set Widgetlist = ##class(%ZEN.proxyObject).%New()
-    set Widgetlist.widgets = ##class(%ListOfObjects).%New()
-    set Widgetlist.filters = ##class(%ListOfObjects).%New()
+    set Widgetlist = $$$NewDynObj
+    set Widgetlist.widgets = $$$NewDynObjList
+    set Widgetlist.filters = $$$NewDynObjList
     set Widgetlist.displayInfo = ..GetDashboardDisplayInfo(Dashboard)
     set Widgetlist.info = ..GetDashboardInfo(Dashboard)
     
     set st = $$$OK
     try {
 	    for i=1:1:Dashboard.widgets.Count() {
-			do Widgetlist.widgets.Insert(..WidgetToProxyObject(Dashboard.widgets.GetAt(i)))
-			
+			$$$Insert(Widgetlist.widgets,..WidgetToProxyObject(Dashboard.widgets.GetAt(i)))			
 			#dim filters As %ListOfObjects
 			set filters = ..WidgetFiltersToProxyObject(Dashboard.widgets.GetAt(i))
-			for j=1:1:filters.Count() {
-				do Widgetlist.filters.Insert(filters.GetAt(j))
+			for j=1:1:$$$ListSize(filters) {
+				$$$Insert(Widgetlist.filters,$$$ListGet(filters,j))
 			}		
         }         
     } catch ex {
@@ -51,11 +51,13 @@ Converts relevant parts of %DeepSee.Dashboard.Widget object into %ZEN.proxyObjec
     &sql(SELECT cubeName into :cube FROM %DeepSee_Dashboard.Pivot WHERE fullName=:Widget.dataSource)
 	set:(SQLCODE'=0) cube=""
 
-    set obj = ##class(%ListOfObjects).%New()    
+    set obj = $$$NewDynObjList    
 	for i=1:1:Widget.controls.Count()
 	{
 		set filter = ..WidgetFilterToProxyObject(Widget,i,cube)
-		do:$IsObject(filter) obj.Insert(filter)
+		if $IsObject(filter){ 
+			$$$Insert(obj,filter)
+		}
 	}
 	return obj
 ]]></Implementation>
