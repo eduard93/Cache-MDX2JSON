@@ -445,8 +445,13 @@ This is the Schema which defines the form of the dispatch map</Description>
 </XData>
 
 <Method name="OutputToStr">
+<Description>
+Executes actions and returns device output  
+pObj - OREF or class
+pMethod - instance or class method to execute respectively
+pArgs - additional arguments</Description>
 <ClassMethod>1</ClassMethod>
-<FormalSpec>pObj:%ZEN.proxyObject,pMethod:%String="%ToJSON",pArgs...</FormalSpec>
+<FormalSpec>pObj,pMethod,pArgs...</FormalSpec>
 <ProcedureBlock>0</ProcedureBlock>
 <ReturnType>%String</ReturnType>
 <Implementation><![CDATA[
@@ -458,10 +463,18 @@ This is the Schema which defines the form of the dispatch map</Description>
 	//Enable redirection
 	do ##class(%Device).ReDirectIO(1)
 	
-	if $d(pArgs)= 0 {
-		do $Method(pobj,pMethod)
-	} else {
-		do $Method(pobj,pMethod,pArgs)
+	if $isobject(pObj) {
+		if $d(pArgs)= 0 {
+			do $Method(pobj,pMethod)
+		} else {
+			do $Method(pobj,pMethod,pArgs)
+		}
+	} elseif $$$comClassDefined("%Library.Array") {
+		if $d(pArgs)= 0 {
+			do $ClassMethod(pobj,pMethod)
+		} else {
+			do $ClassMethod(pobj,pMethod,pArgs)
+		}
 	}
 	
     //Disable redirection
