@@ -244,6 +244,7 @@ Using dashboard name get JSON representation of all its' widgets and filters.<br
 		
 		set st = ##class(MDX2JSON.DashboardFilters).WidgetsToProxyObject(dash, .widgetlist)
 		return:($$$ISERR(st)) st
+		w "" // weird hack required for 15.3
 		$$$DynObjToJSON(widgetlist)
     } catch ex {
         set st = ex.AsStatus()

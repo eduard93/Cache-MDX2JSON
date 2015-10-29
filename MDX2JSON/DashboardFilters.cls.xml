@@ -14,7 +14,6 @@ Converts %DeepSee.Dashboard.Definition widgets into %ZEN.proxyObject.</Descripti
 <FormalSpec>Dashboard:%DeepSee.Dashboard.Definition,*Widgetlist:%ZEN.proxyObject</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-	w "" // weird hack required for 15.3
     #Dim widget As %DeepSee.Dashboard.Widget
     set Widgetlist = $$$NewDynObj
     set Widgetlist.widgets = $$$NewDynObjList
