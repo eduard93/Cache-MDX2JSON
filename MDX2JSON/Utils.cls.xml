@@ -220,7 +220,7 @@ Using dashboard name get JSON representation (array of ("type","title","mdx")) o
 		
 		set st = ##class(MDX2JSON.Dashboard).WidgetsToProxyObject(dash, .widgetlist)
 		return:($$$ISERR(st)) st
-		
+		w "" // weird hack required for 15.3
 		$$$DynObjToJSON(widgetlist)
     } catch ex {
         set st = ex.AsStatus()
