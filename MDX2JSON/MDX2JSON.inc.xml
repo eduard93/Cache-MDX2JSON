@@ -32,7 +32,7 @@
 	#define DynObjToJSON(%obj) do %obj.%ToJSON()
 	#define ListToJSON(%obj) do ##class(%ZEN.Auxiliary.jsonProvider).%ObjectToJSON(%obj)
 	#define ListSize(%obj) %obj.Count()
-	#define ListGet(%obj,%i) %obj.Get(%i)
+	#define ListGet(%obj,%i) %obj.GetAt(%i)
 #endif
 #define IsNewJSON ##Expression($$$comClassDefined("%Library.Array"))
 ]]></Routine>
