@@ -108,7 +108,6 @@ Moves widgets datasources into Mobile folder</Description>
 do ##class(MDX2JSON.Tests).DynamicObjects()</Description>
 <ClassMethod>1</ClassMethod>
 <Implementation><![CDATA[
-	
 	set obj = $$$NewDynObj
 	set obj.prop = "val"
 	$$$DynObjToJSON(obj)
@@ -120,12 +119,35 @@ do ##class(MDX2JSON.Tests).DynamicObjects()</Description>
 ]]></Implementation>
 </Method>
 
-<Method name="RenderMDXToJSONString">
+<Method name="RenderSpeed">
 <Description>
-do ##class(MDX2JSON.Tests).RenderMDXToJSONString()</Description>
+do ##class(MDX2JSON.Tests).RenderSpeed()</Description>
 <ClassMethod>1</ClassMethod>
-<FormalSpec>MDX:%String</FormalSpec>
-<ReturnType>%String</ReturnType>
+<FormalSpec>MDX:%String,Count:%Integer(MINVAL=1)=10</FormalSpec>
+<Implementation><![CDATA[
+	Set:$d(MDX)'=1 MDX = "SELECT NON EMPTY [Product].[P1].[Product Category].Members ON 0,NON EMPTY [Outlet].[H1].[Region].Members ON 1 FROM [HoleFoods]"
+	Set RS = ##class(MDX2JSON.Utils).GetResultSet(MDX,.st)
+	Write $System.Status.GetErrorText(st)
+	Set obj = RS.ToProxyObject(.st)
+	Write $System.Status.GetErrorText(st)
+	Set od=$io
+	Set nul=##class(%Device).GetNullDevice() //"\\.\nul" // /dev/null/ - UNIX
+	Open nul
+	Use nul
+  
+	Set startTime = $NOW()
+	For i = 1:1:Count {
+		$$$DynObjToJSON(obj)
+	}
+	Set endTime = $NOW()
+	
+	Set time = $p(endTime,",",*) - $p(startTime,",",*)
+	Use od
+	Close nul
+	Write "Iterations: ",Count,!
+	Write "Time Total ",time,!
+	Write "Time Average: ",time/Count
+]]></Implementation>
 </Method>
 </Class>
 </Export>
