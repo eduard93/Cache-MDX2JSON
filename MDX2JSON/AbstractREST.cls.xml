@@ -469,7 +469,7 @@ pArgs - additional arguments]]></Description>
 		} else {
 			do $Method(pobj,pMethod,pArgs)
 		}
-	} elseif $$$comClassDefined("%Library.Array") {
+	} elseif $$$comClassDefined(pObj) {
 		if $d(pArgs)= 0 {
 			do $ClassMethod(pobj,pMethod)
 		} else {
