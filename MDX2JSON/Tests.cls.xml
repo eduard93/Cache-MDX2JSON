@@ -119,5 +119,13 @@ do ##class(MDX2JSON.Tests).DynamicObjects()</Description>
 	$$$ListToJSON(dtList)
 ]]></Implementation>
 </Method>
+
+<Method name="RenderMDXToJSONString">
+<Description>
+do ##class(MDX2JSON.Tests).RenderMDXToJSONString()</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>MDX:%String</FormalSpec>
+<ReturnType>%String</ReturnType>
+</Method>
 </Class>
 </Export>

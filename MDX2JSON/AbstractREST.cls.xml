@@ -445,11 +445,11 @@ This is the Schema which defines the form of the dispatch map</Description>
 </XData>
 
 <Method name="OutputToStr">
-<Description>
-Executes actions and returns device output  
-pObj - OREF or class
-pMethod - instance or class method to execute respectively
-pArgs - additional arguments</Description>
+<Description><![CDATA[
+Executes actions and returns device output <br>
+pObj - OREF or class<br>
+pMethod - instance or class method to execute respectively<br>
+pArgs - additional arguments<br>]]></Description>
 <ClassMethod>1</ClassMethod>
 <FormalSpec>pObj,pMethod,pArgs...</FormalSpec>
 <ProcedureBlock>0</ProcedureBlock>
@@ -498,7 +498,7 @@ wstr(s)      do output(s)  quit
     //Write a tab - call the output label
 wtab(s)      do output($char(9))  quit
     //Output label - this is where you would handle what you actually want to do.
-    //  in our case, we want to write to myStream
+    //  in our case, we want to write to str
 output(s)    set str=str_s   quit
 ]]></Implementation>
 </Method>
