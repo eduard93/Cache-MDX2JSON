@@ -444,9 +444,9 @@ This is the Schema which defines the form of the dispatch map</Description>
 ]]></Data>
 </XData>
 
-<Method name="POtoStr">
+<Method name="OutputToStr">
 <ClassMethod>1</ClassMethod>
-<FormalSpec>obj:%ZEN.proxyObject</FormalSpec>
+<FormalSpec>pObj:%ZEN.proxyObject,pMethod:%String="%ToJSON",pArgs...</FormalSpec>
 <ProcedureBlock>0</ProcedureBlock>
 <ReturnType>%String</ReturnType>
 <Implementation><![CDATA[
@@ -457,8 +457,12 @@ This is the Schema which defines the form of the dispatch map</Description>
 	
 	//Enable redirection
 	do ##class(%Device).ReDirectIO(1)
-
-	set st = obj.%ToJSON()
+	
+	if $d(pArgs)= 0 {
+		do $Method(pobj,pMethod)
+	} else {
+		do $Method(pobj,pMethod,pArgs)
+	}
 	
     //Disable redirection
     do ##class(%Device).ReDirectIO(0)

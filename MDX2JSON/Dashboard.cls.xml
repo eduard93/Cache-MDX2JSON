@@ -205,7 +205,7 @@ Converts relevant parts of %DeepSee.Dashboard.Widget object into %ZEN.proxyObjec
 		do ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(overridestr,,.override,1) // convert it into %ZEN.proxyObject
 
 		#if $$$IsNewJSON // if we are on new versions
-			set overridestr = ##class(MDX2JSON.AbstractREST).POtoStr(override) // convert it into valid json 
+			set overridestr = ##class(MDX2JSON.AbstractREST).OutputToStr(override,"%ToJSON") // convert it into valid json 
 			set override = ##class(%Object).$fromJSON(overridestr) // and into %Object
 		#endif
 		
