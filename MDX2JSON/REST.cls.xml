@@ -248,7 +248,13 @@ Converts incoming request object and calls abovementioned method.]]></Descriptio
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
     try {
-        set st = ##class(MDX2JSON.Utils).WriteJSONfromMDX($$$R("MDX"))
+	    if $$$R("Engine")="DeepSeeREST" {
+		    // DeepSeeREST engine for MDX->JSON transformation. Only in 15.3+
+		    set st = ##class(MDX2JSON.Utils).WriteJSONfromMDXNew($$$R("MDX"))
+	    } else {
+		    // Default MDX2JSON engine. 14.1+
+        	set st = ##class(MDX2JSON.Utils).WriteJSONfromMDX($$$R("MDX"))
+	    }
     } catch ex {
         set st=ex.AsStatus()
     }
