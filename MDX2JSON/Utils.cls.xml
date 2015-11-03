@@ -283,5 +283,20 @@ Get format defaults.</Description>
     return st
 ]]></Implementation>
 </Method>
+
+<Method name="ExecuteAction">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>Cube:%String,Action:%String,Context:%ZEN.proxyObject=##class(%ZEN.proxyObject).%New()</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	set st = $$$OK
+	set Cube = $$$UPPER(Cube)
+	set ActionClass = $G($$$DeepSeeMetaGLVN("cubes",Cube,"actionClass"))
+	if (ActionClass'="") {
+		set st = $classmethod(ActionClass,"%OnDashboardAction",Action,Context)
+	}
+	return st
+]]></Implementation>
+</Method>
 </Class>
 </Export>

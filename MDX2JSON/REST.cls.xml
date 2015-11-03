@@ -60,6 +60,7 @@ Example: send HTTP GET request to web application with Dispatch class <b>MDX2JSO
    <Route Url="/Dashboards" Method="POST" Call="GetDashboardList" Body="Folder"/> 
    <Route Url="/Dashboard" Method="POST" Call="GetDashboard" Body="Dashboard"/>
    <Route Url="/Widgets" Method="POST" Call="GetWidgetsList" Body="Dashboard"/>
+   <Route Url="/Action/:Cube/:Action" Method="POST" Call="ExecuteAction"/> 
    
    <!-- Get info about system format and locale-->
    <Route Url="/Format" Method="GET" Call="GetFormat"/> 
@@ -337,6 +338,17 @@ Wrapper for ##class(MDX2JSON.Users).SetConfig()</Description>
 <Implementation><![CDATA[
 	set Name = $ZCONVERT($ZCONVERT(Name ,"I","URL") ,"I","UTF8")
 	return ##class(%DeepSee.UserLibrary.Utils).%RemoveFavorite(Name)
+]]></Implementation>
+</Method>
+
+<Method name="ExecuteAction">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>Cube:%String,Action:%String</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	set Cube = $ZCONVERT($ZCONVERT(Cube ,"I","URL") ,"I","UTF8")
+	set Action = $ZCONVERT($ZCONVERT(Action ,"I","URL") ,"I","UTF8")
+	return ##class(MDX2JSON.Utils).ExecuteAction(Cube,Action,%request.Content)
 ]]></Implementation>
 </Method>
 </Class>
