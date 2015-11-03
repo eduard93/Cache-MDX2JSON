@@ -62,6 +62,21 @@ Automatic processing of MDX query and outputting resulting JSONP.<br>
 ]]></Implementation>
 </Method>
 
+<Method name="WriteJSONfromMDXNew">
+<Description><![CDATA[
+Automatic processing of MDX query and outputting resulting JSON.<br>
+<b>pMDX</b> - String containing MDX query.<br>]]></Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>pMDX:%String</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	set Provider = ##class(%ZEN.Auxiliary.jsonMDXProvider).%New()
+	set Provider.mdxQuery = pMDX
+	set st = tProvider.%DrawJSON()
+	return st
+]]></Implementation>
+</Method>
+
 <Method name="WriteDrillthroughJSON">
 <Description><![CDATA[
 Automatic processing of MDX Drillthrough query and outputting resulting listing as JSON.<br>
