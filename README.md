@@ -85,6 +85,7 @@ These are the possible requests to web application (add param ?Namespace={Desire
 | Dashboard                   | POST | {Dashboard:"DashboardName"} | JSON      | All widgets in a dashboard, with filters as part of dashboard|
 | Widgets                     | POST | {Dashboard:"DashboardName"} | JSON      | All widgets in a dashboard, with filters as part of widgets  |
 | DataSource                  | POST |{DataSource:"Pivot fullname"}| JSON      | All info about Pivot           |
+| Action/:Cube/:Action        | POST |{[context object](http://docs.intersystems.com/ens20152/csp/docbook/DocBook.UI.Page.cls?KEY=D2IMP_ch_action#D2IMP_action_context_info)}             | JSON      | Execute cube action            |
 | Filters                     | POST |{ "DataSource": "DataSourceName.ext", "Values":1, Search:"SearchTerm"}| JSON   | All filters for DeepSee DataSource (cube, pivot, kpi, metric) with values (if Values = 1, set to 0 or omit otherwise). If Search is not empty only filter values, containing search term would be returned.|
 | Format                      | GET  |                             | JSON      | Default formatting             |
 | TermList                    | POST | {"TermList":"TermListName"} | JSON      | Termlist key-value array       |
