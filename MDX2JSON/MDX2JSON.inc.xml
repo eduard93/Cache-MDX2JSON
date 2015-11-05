@@ -13,7 +13,7 @@
 #define Private '$$$Public
 
 #; For work with dynamic objects
-#if $$$comClassDefined("%Library.Array")
+#if $$$comClassDefined("%Library.AbstractObject")
 	#define NewDynObj ##class(%Object).%New()
 	#define NewDynDTList ##class(%Array).%New()
 	#;define NewDynDTArray $$$NewDynDTList
@@ -36,6 +36,6 @@
 	#define ListSize(%obj) %obj.Count()
 	#define ListGet(%obj,%i) %obj.GetAt(%i)
 #endif
-#define IsNewJSON ##Expression($$$comClassDefined("%Library.Array"))
+#define IsNewJSON ##Expression($$$comClassDefined("%Library.AbstractObject"))
 ]]></Routine>
 </Export>
