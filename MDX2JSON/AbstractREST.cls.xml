@@ -222,15 +222,16 @@ Called for a REST page in the event of a login being required</Description>
 	Do %response.SetHeader("Access-Control-Allow-Headers","Content-Type, Authorization, Accept-Language, X-Requested-With")
 	
 	Set %response.CharSet = "utf-8"
-	Set %response.ContentType="application/json"
+	Set %response.ContentType = "application/json"
 	
 	If (%request.GetCgiEnv("REQUEST_METHOD") = "OPTIONS"){
 		Do %response.WriteHTTPHeader()
 		Return $$$OK
 	}
+	Set %response.Status = "401 Unauthorized"
 	
     #; Don't want the session token
-    Set %response.OutputSessionToken=0
+    Set %response.OutputSessionToken = 0
     
     #; We want Basic authentication
 	//Do %response.SetHeader("WWW-Authenticate","Basic")    	   
