@@ -113,7 +113,8 @@ do ##class(MDX2JSON.Tests).DynamicObjects()</Description>
 	$$$DynObjToJSON(obj)
 	
 	set dtList = $$$NewDynDTList
-	s a=1
+	set a = 1
+	$$$Insert(dtList,a)
 	$$$Insert(dtList,"a")
 	$$$ListToJSON(dtList)
 ]]></Implementation>
