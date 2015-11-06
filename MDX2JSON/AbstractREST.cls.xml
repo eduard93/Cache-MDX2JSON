@@ -477,13 +477,13 @@ pArgs - additional arguments]]></Description>
 		if $d(pArgs)= 0 {
 			do $Method(pobj,pMethod)
 		} else {
-			do $Method(pobj,pMethod,pArgs)
+			do $Method(pobj,pMethod,pArgs...)
 		}
 	} elseif $$$comClassDefined(pObj) {
 		if $d(pArgs)= 0 {
 			do $ClassMethod(pobj,pMethod)
 		} else {
-			do $ClassMethod(pobj,pMethod,pArgs)
+			do $ClassMethod(pobj,pMethod,pArgs...)
 		}
 	}
 	
