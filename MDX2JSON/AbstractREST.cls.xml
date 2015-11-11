@@ -264,7 +264,7 @@ Issue an '500' error and give some indication as to what occurred.<br>
 
 <Method name="GetMappings">
 <Description>
-Retums info about MDX2JSON package mapping</Description>
+Returns info about MDX2JSON package mapping</Description>
 <ClassMethod>1</ClassMethod>
 <ReturnType>%ArrayOfObjects</ReturnType>
 <Implementation><![CDATA[
