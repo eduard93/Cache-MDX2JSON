@@ -19,7 +19,9 @@ Transforms MDX query into executed <b>MDX2JSON.ResultSet</b>.<br>
 <Implementation><![CDATA[
     set Params = ""
     set pStatus = $$$OK
-    set RS = ##class(MDX2JSON.ResultSet).%ExecuteDirect(pMDX,.Params,.pStatus)
+    set RS = ##class(MDX2JSON.ResultSet).%New()
+	set st = RS.%PrepareMDX()
+	set st = RS.%ExecuteAsync(pMDX,.Params,1)
     return RS
 ]]></Implementation>
 </Method>
