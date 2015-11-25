@@ -20,8 +20,9 @@ Transforms MDX query into executed <b>MDX2JSON.ResultSet</b>.<br>
     set Params = ""
     set pStatus = $$$OK
     set RS = ##class(MDX2JSON.ResultSet).%New()
-	set st = RS.%PrepareMDX(pMDX)
-	set st = RS.%ExecuteAsynch(,.Params,1)
+	set pStatus = RS.%PrepareMDX(pMDX)
+	return:$$$ISERR(pStatus) RS
+	set pStatus = RS.%ExecuteAsynch(,.Params,1)
     return RS
 ]]></Implementation>
 </Method>
