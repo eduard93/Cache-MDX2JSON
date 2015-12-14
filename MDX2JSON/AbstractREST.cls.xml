@@ -474,9 +474,9 @@ pArgs - additional arguments]]></Description>
 	do ##class(%Device).ReDirectIO(1)
 	
 	if $isobject(pObj) {
-		do $Method(pobj,pMethod,pArgs...)
+		do $Method(pObj,pMethod,pArgs...)
 	} elseif $$$comClassDefined(pObj) {
-		do $ClassMethod(pobj,pMethod,pArgs...)
+		do $ClassMethod(pObj,pMethod,pArgs...)
 	}
 	
     //Disable redirection
