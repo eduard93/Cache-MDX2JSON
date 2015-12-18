@@ -150,5 +150,35 @@ do ##class(MDX2JSON.Tests).RenderSpeed()</Description>
 	Write "Time Average: ",time/Count
 ]]></Implementation>
 </Method>
+
+<Method name="MakeWidgetKeyUnique">
+<Description>
+Iterate over all dashboards in a namespace, for each iterate over widgets.
+Changes widget key if previously encountered</Description>
+<ClassMethod>1</ClassMethod>
+<Implementation><![CDATA[
+	set rs = ##class(%DeepSee.Dashboard.Definition).ExtentFunc()
+	set WidgetKeyList=""
+	while rs.%Next() {
+         set Dash = ##class(%DeepSee.Dashboard.Definition).%OpenId(rs.%Get("ID"))
+         for i=1:1:Dash.widgets.Count() {
+	         set WidgetKey = Dash.widgets.GetAt(i).key
+	         if $LF(WidgetKeyList,WidgetKey) {
+		         write "Duplicate dash: ", rs.%Get("ID"), " oldkey: ", WidgetKey
+		         // generate new randow widget key
+		         do {
+		         	set WidgetKey = $R(1000000000)
+		         } while ($LF(WidgetKeyList,WidgetKey)'=0)
+		         set WidgetKeyList = WidgetKeyList _$LB(WidgetKey)
+		         set Dash.widgets.GetAt(i).key = WidgetKey	
+		         write "newkey: ", WidgetKey, !
+		         write $System.Status.GetErrorText(Dash.%Save())		
+	         } else {
+		         set WidgetKeyList = WidgetKeyList _$LB(WidgetKey)
+	         }
+         }
+   }
+]]></Implementation>
+</Method>
 </Class>
 </Export>
