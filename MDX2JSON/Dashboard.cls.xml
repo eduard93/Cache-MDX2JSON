@@ -296,7 +296,11 @@ Returns MDX string used to create pivot.<br>
 		set rs = tPivotTable.%CreateResultSet(.pStatus,.tParms,.tFilterInfo,.tAdvancedFilters,.MDX) // returns tQueryText - mdx with filters
 		return:$$$ISERR(pStatus) pStatus		
 	} 
-        
+	
+	// Remove \n
+    set MDX = $TR(MDX,$C(10),"")
+    set BaseMDX = $TR(MDX,$C(10),"")
+    
     return pStatus
 ]]></Implementation>
 </Method>
