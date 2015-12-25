@@ -31,12 +31,12 @@ Set <b>App</b> configuration for all Users equal to <b>Config</b>]]></Descriptio
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
 	set ns = $Namespace
-	zn "%SYS"		
+	zn "%SYS"
 	return:'($$$IOwnAllRole) $$$ERROR($$$AccessDenied)
-	
+
 	set rs=##Class(%ResultSet).%New("Security.Users:List")
 	set st = rs.Execute()
-	while rs.Next() { 
+	while rs.Next() {
 		set st=$$$ADDSC(st,..SetConfig(App, Config, rs.Get("Name")))
 	}
 	zn ns
@@ -66,7 +66,7 @@ Export <b>App</b> configuration for <b>User</b> to <b>File</b>]]></Description>
 <FormalSpec>App:%String,User:%String=$Username,FileName:%String</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-	
+
 	set config = ..GetConfig(App,User)
 	set stream=##class(%Stream.FileCharacter).%New()
 	set stream.TranslateTable="UTF8"
@@ -121,12 +121,12 @@ Retums info about relevant user priveleges</Description>
 <ReturnType>%ArrayOfObjects</ReturnType>
 <Implementation><![CDATA[
 	Set result = ##class(%ArrayOfDataTypes).%New()
-	
+
 	do result.SetAt($SYSTEM.SQL.CheckPriv(User,"9,MDX2JSON.ResolveText","e"),"MDX2JSON.ResolveText")
-	do result.SetAt($SYSTEM.SQL.CheckPriv(User,"9,MDX2JSON.IsItemVisible","e"),"MDX2JSON.IsItemVisible") 
-	do result.SetAt($SYSTEM.SQL.CheckPriv(User,"9,MDX2JSON.GetDashCover","e"),"MDX2JSON.GetDashCover") 
-	do result.SetAt($SYSTEM.SQL.CheckPriv(User,"1,%DeepSee_Dashboard.Definition","s"),"%DeepSee_Dashboard.Definition") 
-	
+	do result.SetAt($SYSTEM.SQL.CheckPriv(User,"9,MDX2JSON.IsItemVisible","e"),"MDX2JSON.IsItemVisible")
+	do result.SetAt($SYSTEM.SQL.CheckPriv(User,"9,MDX2JSON.GetDashCover","e"),"MDX2JSON.GetDashCover")
+	do result.SetAt($SYSTEM.SQL.CheckPriv(User,"1,%DeepSee_Dashboard.Definition","s"),"%DeepSee_Dashboard.Definition")
+
 	return result
 ]]></Implementation>
 </Method>

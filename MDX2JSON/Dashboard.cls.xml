@@ -40,7 +40,7 @@ Usage: Select MDX2JSON.Dashboard_GetDashCover(bookCover) FROM %DeepSee_Dashboard
 <Implementation><![CDATA[
 	do ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(bookCover,,.obj,1)
 	return:$isobject(obj) obj.background.src
-    return ""
+	return ""
 ]]></Implementation>
 </Method>
 
@@ -55,8 +55,8 @@ Usage: Select fullname, MDX2JSON.IsItemVisible(fullname) FROM %DeepSee_Dashboard
 <SqlProc>1</SqlProc>
 <Implementation><![CDATA[
 	set visible = ##class(%DeepSee.UserLibrary.Utils).%FolderItemExists(fullName)
-    return:visible=1 1
-    return 0
+	return:visible=1 1
+	return 0
 ]]></Implementation>
 </Method>
 
@@ -74,7 +74,7 @@ Usage: Select MDX2JSON.Dashboard_ResolveText(title) FROM %DeepSee_Dashboard.Defi
 <ReturnType>%String</ReturnType>
 <SqlName>ResolveText</SqlName>
 <SqlProc>1</SqlProc>
-<Implementation><![CDATA[    return ##class(%DeepSee.UserPortal.Utils).%ResolveText(Text)
+<Implementation><![CDATA[	return ##class(%DeepSee.UserPortal.Utils).%ResolveText(Text)
 ]]></Implementation>
 </Method>
 
@@ -89,12 +89,12 @@ Opens DeepSee dashboard by it's name. Returns status of aatempt to locate and op
 <Implementation><![CDATA[
 	 kill Dashboard
 	 &sql(
-        SELECT TOP 1 ID into :tDashId
-        FROM %DeepSee_Dashboard.Definition
-        WHERE fullName=:DashName
-     )
-     return:(SQLCODE'=0) $$$ERROR($$$SQLError, SQLCODE)
-     
+		SELECT TOP 1 ID into :tDashId
+		FROM %DeepSee_Dashboard.Definition
+		WHERE fullName=:DashName
+	 )
+	 return:(SQLCODE'=0) $$$ERROR($$$SQLError, SQLCODE)
+
 	 set Dashboard = ##class(%DeepSee.Dashboard.Definition).%OpenId(tDashId,,.st)
 	 return st
 ]]></Implementation>
@@ -107,22 +107,22 @@ Converts %DeepSee.Dashboard.Definition widgets into %ZEN.proxyObject.</Descripti
 <FormalSpec>Dashboard:%DeepSee.Dashboard.Definition,*Widgetlist:%ZEN.proxyObject</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-    #Dim widget As %DeepSee.Dashboard.Widget
-    set Widgetlist = $$$NewDynObj
-    set Widgetlist.children = $$$NewDynObjList
-    set Widgetlist.displayInfo = ..GetDashboardDisplayInfo(Dashboard)
-    set Widgetlist.info = ..GetDashboardInfo(Dashboard)
-    
-    set st = $$$OK
-    try {
-	    for i=1:1:Dashboard.widgets.Count() {
+	#Dim widget As %DeepSee.Dashboard.Widget
+	set Widgetlist = $$$NewDynObj
+	set Widgetlist.children = $$$NewDynObjList
+	set Widgetlist.displayInfo = ..GetDashboardDisplayInfo(Dashboard)
+	set Widgetlist.info = ..GetDashboardInfo(Dashboard)
+
+	set st = $$$OK
+	try {
+		for i=1:1:Dashboard.widgets.Count() {
 			$$$Insert(Widgetlist.children,..WidgetToProxyObject(Dashboard.widgets.GetAt(i)))
-        }         
-    } catch ex {
-        set st = ex.AsStatus()
-        do ex.Log() 
-    }
-    return st
+		}
+	} catch ex {
+		set st = ex.AsStatus()
+		do ex.Log()
+	}
+	return st
 ]]></Implementation>
 </Method>
 
@@ -134,11 +134,11 @@ Converts relevant parts of %DeepSee.Dashboard.Widget object into %ZEN.proxyObjec
 <FormalSpec>Widget:%DeepSee.Dashboard.Widget</FormalSpec>
 <ReturnType>%ZEN.proxyObject</ReturnType>
 <Implementation><![CDATA[
-    set obj = $$$NewDynObj
-    
-    &sql(SELECT cubeName into :cube FROM %DeepSee_Dashboard.Pivot WHERE fullName=:Widget.dataSource)
+	set obj = $$$NewDynObj
+
+	&sql(SELECT cubeName into :cube FROM %DeepSee_Dashboard.Pivot WHERE fullName=:Widget.dataSource)
 	set:(SQLCODE'=0) cube=""
-	
+
 	if (Widget.dataSource'="") {
 		set st = ..GetMdx(Widget.dataSource, .mdx, .basemdx)
 	} else {
@@ -147,13 +147,13 @@ Converts relevant parts of %DeepSee.Dashboard.Widget object into %ZEN.proxyObjec
 		set basemdx = ""
 		set obj.Link = Widget.dataLink
 	}
-	
+
 	set obj.mdx = mdx
 	set obj.name = Widget.name
 	set obj.basemdx = basemdx
 	set obj.type =Widget.subtype
 	set obj.title = ##class(%DeepSee.UserPortal.Utils).%ResolveText(Widget.title) /// $$$ support
-	set obj.key =  Widget.key 
+	set obj.key =  Widget.key
 	set obj.dataSource = Widget.dataSource
 	set obj.drillDownDataSource = Widget.drillDownDataSource
 	set obj.cube = cube
@@ -167,20 +167,20 @@ Converts relevant parts of %DeepSee.Dashboard.Widget object into %ZEN.proxyObjec
 			$$$Insert(obj.controls,control)
 		}
 	}
-	
+
 	if ##class(%Dictionary.CompiledMethod).%ExistsId("MDX2JSON.Dashboard||Process"_Widget.subtype) {
 		do $ClassMethod("MDX2JSON.Dashboard", "Process"_Widget.subtype, Widget, obj)
 	}
-	
+
 	if (Widget.properties.Count()>0) {
 		set obj.properties = $$$NewDynObj //##class(%ArrayOfDataTypes).%New()
 		do {
-			set property = Widget.properties.GetNext(.key)		
+			set property = Widget.properties.GetNext(.key)
 			//do:(key'="") obj.properties.SetAt(property,key)
 			do:(key'="") obj.properties.%DispatchSetProperty(key,property)
 		} while key'=""
 	}
-	
+
 	return obj
 ]]></Implementation>
 </Method>
@@ -189,30 +189,30 @@ Converts relevant parts of %DeepSee.Dashboard.Widget object into %ZEN.proxyObjec
 <ClassMethod>1</ClassMethod>
 <FormalSpec>Widget:%DeepSee.Dashboard.Widget,Obj:%ZEN.proxyObject</FormalSpec>
 <Implementation><![CDATA[
-	
+
 	set Obj.seriesTypes = $$$NewDynDTList
 	for i=1:1:Widget.dataSeries.Count()
 	{
 		$$$Insert(Obj.seriesTypes,Widget.dataSeries.GetAt(i).type)
 	}
-	
+
 	set Obj.overrides = $$$NewDynObjList
 	do {
 		set overridestr = Widget.overrides.GetNext(.key) // we take DeepSee widget override string (in "json" format)
 		return:key=""
-		
-		
+
+
 		do ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(overridestr,,.override,1) // convert it into %ZEN.proxyObject
 
 		#if $$$IsNewJSON // if we are on new versions
-			set overridestr = ##class(MDX2JSON.AbstractREST).OutputToStr(override,"%ToJSON") // convert it into valid json 
+			set overridestr = ##class(MDX2JSON.AbstractREST).OutputToStr(override,"%ToJSON") // convert it into valid json
 			set override = ##class(%Object).$fromJSON(overridestr) // and into %Object
 		#endif
-		
+
 		if $IsObject(override) {
 			$$$Insert(Obj.overrides,override)
 		}
-		
+
 	} while key'=""
 ]]></Implementation>
 </Method>
@@ -241,11 +241,11 @@ Converts %DeepSee.Dashboard.Control object into %ZEN.proxyObject, handles run-ti
 <Implementation><![CDATA[
 	set obj = $$$NewDynObj
 	set st = Widget.controls.GetAt(Number).%CopyTo(obj) // copy widget control properties to proxyObj
-	
+
 	set obj.label = ##class(%DeepSee.UserPortal.Utils).%ResolveText(obj.label)
 	set obj.source = Widget.name
-	
-	set:(obj.target="") obj.target = Widget.name 
+
+	set:(obj.target="") obj.target = Widget.name
 
 	if ($e(obj.value)="@") {
 		set name = $e(obj.value,2,*)
@@ -256,8 +256,8 @@ Converts %DeepSee.Dashboard.Control object into %ZEN.proxyObject, handles run-ti
 			set obj.value = "&[" _ value _ "]"
 		}
 	}
-	
-	set:((obj.action="applyFilter") || (obj.action="setFilter")) obj.values = ..GetMembersForFilter(Cube,obj.targetProperty)	
+
+	set:((obj.action="applyFilter") || (obj.action="setFilter")) obj.values = ..GetMembersForFilter(Cube,obj.targetProperty)
 	return obj
 ]]></Implementation>
 </Method>
@@ -275,16 +275,16 @@ Returns MDX string used to create pivot.<br>
 	#dim tPivotTable As %DeepSee.Component.pivotTable
 	set MDX = ""
 	set BaseMDX = ""
-    
-    set tPivot = ##class(%DeepSee.UserLibrary.Utils).%OpenFolderItem(pPivotName,.pStatus)
-    return:'$IsObject(tPivot) $$$OK
-    return:$$$ISERR(pStatus) pStatus
 
-    set tPivotTable = ##class(%DeepSee.Component.pivotTable).%New()
-    set pStatus = tPivot.%CopyToComponent(tPivotTable)
-    return:$$$ISERR(pStatus) pStatus
-    
-    set rs = tPivotTable.%CreateResultSet(.pStatus,.tParms,.tFilterInfo,.tAdvancedFilters,.BaseMDX) // returns tQueryText - mdx without filters
+	set tPivot = ##class(%DeepSee.UserLibrary.Utils).%OpenFolderItem(pPivotName,.pStatus)
+	return:'$IsObject(tPivot) $$$OK
+	return:$$$ISERR(pStatus) pStatus
+
+	set tPivotTable = ##class(%DeepSee.Component.pivotTable).%New()
+	set pStatus = tPivot.%CopyToComponent(tPivotTable)
+	return:$$$ISERR(pStatus) pStatus
+
+	set rs = tPivotTable.%CreateResultSet(.pStatus,.tParms,.tFilterInfo,.tAdvancedFilters,.BaseMDX) // returns tQueryText - mdx without filters
 	return:$$$ISERR(pStatus) pStatus
 
 	set pStatus = tPivotTable.%GetFilterInfo(.tFilterInfo,.tAdvancedFilters)
@@ -294,14 +294,14 @@ Returns MDX string used to create pivot.<br>
 		set MDX = BaseMDX // no filters, so we're good
 	} else {
 		set rs = tPivotTable.%CreateResultSet(.pStatus,.tParms,.tFilterInfo,.tAdvancedFilters,.MDX) // returns tQueryText - mdx with filters
-		return:$$$ISERR(pStatus) pStatus		
-	} 
-	
+		return:$$$ISERR(pStatus) pStatus
+	}
+
 	// Remove \n
-    set MDX = $TR(MDX,$C(10),"")
-    set BaseMDX = $TR(MDX,$C(10),"")
-    
-    return pStatus
+	set MDX = $TR(MDX,$C(10),"")
+	set BaseMDX = $TR(MDX,$C(10),"")
+
+	return pStatus
 ]]></Implementation>
 </Method>
 
@@ -315,8 +315,8 @@ Returns list of %ZEN.proxyObject:<br/>]]></Description>
 <Implementation><![CDATA[
 	set st = ##class(%DeepSee.Dashboard.Utils).%GetMembersForFilter(DataSource,Filter,.tMembers,.tDefaultFilterValue,,.tRelatedFilters,0,,.tValueList)
 	set members = $$$NewDynObjList
-	
-	set key = $order(tMembers("")) 
+
+	set key = $order(tMembers(""))
 	while (key '= "") {
 		set member = $$$NewDynObj
 		set member.name = $lg(tMembers(key),1)
@@ -336,12 +336,12 @@ Converts %DeepSee.Dashboard.Definition display information into %ZEN.proxyObject
 <FormalSpec>Dashboard:%DeepSee.Dashboard.Definition</FormalSpec>
 <ReturnType>%ZEN.proxyObject</ReturnType>
 <Implementation><![CDATA[
-    set DisplayInfo = $$$NewDynObj
-    set DisplayInfo.snapToGrid = Dashboard.snapTo // Dashboard is in "snap to grid" mode.
-    set DisplayInfo.gridMode = Dashboard.snapGrid // Dashboard uses the new snapGrid layout mode.
-    set DisplayInfo.gridRows = Dashboard.gridRows
-    set DisplayInfo.gridCols = Dashboard.gridCols
-    return DisplayInfo
+	set DisplayInfo = $$$NewDynObj
+	set DisplayInfo.snapToGrid = Dashboard.snapTo // Dashboard is in "snap to grid" mode.
+	set DisplayInfo.gridMode = Dashboard.snapGrid // Dashboard uses the new snapGrid layout mode.
+	set DisplayInfo.gridRows = Dashboard.gridRows
+	set DisplayInfo.gridCols = Dashboard.gridCols
+	return DisplayInfo
 ]]></Implementation>
 </Method>
 
@@ -352,7 +352,7 @@ Converts %DeepSee.Dashboard.Widget display information into %ZEN.proxyObject.</D
 <FormalSpec>Widget:%DeepSee.Dashboard.Widget</FormalSpec>
 <ReturnType>%ZEN.proxyObject</ReturnType>
 <Implementation><![CDATA[
-    set DisplayInfo = $$$NewDynObj
+	set DisplayInfo = $$$NewDynObj
 
 	set DisplayInfo.top = Widget.top
 	set DisplayInfo.left = Widget.left
@@ -361,9 +361,9 @@ Converts %DeepSee.Dashboard.Widget display information into %ZEN.proxyObject.</D
 	set DisplayInfo.topCol = Widget.homeColL
 	set DisplayInfo.leftRow = Widget.homeRowL
 	set DisplayInfo.colWidth = Widget.colSpanL
-    set DisplayInfo.rowHeight = Widget.rowSpanL
-    
-    return DisplayInfo
+	set DisplayInfo.rowHeight = Widget.rowSpanL
+
+	return DisplayInfo
 ]]></Implementation>
 </Method>
 
@@ -374,10 +374,10 @@ Converts %DeepSee.Dashboard.Definition display information into %ZEN.proxyObject
 <FormalSpec>Dashboard:%DeepSee.Dashboard.Definition</FormalSpec>
 <ReturnType>%ZEN.proxyObject</ReturnType>
 <Implementation><![CDATA[
-    set Info = $$$NewDynObj
-    set Info.title = Dashboard.title
+	set Info = $$$NewDynObj
+	set Info.title = Dashboard.title
 
-    return Info
+	return Info
 ]]></Implementation>
 </Method>
 

@@ -4,34 +4,34 @@
 <Description><![CDATA[
 Class for REST-like web api for MDX2JSON transformation (and XML/A).<br>
 Example: send HTTP POST request to web application with Dispatch class <b>MDX2JSON.REST</b>
-with body: { "MDX":"QUERY" }, where QUERY is a correct MDX statement, ex:  <br> 
+with body: { "MDX":"QUERY" }, where QUERY is a correct MDX statement, ex:  <br>
 {<br>
-        "MDX": "SELECT NON EMPTY [Product].[P1].[Product Category].Members ON 0,NON EMPTY [Outlet].[H1].[Region].Members ON 1 FROM [HoleFoods]"<br>
+		"MDX": "SELECT NON EMPTY [Product].[P1].[Product Category].Members ON 0,NON EMPTY [Outlet].[H1].[Region].Members ON 1 FROM [HoleFoods]"<br>
 } <br>
 You can send requests to:<br> <ul>
-    <li>webapplication/Test - to get test info, %request, %response and %session</li> 
-    <li>webapplication/MDX - to get result in JSON format for MDX query</li>
-    <li>webapplication/MDXDrillthrough - to get resulting listing in JSON format for MDX Drillthrough query</li>
-    <li>webapplication/MDX2XMLA - to get result in XML/A format for MDX query</li>
+	<li>webapplication/Test - to get test info, %request, %response and %session</li>
+	<li>webapplication/MDX - to get result in JSON format for MDX query</li>
+	<li>webapplication/MDXDrillthrough - to get resulting listing in JSON format for MDX Drillthrough query</li>
+	<li>webapplication/MDX2XMLA - to get result in XML/A format for MDX query</li>
 </ul>
 
 Dashboard related requests are:
  <ul>
-    <li>webapplication/Dashboards - get all dashboards in a namespace (GET request).</li>
-    <li>webapplication/Dashboards - get folder specific (recursively) dashboards in a namespace (POST request with {Folder:"FolderName"} body) ).</li>
-    <li>webapplication/Dashboard - get all dashboard widgets (POST request with {Dashboard:"DashboardName"} body) with filters as part of dashboard.</li>
-    <li>webapplication/Widgets - get all dashboard widgets (POST request with {Dashboard:"DashboardName"} body) with filters as part of widgets.</li>
+	<li>webapplication/Dashboards - get all dashboards in a namespace (GET request).</li>
+	<li>webapplication/Dashboards - get folder specific (recursively) dashboards in a namespace (POST request with {Folder:"FolderName"} body) ).</li>
+	<li>webapplication/Dashboard - get all dashboard widgets (POST request with {Dashboard:"DashboardName"} body) with filters as part of dashboard.</li>
+	<li>webapplication/Widgets - get all dashboard widgets (POST request with {Dashboard:"DashboardName"} body) with filters as part of widgets.</li>
 </ul>
 To get information about possible datasource (cube, pivot, kpi, metric) filters and filters' values:<br><ul>
-    <li>webapplication/Filters - Same but with POST { "DataSource":"DataSourceName.ext","Values":0, Search:"SearchTerm"} body. If values = 1, then filters' values would also be provided. If Search is not empty only filter values, containing search term would be returned.</li> 
-</ul> 
-        
+	<li>webapplication/Filters - Same but with POST { "DataSource":"DataSourceName.ext","Values":0, Search:"SearchTerm"} body. If values = 1, then filters' values would also be provided. If Search is not empty only filter values, containing search term would be returned.</li>
+</ul>
+
 To get information about pivot:<br><ul>
-        <li>webapplication/DataSource- to get info about pivot (POST {DataSource:"Name of DS"})</li> </ul> 
-        
+		<li>webapplication/DataSource- to get info about pivot (POST {DataSource:"Name of DS"})</li> </ul>
+
 To get information about system-wide defaults (format):<br><ul>
-        <li>webapplication/Format - to get info about system-wide defaults (format). GET request </li> </ul> 
-        
+		<li>webapplication/Format - to get info about system-wide defaults (format). GET request </li> </ul>
+
 You can add a param Namespace to request to execute MDX in desired namespace (MDX2JSON package must be mapped to that namespace):<br>
 webapplication/MDX?Namespace=Samples<br>
 
@@ -45,43 +45,43 @@ Example: send HTTP GET request to web application with Dispatch class <b>MDX2JSO
 <XData name="UrlMap">
 <Data><![CDATA[
 <Routes>
-    <!-- Send objects in this format: {"MDX":"QUERY"} HTTP method: POST -->
-   
+	<!-- Send objects in this format: {"MDX":"QUERY"} HTTP method: POST -->
+
    <Route Url="/MDX" Method="POST" Call="WriteJSONfromMDX" Body="MDX"/>
-   <Route Url="/MDX2JSONP" Method="POST" Call="WriteJSONPfromMDX" Body="MDX"/>  
+   <Route Url="/MDX2JSONP" Method="POST" Call="WriteJSONPfromMDX" Body="MDX"/>
    <Route Url="/MDXDrillthrough" Method="POST" Call="WriteDrillthroughJSON" Body="MDX"/>
-   <Route Url="/MDX2XMLA" Method="POST" Call="WriteXMLAfromMDX" Body="MDX"/>  
+   <Route Url="/MDX2XMLA" Method="POST" Call="WriteXMLAfromMDX" Body="MDX"/>
 
    <!-- Get info about availible filters and their values -->
    <Route Url="/Filters" Method="POST" Call="WriteFiltersForDataSource"/>
-   
+
    <!-- Get info about widgets-->
-   <Route Url="/Dashboards" Method="GET" Call="GetDashboardList"/> 
-   <Route Url="/Dashboards" Method="POST" Call="GetDashboardList" Body="Folder"/> 
+   <Route Url="/Dashboards" Method="GET" Call="GetDashboardList"/>
+   <Route Url="/Dashboards" Method="POST" Call="GetDashboardList" Body="Folder"/>
    <Route Url="/Dashboard" Method="POST" Call="GetDashboard" Body="Dashboard"/>
    <Route Url="/Widgets" Method="POST" Call="GetWidgetsList" Body="Dashboard"/>
-   <Route Url="/Action/:Cube/:Action" Method="POST" Call="ExecuteAction"/> 
-   
+   <Route Url="/Action/:Cube/:Action" Method="POST" Call="ExecuteAction"/>
+
    <!-- Get info about system format and locale-->
-   <Route Url="/Format" Method="GET" Call="GetFormat"/> 
-       
+   <Route Url="/Format" Method="GET" Call="GetFormat"/>
+
    <!-- Get info about pivot-->
-   <Route Url="/DataSource" Method="POST" Call="GetDataSource" Body="DataSource"/>  
-   
+   <Route Url="/DataSource" Method="POST" Call="GetDataSource" Body="DataSource"/>
+
    <!-- Get info about pivot-->
-   <Route Url="/TermList" Method="POST" Call="GetTermList" Body="TermList"/>  
-   
+   <Route Url="/TermList" Method="POST" Call="GetTermList" Body="TermList"/>
+
    <!-- Get info about user config-->
-   <Route Url="/Config" Method="POST" Call="SetConfig" Body="Application"/> 
-   <Route Url="/Config/:Application" Method="GET" Call="GetConfig" />     
-   
+   <Route Url="/Config" Method="POST" Call="SetConfig" Body="Application"/>
+   <Route Url="/Config/:Application" Method="GET" Call="GetConfig" />
+
    <!-- Get info about user favorites-->
-   <Route Url="/Favorites" Method="GET" Call="GetFavorites"/> 
-   <Route Url="/Favorites/:Item" Method="POST" Call="AddFavorite" />   
-   <Route Url="/Favorites/:Item" Method="DELETE" Call="RemoveFavorite" /> 
-     
+   <Route Url="/Favorites" Method="GET" Call="GetFavorites"/>
+   <Route Url="/Favorites/:Item" Method="POST" Call="AddFavorite" />
+   <Route Url="/Favorites/:Item" Method="DELETE" Call="RemoveFavorite" />
+
    <!-- Valid but illicit, do not use-->
-   <Route Url="/MDX/:query" Method="GET" Call="WriteJSONfromMDXURL"/>  
+   <Route Url="/MDX/:query" Method="GET" Call="WriteJSONfromMDXURL"/>
    <Route Url="/MDXfilters/:query" Method="GET" Call="WriteFiltersForMDX"/>
 
    <!-- Test method-->
@@ -123,22 +123,22 @@ Test method, outputs <b>%request</b>, <b>%response</b> and <b>%session</b> objec
 		set obj.Response = %response
 		set obj.Session = %session
 	}
-    do obj.%ToJSON()
-    return $$$OK
+	do obj.%ToJSON()
+	return $$$OK
 ]]></Implementation>
 </Method>
 
 <Method name="GetDataSource">
 <ClassMethod>1</ClassMethod>
 <ReturnType>%Status</ReturnType>
-<Implementation><![CDATA[    return ##class(MDX2JSON.Utils).GetDataSource($$$R("DataSource"))
+<Implementation><![CDATA[	return ##class(MDX2JSON.Utils).GetDataSource($$$R("DataSource"))
 ]]></Implementation>
 </Method>
 
 <Method name="GetTermList">
 <ClassMethod>1</ClassMethod>
 <ReturnType>%Status</ReturnType>
-<Implementation><![CDATA[    return ##class(MDX2JSON.Utils).GetTermList($$$R("TermList"))
+<Implementation><![CDATA[	return ##class(MDX2JSON.Utils).GetTermList($$$R("TermList"))
 ]]></Implementation>
 </Method>
 
@@ -148,7 +148,7 @@ Wrapper for ##class(MDX2JSON.Utils).GetWidgetsList()<br>
 Converts incoming request object (JSON: {Dashboard:"Dashboard Full Name"} and calls abovementioned method.]]></Description>
 <ClassMethod>1</ClassMethod>
 <ReturnType>%Status</ReturnType>
-<Implementation><![CDATA[    return ##class(MDX2JSON.Utils).GetWidgetsList($$$R("Dashboard"))
+<Implementation><![CDATA[	return ##class(MDX2JSON.Utils).GetWidgetsList($$$R("Dashboard"))
 ]]></Implementation>
 </Method>
 
@@ -158,7 +158,7 @@ Wrapper for ##class(MDX2JSON.Utils).GetDashboard()<br>
 Converts incoming request object (JSON: {Dashboard:"Dashboard Full Name"} and calls abovementioned method.]]></Description>
 <ClassMethod>1</ClassMethod>
 <ReturnType>%Status</ReturnType>
-<Implementation><![CDATA[    return ##class(MDX2JSON.Utils).GetDashboard($$$R("Dashboard"))
+<Implementation><![CDATA[	return ##class(MDX2JSON.Utils).GetDashboard($$$R("Dashboard"))
 ]]></Implementation>
 </Method>
 
@@ -168,20 +168,20 @@ Returns JSON array of (title, path) for all dashboards in namespace (accessible 
 <ClassMethod>1</ClassMethod>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-    set st = $$$OK
-    if %request.Method = "POST" {
-	    set folderName = $$$R("Folder")
-    } else {
-    	set folderName = ##class(MDX2JSON.Dashboard).#folderName
-    }
-    return:((folderName'="") && ('$IsObject(##class(%DeepSee.UserLibrary.Utils).%FindFolder(folderName)))) $$$ERROR($$$GeneralError,"Folder " _ folderName _ " does not exist")
-    set sql = ##class(MDX2JSON.Dashboard).GetDashboardListSQL(folderName)
-    try {        
-        do ##class(%ZEN.Auxiliary.jsonSQLProvider).%WriteJSONFromSQL(,sql)
-    } catch ex {
-        set st = ex.AsStatus()
-    }
-    return st
+	set st = $$$OK
+	if %request.Method = "POST" {
+		set folderName = $$$R("Folder")
+	} else {
+		set folderName = ##class(MDX2JSON.Dashboard).#folderName
+	}
+	return:((folderName'="") && ('$IsObject(##class(%DeepSee.UserLibrary.Utils).%FindFolder(folderName)))) $$$ERROR($$$GeneralError,"Folder " _ folderName _ " does not exist")
+	set sql = ##class(MDX2JSON.Dashboard).GetDashboardListSQL(folderName)
+	try {
+		do ##class(%ZEN.Auxiliary.jsonSQLProvider).%WriteJSONFromSQL(,sql)
+	} catch ex {
+		set st = ex.AsStatus()
+	}
+	return st
 ]]></Implementation>
 </Method>
 
@@ -191,7 +191,7 @@ Wrapper for ##class(MDX2JSON.Utils).WriteDrillthroughJSON(pMDX).<br>
 Converts incoming request object and calls abovementioned method.]]></Description>
 <ClassMethod>1</ClassMethod>
 <ReturnType>%Status</ReturnType>
-<Implementation><![CDATA[    return ##class(MDX2JSON.Utils).WriteDrillthroughJSON($$$R("MDX"))
+<Implementation><![CDATA[	return ##class(MDX2JSON.Utils).WriteDrillthroughJSON($$$R("MDX"))
 ]]></Implementation>
 </Method>
 
@@ -232,9 +232,9 @@ Wrapper for ##class(MDX2JSON.Utils).WriteFiltersForDataSource(pDataSource, pValu
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
 	set DataSource = $$$R("DataSource")
-    set Values = $$$R("Values")
-    set Search = $$$R("Search")
-    
+	set Values = $$$R("Values")
+	set Search = $$$R("Search")
+
    	set st = ##class(MDX2JSON.Utils).WriteFiltersForDataSource(DataSource,Values,Search)
   	return st
 ]]></Implementation>
@@ -247,19 +247,19 @@ Converts incoming request object and calls abovementioned method.]]></Descriptio
 <ClassMethod>1</ClassMethod>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-    try {
-	    if $$$R("Engine")="DeepSeeREST" {
-		    // DeepSeeREST engine for MDX->JSON transformation. Only in 15.3+
-		    set st = ##class(MDX2JSON.Utils).WriteJSONfromMDXNew($$$R("MDX"))
-	    } else {
-		    // Default MDX2JSON engine. 14.1+
-        	set st = ##class(MDX2JSON.Utils).WriteJSONfromMDX($$$R("MDX"))
-	    }
-    } catch ex {
-        set st=ex.AsStatus()
-    }
+	try {
+		if $$$R("Engine")="DeepSeeREST" {
+			// DeepSeeREST engine for MDX->JSON transformation. Only in 15.3+
+			set st = ##class(MDX2JSON.Utils).WriteJSONfromMDXNew($$$R("MDX"))
+		} else {
+			// Default MDX2JSON engine. 14.1+
+			set st = ##class(MDX2JSON.Utils).WriteJSONfromMDX($$$R("MDX"))
+		}
+	} catch ex {
+		set st=ex.AsStatus()
+	}
 
-    return st
+	return st
 ]]></Implementation>
 </Method>
 
@@ -269,7 +269,7 @@ Wrapper for ##class(MDX2JSON.Utils).WriteJSONPfromMDX(pMDX)<br>
 Converts incoming request object and calls abovementioned method.]]></Description>
 <ClassMethod>1</ClassMethod>
 <ReturnType>%Status</ReturnType>
-<Implementation><![CDATA[    return ##class(MDX2JSON.Utils).WriteJSONPfromMDX($$$R("MDX"))
+<Implementation><![CDATA[	return ##class(MDX2JSON.Utils).WriteJSONPfromMDX($$$R("MDX"))
 ]]></Implementation>
 </Method>
 
@@ -279,7 +279,7 @@ Wrapper for ##class(MDX2JSON.Utils).WriteXMLAfromMDX(pMDX)<br>
 Converts incoming request object and calls abovementioned method.]]></Description>
 <ClassMethod>1</ClassMethod>
 <ReturnType>%Status</ReturnType>
-<Implementation><![CDATA[    return ##class(MDX2JSON.Utils).WriteXMLAfromMDX($$$R("MDX"))
+<Implementation><![CDATA[	return ##class(MDX2JSON.Utils).WriteXMLAfromMDX($$$R("MDX"))
 ]]></Implementation>
 </Method>
 
@@ -288,7 +288,7 @@ Converts incoming request object and calls abovementioned method.]]></Descriptio
 Wrapper for ##class(MDX2JSON.Utils).GetFormat()</Description>
 <ClassMethod>1</ClassMethod>
 <ReturnType>%Status</ReturnType>
-<Implementation><![CDATA[    return ##class(MDX2JSON.Utils).GetFormat()
+<Implementation><![CDATA[	return ##class(MDX2JSON.Utils).GetFormat()
 ]]></Implementation>
 </Method>
 
@@ -299,8 +299,8 @@ Wrapper for ##class(MDX2JSON.Users).GetConfig()</Description>
 <FormalSpec>Application</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-    w "{"_$$$ZENJSPAIR("Config",##class(MDX2JSON.Users).GetConfig(Application))_"}"
-    return $$$OK
+	w "{"_$$$ZENJSPAIR("Config",##class(MDX2JSON.Users).GetConfig(Application))_"}"
+	return $$$OK
 ]]></Implementation>
 </Method>
 
@@ -311,7 +311,7 @@ Wrapper for ##class(MDX2JSON.Users).SetConfig()</Description>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
 	set config = $$$R("Config")
-	if (($IsObject(config)) && (config.%IsA("%ZEN.proxyObject"))) {					
+	if (($IsObject(config)) && (config.%IsA("%ZEN.proxyObject"))) {
 		set config = ..OutputToStr(config,"%ToJSON")
 	}
 	return ##class(MDX2JSON.Users).SetConfig($$$R("Application"),config)

@@ -46,7 +46,7 @@ todo add optional parameter WEBAPP to Alter web app name if it needs to have ano
 <Namespace Name="%All" Create="yes" Code="CACHETEMP" Data="CACHETEMP" Ensemble="0">
 <Configuration>
 	<Log Text="Mapping MDX2JSON package to %All namespace" Level="0"/>
-	<ClassMapping From="${Namespace}" Package="MDX2JSON"/> 
+	<ClassMapping From="${Namespace}" Package="MDX2JSON"/>
 </Configuration>
 </Namespace>
 </If>
@@ -54,18 +54,18 @@ todo add optional parameter WEBAPP to Alter web app name if it needs to have ano
 <Log Text="Mapping MDX2JSON package to Samples namespace" Level="0"/>
 <Namespace Name="Samples" Create="no" Code="SAMPLES" Data="SAMPLES" Ensemble="0">
 <Configuration>
-<ClassMapping From="${Namespace}" Package="MDX2JSON"/> 
+<ClassMapping From="${Namespace}" Package="MDX2JSON"/>
 </Configuration>
 </Namespace>
-	
+
 <IfDef Var="User" >
 <IfDef Var="Password">
 <RunInstall Class="MDX2JSON.Installer" Method="createuser" />
-</IfDef> 
+</IfDef>
 <IfNotDef Var="Password">
 <Log Text="You specified username but not a password" Level="0"/>
-</IfNotDef> 
-</IfDef> 
+</IfNotDef>
+</IfDef>
 
 </Manifest>
 ]]></Data>
@@ -86,11 +86,11 @@ Creates user and gives him access</Description>
 <Log Text="User modifyed/created and granted SELECT access to all tables in ${Namespace}" Level="0"/>
 <RunInstall Class="MDX2JSON.Installer" Method="GrantExecuteToUserInstaller"/>
 <Log Text="User modifyed/created and granted EXECUTE access to all procedures of MDX2JSON package in ${Namespace}" Level="0"/>
-</IfDef> 
+</IfDef>
 <IfNotDef Var="Password">
 <Log Text="You specified username but not a password" Level="0"/>
-</IfNotDef> 
-</IfDef> 
+</IfNotDef>
+</IfDef>
 
 </Manifest>
 ]]></Data>
@@ -131,21 +131,21 @@ do ##class(MDX2JSON.Installer).createuser(.pVars)</Description>
 <FormalSpec>pVars,pLogLevel,tInstaller</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-    Set Namespace=tInstaller.Evaluate("${Namespace}")
-    Do tInstaller.PushNS("%SYS")
-    Do ##class(Security.System).GetInstallationSecuritySetting(.security)
-    If (security="None") {
-    	Set cspProperties("AutheEnabled") = 64 // Unauthenticated
-    } Else {
-	    Set cspProperties("AutheEnabled") = 32 // Password
-    }
-    Set cspProperties("NameSpace") = Namespace
-    Set cspProperties("IsNameSpaceDefault") = 1
-    Set cspProperties("DispatchClass")="MDX2JSON.REST"
-    Set tSC = ##class(Security.Applications).Create("/"_Namespace, .cspProperties)
-    Do tInstaller.PopNS()
-    If $$$ISERR(tSC) Throw ##class(%Installer.Exception).CreateFromStatus(tSC)
-    Quit $$$OK
+	Set Namespace=tInstaller.Evaluate("${Namespace}")
+	Do tInstaller.PushNS("%SYS")
+	Do ##class(Security.System).GetInstallationSecuritySetting(.security)
+	If (security="None") {
+		Set cspProperties("AutheEnabled") = 64 // Unauthenticated
+	} Else {
+		Set cspProperties("AutheEnabled") = 32 // Password
+	}
+	Set cspProperties("NameSpace") = Namespace
+	Set cspProperties("IsNameSpaceDefault") = 1
+	Set cspProperties("DispatchClass")="MDX2JSON.REST"
+	Set tSC = ##class(Security.Applications).Create("/"_Namespace, .cspProperties)
+	Do tInstaller.PopNS()
+	If $$$ISERR(tSC) Throw ##class(%Installer.Exception).CreateFromStatus(tSC)
+	Quit $$$OK
 ]]></Implementation>
 </Method>
 
@@ -154,23 +154,23 @@ do ##class(MDX2JSON.Installer).createuser(.pVars)</Description>
 <FormalSpec>Namespace=$Namespace</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-    // Based on %CSP.UI.Portal.Dialog.NamespaceDelete:SaveData
-    Try {
-	    Set st = ##class(MDX2JSON.AbstractREST).CheckNamespace(.Namespace)
-    	Return:$$$ISERR(st) st
-	    
-	    Set ns=$Namespace
-	    zn:ns'="%SYS" "%SYS"
+	// Based on %CSP.UI.Portal.Dialog.NamespaceDelete:SaveData
+	Try {
+		Set st = ##class(MDX2JSON.AbstractREST).CheckNamespace(.Namespace)
+		Return:$$$ISERR(st) st
+
+		Set ns=$Namespace
+		zn:ns'="%SYS" "%SYS"
 		Set st = ##class(Config.Namespaces).Delete(Namespace)
 		Return:$$$ISERR(st) st
-		
+
 		#; clear application
 		/*&sql(DECLARE C1 CURSOR FOR SELECT Name,Path INTO :Name,:Path FROM Security.Applications)
 		&sql(OPEN C1)
 		&sql(FETCH C1)
 
 		While (SQLCODE = 0) {
-		    #; delete csp application from security
+			#; delete csp application from security
 			Set st = ##Class(Security.Applications).Delete(Name)
 			#; delete csp pages and physical path
 			If (Path '= "") {
@@ -183,18 +183,18 @@ do ##class(MDX2JSON.Installer).createuser(.pVars)</Description>
 				#; delete this directory - If there are no files left and no subdirectory, then it's deleted.
 				Do ##class(%File).RemoveDirectory(Path)
 			}
-			    
-		    &sql(FETCH C1)
+
+			&sql(FETCH C1)
 		}
-    
+
  		&sql(CLOSE C1)*/
-		
+
 		#; remove Ensemble namespace
 	 	If ((##class(%Library.EnsembleMgr).IsEnsembleInstalled() || ##class(%Library.EnsembleMgr).IsHealthShareInstalled())) {
 	 		Set tSC = ##class(%Library.EnsembleMgr).DisableNamespace(Namespace)
 	 		Return:$$$ISERR(st) st
 	 	}
-	 	
+	
 		#; remove the session data so System link (from locator bar) will not have the old namespace built into URL.
 		Kill %session.Data("$NAMESPACE")
 	} catch Error {
@@ -202,7 +202,7 @@ do ##class(MDX2JSON.Installer).createuser(.pVars)</Description>
 	}
 	zn:((ns'="%SYS") && (ns'=Namespace)) ns
 
-    Quit st
+	Quit st
 ]]></Implementation>
 </Method>
 
@@ -211,12 +211,12 @@ do ##class(MDX2JSON.Installer).createuser(.pVars)</Description>
 <FormalSpec>pVars,pLogLevel,tInstaller</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-    Set Namespace=tInstaller.Evaluate("${Namespace}")
-    Do tInstaller.PushNS("%SYS")
-    Set tSC = ..Update(Namespace, "intersystems-ru", "Cache-MDX2JSON", "master")
-    Do tInstaller.PopNS()
-    If $$$ISERR(tSC) Throw ##class(%Installer.Exception).CreateFromStatus(tSC)
-    quit $$$OK
+	Set Namespace=tInstaller.Evaluate("${Namespace}")
+	Do tInstaller.PushNS("%SYS")
+	Set tSC = ..Update(Namespace, "intersystems-ru", "Cache-MDX2JSON", "master")
+	Do tInstaller.PopNS()
+	If $$$ISERR(tSC) Throw ##class(%Installer.Exception).CreateFromStatus(tSC)
+	quit $$$OK
 ]]></Implementation>
 </Method>
 
@@ -228,11 +228,11 @@ Downloads and compiles GitHub repository.<br>
  <b>Branch</b> - The name of the commit/branch/tag. If skipped the repository’s default branch (usually master) would be used.<br>
  <b>Username</b> - GitHub user, who has access to repository. Optional for public repositories.<br>
  <b>Password</b> - GitHub password, corresponding to Username. Optional for public repositories.<br>
- Note, that with Username, you can make up to 5,000 requests per hour. 
- For unauthenticated requests, the rate limit allows to make up to 60 requests per hour. 
+ Note, that with Username, you can make up to 5,000 requests per hour.
+ For unauthenticated requests, the rate limit allows to make up to 60 requests per hour.
  Unauthenticated requests are associated with an IP address.<br>
  <b>Namespace</b> - Namespace, where to download and compile repository.<br>
- 
+
  For example in the repository: https://github.com/intersystems-ru/Cache-MDX2JSON<br>
  Owner - intersystems-ru, Repository - Cache-MDX2JSON.<br> ]]></Description>
 <ClassMethod>1</ClassMethod>
@@ -241,7 +241,7 @@ Downloads and compiles GitHub repository.<br>
 <Implementation><![CDATA[
 	Set namespace = $Namespace
  	Set SSLConfig = "GitHub"
- 	
+
  	Zn "%SYS"
  	Do:'##class(Security.SSLConfigs).Exists(SSLConfig) ##class(Security.SSLConfigs).Create(SSLConfig)
 
@@ -249,24 +249,24 @@ Downloads and compiles GitHub repository.<br>
  	Set req.Https=1
 	Set req.SSLConfiguration=SSLConfig
 	Set req.Server="api.github.com"
-	Set req.Location = "repos/" _ Owner _ "/" _ Repository _ "/contents" 	// as described in https://developer.github.com/v3/repos/	
+	Set req.Location = "repos/" _ Owner _ "/" _ Repository _ "/contents" 	// as described in https://developer.github.com/v3/repos/
 	Do:$d(Branch) req.SetParam("ref",Branch) 								// if omitted the repository’s default branch (usually master) would be used
 	Do req.SetHeader("Accept","application/vnd.github.v3+json") 			// we want to receive API v3
-	
+
 	If ($d(Username) && $d(Password)) {										// supply Username and Passwor, if both are provided. GitHub accept Basic Auth
 		Set req.Username = Username											// https://developer.github.com/v3/auth/
 	 	Set req.Password = Password
-	} 	
+	}
 
  	Set links = ##class(%ListOfDataTypes).%New()
  	Set st = ..ProcessDirectory("",req,.links)
  	Return:$$$ISERR(st) st
- 	 	
+ 	
  	Zn Namespace
 	Set st = ..DownloadFiles(links,req,.list)
 	Set st2 = $system.OBJ.CompileList(.list)
 	Zn namespace
-	
+
  	Return $$$ADDSC(st, st2)
 ]]></Implementation>
 </Method>
@@ -283,28 +283,28 @@ Process one directory of GitHub repository. Recursive.<br>
 <Implementation><![CDATA[
 	Set location = Request.Location
 	Set Request.Location = Request.Location _ Path
-	
+
 	Set st = Request.Get()
 	Return:$$$ISERR(st) st
 	Return:(Request.HttpResponse.StatusCode = 404) $$$ERROR($$$GeneralError,"Repository doesn't exist OR you don't have access")
 	Return:((Request.HttpResponse.StatusCode = 403) && (Request.HttpResponse.GetHeader("X-RATELIMIT-REMAINING")=0)) $$$ERROR($$$GeneralError,"API rate limit exceeded. Try logging in.")
  	Return:(Request.HttpResponse.StatusCode '= 200) $$$ERROR($$$GeneralError,"Received " _ Request.HttpResponse.StatusCode _ " status, expected 200")
- 	
+
  	#dim objects As List of %ZEN.proxyObject
  	#dim obj As %ZEN.proxyObject
 	Set st = ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(Request.HttpResponse.Data,,.objects,1)
 	Return:$$$ISERR(st) st
-	
-	For i = 1:1:objects.Count() {		
+
+	For i = 1:1:objects.Count() {
 		Set obj = objects.GetAt(i)
 		If (obj.type = "dir") {
 			Set st = ..ProcessDirectory("/"_obj.name,Request,.Links)
-			Return:$$$ISERR(st) st		
+			Return:$$$ISERR(st) st
 		} ElseIf (obj.type = "file") {
 			Do:..IsCacheFile(obj) Links.Insert(obj."download_url")
 		} Else {
 			// obj.type = "symlink" or obj.type = "submodule"
-		} 
+		}
 	}
 	Set Request.Location = location // to keep track of where in the repository tree we are
 	Return $$$OK
@@ -338,16 +338,16 @@ Download list of files on https://raw.githubusercontent.com/ server.<br>
 	Kill Items
 	Set Request.Server = "raw.githubusercontent.com"
 	Set st = $$$OK
-	
+
 	For i = 1:1:Links.Count() {
-		Set streq = Request.Get($e(Links.GetAt(i),35,*)) // Remove "https://raw.githubusercontent.com/" from URL.	
+		Set streq = Request.Get($e(Links.GetAt(i),35,*)) // Remove "https://raw.githubusercontent.com/" from URL.
 		Set:$$$ISERR(streq) st=$$$ADDSC(st, streq)
 		Set binarystream = Request.HttpResponse.Data
 		Do binarystream.Rewind() // just in case
 
 		Set stream=##class(%GlobalCharacterStream).%New() //translating binary stream into character stream
-		While 'binarystream.AtEnd { 
-			Do stream.Write(binarystream.Read()) 
+		While 'binarystream.AtEnd {
+			Do stream.Write(binarystream.Read())
 		}
 		Do stream.Rewind()
 
@@ -355,7 +355,7 @@ Download list of files on https://raw.githubusercontent.com/ server.<br>
 		Set:$$$ISERR(stload) st=$$$ADDSC(st, stload)
 		Merge Items = items  // Does not overwrite existing array keys: Items(itemname)=""
 	}
-	
+
 	Set Request.Server="api.github.com"
 	Return st
 ]]></Implementation>
@@ -398,7 +398,7 @@ Returns comma-separated list of all local availible namespaces</Description>
 		set enabled = $lg(nsarrary(namespace),1)
 		set remote = $lg(nsarrary(namespace),2)
 		if ((enabled = 1) && (remote=0)) {
-			set nslist=nslist _ namespace _ ","	
+			set nslist=nslist _ namespace _ ","
 		}
 		set namespace = $O(nsarrary(namespace))
 	}
@@ -431,7 +431,7 @@ Grant select access to User to all tables in comma-separated list of namespaces<
 	set st = $$$OK
 	for i=1:1:$l(NamespacesList,",") {
 		zn $p(NamespacesList,",",i)
-		set st = $$$ADDSC(st,$SYSTEM.SQL.GrantObjPriv("SELECT","*","TABLE",User))	
+		set st = $$$ADDSC(st,$SYSTEM.SQL.GrantObjPriv("SELECT","*","TABLE",User))
 	}
 	zn basens
 	return st
@@ -469,7 +469,7 @@ Grant EXECUTE access to User to all procedures of MDX2JSON package in comma-sepa
 		return:$$$ISERR(st) st
 		set rset = statement.%Execute()
 		w $System.Status.GetErrorText(st)
-		return:((rset.%SQLCODE'=0) && (rset.%SQLCODE'=100)) $System.Status.Error(5521, rset.%SQLCODE,rset.%Message) 
+		return:((rset.%SQLCODE'=0) && (rset.%SQLCODE'=100)) $System.Status.Error(5521, rset.%SQLCODE,rset.%Message)
 	}
 	zn basens
 	return st

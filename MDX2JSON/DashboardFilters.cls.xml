@@ -14,28 +14,28 @@ Converts %DeepSee.Dashboard.Definition widgets into %ZEN.proxyObject.</Descripti
 <FormalSpec>Dashboard:%DeepSee.Dashboard.Definition,*Widgetlist:%ZEN.proxyObject</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-    #Dim widget As %DeepSee.Dashboard.Widget
-    set Widgetlist = $$$NewDynObj
-    set Widgetlist.widgets = $$$NewDynObjList
-    set Widgetlist.filters = $$$NewDynObjList
-    set Widgetlist.displayInfo = ..GetDashboardDisplayInfo(Dashboard)
-    set Widgetlist.info = ..GetDashboardInfo(Dashboard)
-    
-    set st = $$$OK
-    try {
-	    for i=1:1:Dashboard.widgets.Count() {
-			$$$Insert(Widgetlist.widgets,..WidgetToProxyObject(Dashboard.widgets.GetAt(i)))			
+	#Dim widget As %DeepSee.Dashboard.Widget
+	set Widgetlist = $$$NewDynObj
+	set Widgetlist.widgets = $$$NewDynObjList
+	set Widgetlist.filters = $$$NewDynObjList
+	set Widgetlist.displayInfo = ..GetDashboardDisplayInfo(Dashboard)
+	set Widgetlist.info = ..GetDashboardInfo(Dashboard)
+
+	set st = $$$OK
+	try {
+		for i=1:1:Dashboard.widgets.Count() {
+			$$$Insert(Widgetlist.widgets,..WidgetToProxyObject(Dashboard.widgets.GetAt(i)))
 			#dim filters As %ListOfObjects
 			set filters = ..WidgetFiltersToProxyObject(Dashboard.widgets.GetAt(i))
 			for j=1:1:$$$ListSize(filters) {
 				$$$Insert(Widgetlist.filters,$$$ListGet(filters,j))
-			}		
-        }         
-    } catch ex {
-        set st = ex.AsStatus()
-        do ex.Log() 
-    }
-    return st
+			}
+		}
+	} catch ex {
+		set st = ex.AsStatus()
+		do ex.Log()
+	}
+	return st
 ]]></Implementation>
 </Method>
 
@@ -47,14 +47,14 @@ Converts relevant parts of %DeepSee.Dashboard.Widget object into %ZEN.proxyObjec
 <FormalSpec>Widget:%DeepSee.Dashboard.Widget</FormalSpec>
 <ReturnType>%ZEN.proxyObject</ReturnType>
 <Implementation><![CDATA[
-    &sql(SELECT cubeName into :cube FROM %DeepSee_Dashboard.Pivot WHERE fullName=:Widget.dataSource)
+	&sql(SELECT cubeName into :cube FROM %DeepSee_Dashboard.Pivot WHERE fullName=:Widget.dataSource)
 	set:(SQLCODE'=0) cube=""
 
-    set obj = $$$NewDynObjList    
+	set obj = $$$NewDynObjList
 	for i=1:1:Widget.controls.Count()
 	{
 		set filter = ..WidgetFilterToProxyObject(Widget,i,cube)
-		if $IsObject(filter){ 
+		if $IsObject(filter){
 			$$$Insert(obj,filter)
 		}
 	}

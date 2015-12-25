@@ -20,11 +20,11 @@ do ##class(MDX2JSON.Tests).ProjectLength()</Description>
 	 Set count=0
 
 	 While (rset.Next()) {
-	     Set class = rset.Data("Name")
-	     Do ##class(%Compiler.UDL.TextServices).GetTextAsArray($Namespace,class,.raw)
+		 Set class = rset.Data("Name")
+		 Do ##class(%Compiler.UDL.TextServices).GetTextAsArray($Namespace,class,.raw)
 		 Set lines = $O(raw($C(0)),-1)
 		 W class , " " , lines,!
-		 Set count = count + lines 
+		 Set count = count + lines
 	 }
 	 W "Total ",count
 ]]></Implementation>
@@ -60,11 +60,11 @@ Creates DeepSee folder Mobile in <b>Namespace</b><br>]]></Description>
 	&sql(SELECT ID into :ID FROM %DeepSee_UserLibrary.Folder WHERE folder is null AND name = 'Mobile')
 	Zn ns
 	Return:$ISVALIDNUM(ID) ID
-	
+
 	Set folder = ##class(%DeepSee.UserLibrary.Folder).%New()
 	Set folder.name = "Mobile"
 	W $System.Status.GetErrorText(folder.%Save())
-	
+
 	Return folder.%Id()
 ]]></Implementation>
 </Method>
@@ -91,9 +91,9 @@ Moves widgets datasources into Mobile folder</Description>
 			{
 				Set Dashboard.widgets.GetAt(i).dataSource = "Mobile/"_pivot
 			}
-        }  
-        Do Dashboard.%Save()
-        Set Dashboard=""
+		}
+		Do Dashboard.%Save()
+		Set Dashboard=""
 		&sql(FETCH sql1)
 	}
 	&sql(CLOSE sql1)
@@ -111,7 +111,7 @@ do ##class(MDX2JSON.Tests).DynamicObjects()</Description>
 	set obj = $$$NewDynObj
 	set obj.prop = "val"
 	$$$DynObjToJSON(obj)
-	
+
 	set dtList = $$$NewDynDTList
 	set a = 1
 	$$$Insert(dtList,a)
@@ -135,13 +135,13 @@ do ##class(MDX2JSON.Tests).RenderSpeed()</Description>
 	Set nul=##class(%Device).GetNullDevice() //"\\.\nul" // /dev/null/ - UNIX
 	Open nul
 	Use nul
-  
+
 	Set startTime = $NOW()
 	For i = 1:1:Count {
 		$$$DynObjToJSON(obj)
 	}
 	Set endTime = $NOW()
-	
+
 	Set time = $p(endTime,",",*) - $p(startTime,",",*)
 	Use od
 	Close nul
@@ -160,23 +160,23 @@ Changes widget key if previously encountered</Description>
 	set rs = ##class(%DeepSee.Dashboard.Definition).ExtentFunc()
 	set WidgetKeyList=""
 	while rs.%Next() {
-         set Dash = ##class(%DeepSee.Dashboard.Definition).%OpenId(rs.%Get("ID"))
-         for i=1:1:Dash.widgets.Count() {
-	         set WidgetKey = Dash.widgets.GetAt(i).key
-	         if $LF(WidgetKeyList,WidgetKey) {
-		         write "Duplicate dash: ", rs.%Get("ID"), " oldkey: ", WidgetKey
-		         // generate new randow widget key
-		         do {
-		         	set WidgetKey = $R(1000000000)
-		         } while ($LF(WidgetKeyList,WidgetKey)'=0)
-		         set WidgetKeyList = WidgetKeyList _$LB(WidgetKey)
-		         set Dash.widgets.GetAt(i).key = WidgetKey	
-		         write "newkey: ", WidgetKey, !
-		         write $System.Status.GetErrorText(Dash.%Save())		
-	         } else {
-		         set WidgetKeyList = WidgetKeyList _$LB(WidgetKey)
-	         }
-         }
+		 set Dash = ##class(%DeepSee.Dashboard.Definition).%OpenId(rs.%Get("ID"))
+		 for i=1:1:Dash.widgets.Count() {
+			 set WidgetKey = Dash.widgets.GetAt(i).key
+			 if $LF(WidgetKeyList,WidgetKey) {
+				 write "Duplicate dash: ", rs.%Get("ID"), " oldkey: ", WidgetKey
+				 // generate new randow widget key
+				 do {
+				 	set WidgetKey = $R(1000000000)
+				 } while ($LF(WidgetKeyList,WidgetKey)'=0)
+				 set WidgetKeyList = WidgetKeyList _$LB(WidgetKey)
+				 set Dash.widgets.GetAt(i).key = WidgetKey
+				 write "newkey: ", WidgetKey, !
+				 write $System.Status.GetErrorText(Dash.%Save())
+			 } else {
+				 set WidgetKeyList = WidgetKeyList _$LB(WidgetKey)
+			 }
+		 }
    }
 ]]></Implementation>
 </Method>
