@@ -15,18 +15,18 @@ do ##class(MDX2JSON.Tests).ProjectLength()</Description>
 <ReturnType>%String</ReturnType>
 <Implementation><![CDATA[
 	 Set rset = ##class(%ResultSet).%New("%DynamicQuery:SQL")
-	 Do rset.Prepare("SELECT Name FROM %Dictionary.ClassDefinition WHERE Name [ '"_Mask_"'")
+	 Do rset.Prepare("SELECT Name FROM %Dictionary.ClassDefinition WHERE NOT Name %STARTSWITH '%sqlcq' AND Name [ '"_Mask_"'")
 	 Do rset.Execute()
-	 Set count=0
+	 Set count = 0
 
 	 While (rset.Next()) {
 		 Set class = rset.Data("Name")
-		 Do ##class(%Compiler.UDL.TextServices).GetTextAsArray($Namespace,class,.raw)
-		 Set lines = $O(raw($C(0)),-1)
-		 W class , " " , lines,!
+		 Do ##class(%Compiler.UDL.TextServices).GetTextAsArray($Namespace, class, .raw)
+		 Set lines = $O(raw($C(0)), -1)
+		 Write class, $JUSTIFY("",30-$L(class)), $J(lines,5), !
 		 Set count = count + lines
 	 }
-	 W "Total ",count
+	 Write "Total ", $JUSTIFY("",24), $J(count,5)
 ]]></Implementation>
 </Method>
 
