@@ -486,22 +486,22 @@ pArgs - additional arguments]]></Description>
 
 	//Labels that allow for IO redirection
 	//Read Character - we don't care about reading
-rchr(c)	  quit
+rchr(c)      quit
 	//Read a string - we don't care about reading
 rstr(sz,to)  quit
 	//Write a character - call the output label
-wchr(s)	  do output($char(s))  quit
+wchr(s)      do output($char(s))  quit
 	//Write a form feed - call the output label
-wff()		do output($char(12))  quit
+wff()        do output($char(12))  quit
 	//Write a newline - call the output label
-wnl()		do output($char(13,10))  quit
+wnl()        do output($char(13,10))  quit
 	//Write a string - call the output label
-wstr(s)	  do output(s)  quit
+wstr(s)      do output(s)  quit
 	//Write a tab - call the output label
-wtab(s)	  do output($char(9))  quit
+wtab(s)      do output($char(9))  quit
 	//Output label - this is where you would handle what you actually want to do.
 	//  in our case, we want to write to str
-output(s)	set str=str_s   quit
+output(s)    set str=str_s   quit
 ]]></Implementation>
 </Method>
 </Class>
