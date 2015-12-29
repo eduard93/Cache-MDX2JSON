@@ -111,7 +111,7 @@ Test method, outputs <b>%request</b>, <b>%response</b> and <b>%session</b> objec
 	set obj = ##class(%ZEN.proxyObject).%New()
 	set obj.Status = "OK"
 	set obj.User = $Username
-	set obj.Version = "2.1"
+	set obj.Version = "2.2"
 	if $$$Debug {
 		set obj.Roles = $Roles
 		set obj.Namespace = $Namespace
