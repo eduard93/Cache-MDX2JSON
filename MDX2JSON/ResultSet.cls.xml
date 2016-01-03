@@ -153,6 +153,7 @@ Returns array of Axes</Description>
 	set cell.type = $LG(tNode,1) // mbr,cmbr,lit,exp
 	set cell.valueID = $LG(tNode,6) // id in mdx dimension for mbr, path for cmbr
 	set cell.path = ##class(%DeepSee.Query.Engine).%GetSpecForAxisNode(CubeName, QueryKey, AxisNumber, Node) // MDX cell path
+	set cell.title = $LG(tNode,23)
 
 	set info = $LG(tNode,18)
 	set cell.info = info // expected structure is property1:value1;property2:value2;...;propertyN:valueN;
