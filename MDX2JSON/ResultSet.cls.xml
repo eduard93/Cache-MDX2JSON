@@ -147,7 +147,7 @@ Returns array of Axes</Description>
 	set tHierNo = $LG(tNode,10)
 	set tLevelNo = $LG(tNode,11)
 
-	set cell.caption = $LG(tNode,5) // text caption
+	set cell.caption = ##class(MDX2JSON.Dashboard).ResolveText($LG(tNode,5)) // text caption
 	set cell.format = $LG(tNode,12) // format for numbers, eg: $## ###.##
 	set cell.total = $LG(tNode,8) //COUNT,AVG function
 	set cell.type = $LG(tNode,1) // mbr,cmbr,lit,exp
