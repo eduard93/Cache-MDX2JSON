@@ -375,7 +375,7 @@ Converts %DeepSee.Dashboard.Definition display information into %ZEN.proxyObject
 <ReturnType>%ZEN.proxyObject</ReturnType>
 <Implementation><![CDATA[
 	set Info = $$$NewDynObj
-	set Info.title = Dashboard.title
+	set Info.title = ##class(%DeepSee.UserPortal.Utils).%ResolveText(Dashboard.title)
 
 	return Info
 ]]></Implementation>
