@@ -180,5 +180,35 @@ Changes widget key if previously encountered</Description>
    }
 ]]></Implementation>
 </Method>
+
+<Method name="OnCommit">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>Command,InternalName</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[	return $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="GetLastCommitHash">
+<Description><![CDATA[
+This method returns last commit SHA-1 hash of <var>Branch</var>
+in Git repository in <var>RepoFolder</var>.<br>
+To get current namespace repository you need to use
+Cache-tort-git source-control plug-in]]></Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>RepoFolder:%String=##class(%SourceControl.Git.Utils).TempFolder(),Branch="master"</FormalSpec>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[
+	set GitDir = ##class(%File).SubDirectoryName(RepoFolder,".git")
+	set RefDir = ##class(%File).SubDirectoryName(GitDir,"refs")
+	set HeadRefDir = ##class(%File).SubDirectoryName(RefDir, "heads", 1)
+	set HeadRefFileName = HeadRefDir _ Branch
+	set HeadRefFile = ##class(%File).%New(HeadRefFileName)
+	do HeadRefFile.Open("R")
+	set SHAHash = HeadRefFile.ReadLine()
+	do HeadRefFile.Close()
+	return SHAHash
+]]></Implementation>
+</Method>
 </Class>
 </Export>
