@@ -6,6 +6,11 @@ Classes with support methods for testing MDX2JSON</Description>
 <IncludeCode>MDX2JSON.MDX2JSON</IncludeCode>
 <TimeCreated>63636,71862.541637</TimeCreated>
 
+<Parameter name="LastCommit">
+<Type>%String</Type>
+<Default>552cb5a61a6514177a345b3f08d987f92cb59680</Default>
+</Parameter>
+
 <Method name="ProjectLength">
 <Description>
 Count project length in loc
@@ -182,10 +187,20 @@ Changes widget key if previously encountered</Description>
 </Method>
 
 <Method name="OnCommit">
+<Description><![CDATA[
+Hook for Cache-Tort-Git source-control plug-in.<br>
+Sets LastCommit parameter to last successful commit and exports this class.]]></Description>
 <ClassMethod>1</ClassMethod>
 <FormalSpec>Command,InternalName</FormalSpec>
 <ReturnType>%Status</ReturnType>
-<Implementation><![CDATA[	return $$$OK
+<Implementation><![CDATA[
+	return:Command'="commit" $$$OK
+	set SHAHash = ..GetLastCommitHash()	
+	set Parameter = ##class(%Dictionary.ParameterDefinition).IDKEYOpen($classname(), "LastCommit")
+	set Parameter.Default = SHAHash
+	set Status = Parameter.%Save()
+	return:$$$ISERR(Status) Status
+	return ##class(%SourceControl.Git.Utils).ExportItem("MDX2JSON.Tests.cls")
 ]]></Implementation>
 </Method>
 
@@ -194,7 +209,7 @@ Changes widget key if previously encountered</Description>
 This method returns last commit SHA-1 hash of <var>Branch</var>
 in Git repository in <var>RepoFolder</var>.<br>
 To get current namespace repository you need to use
-Cache-tort-git source-control plug-in]]></Description>
+Cache-Tort-Git source-control plug-in]]></Description>
 <ClassMethod>1</ClassMethod>
 <FormalSpec>RepoFolder:%String=##class(%SourceControl.Git.Utils).TempFolder(),Branch="master"</FormalSpec>
 <ReturnType>%String</ReturnType>
