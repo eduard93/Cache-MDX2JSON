@@ -100,7 +100,7 @@ These are the possible requests to web application (add param ?Namespace={Desire
 Example
 -----------
 
-Request Url: http://localhost:57772/MDX2JSON/MDX?Namespace=Samples
+Request URL: http://localhost:57772/MDX2JSON/MDX?Namespace=Samples
 
 Request type: POST
 
@@ -139,7 +139,7 @@ Use $$$Debug macro. It would evaluate as true only if there is a "Debug" URL par
 
         http://localhost:57772/MDX2JSON/MDX?Namespace=Samples&Debug
 		
-Use with postconditional expressions, or other flow control statements:
+Use with post conditional expressions, or other flow control statements:
 
 		w:$$$Debug "debugging"
 		if $$$Debug { w "debugging" } else { w "not debugging"}
@@ -155,11 +155,24 @@ For Google Chrome, install [Advanced REST client](https://chrome.google.com/webs
 For Firefox, install [REST client](https://addons.mozilla.org/en-US/firefox/addon/restclient/) extension.
 Open installed extension and set the following parameters:
 
-- URL to required web api method, eg: `http://serverip:port/mdx2json/Dashboard?Namespace=Samples`
+- URL to required web api method, e.g.: `http://serverip:port/mdx2json/Dashboard?Namespace=Samples`
 - Request type to `GET` or `POST`
 - Payload to `{"Dashboard":"Listing with Filters.dashboard"}`
 - Content-Type to `application/json` (only in Advanced REST client)
 
 Press Send button to view results (depending on your server configuration you may be asked to provide valid login/password to access MDX2JSON api).
 
+Development
+-----------
 
+To develop MDX2JSON you need:
+
+1. Install MDX2JSON in `MDX2JSON` namespace
+2. Install [Cache-Tort-Git](https://github.com/intersystems-ru/cache-tort-git)
+3. In terminal, `MDX2JSON` namespace execute:
+
+		set ^Git("settings","hook") = $lb("MDX2JSON.Tests","OnCommit")
+		set ^Git("settings","groupByFolder") = 1
+
+4. Activate Cache-Tort-Git for `MDX2JSON` namespace
+5. Commit all changes via Studio
