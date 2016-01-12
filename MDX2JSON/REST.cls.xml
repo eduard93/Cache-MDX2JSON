@@ -114,10 +114,10 @@ Test method, outputs <b>%request</b>, <b>%response</b> and <b>%session</b> objec
 	set obj.Version = "2.2"
 	set obj.Parent = ##class(MDX2JSON.Tests).#LastCommit
 	set obj.DefaultApp = $System.CSP.GetDefaultApp($Namespace)
+	set obj.Mappings = ..GetMappings()
 	if $$$Debug {
 		set obj.Roles = $Roles
 		set obj.Namespace = $Namespace
-		set obj.Mappings = ..GetMappings()
 		set obj.Cache = $zv
 		set obj.Access = ##class(MDX2JSON.Users).GetAccess($Username)
 		set obj.SessionId = %session.SessionId
