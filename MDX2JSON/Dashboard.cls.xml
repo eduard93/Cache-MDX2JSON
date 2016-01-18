@@ -116,7 +116,7 @@ Converts %DeepSee.Dashboard.Definition widgets into %ZEN.proxyObject.</Descripti
 	set st = $$$OK
 	try {
 		for i=1:1:Dashboard.widgets.Count() {
-			$$$Insert(Widgetlist.children,..WidgetToProxyObject(Dashboard.widgets.GetAt(i)))
+			$$$Insert(Widgetlist.children,..WidgetToProxyObject(Dashboard.widgets.GetAt(i), ..GetWidgetCube(Dashboard, i)))
 		}
 	} catch ex {
 		set st = ex.AsStatus()
@@ -131,13 +131,10 @@ Converts %DeepSee.Dashboard.Definition widgets into %ZEN.proxyObject.</Descripti
 Converts relevant parts of %DeepSee.Dashboard.Widget object into %ZEN.proxyObject.</Description>
 <Internal>1</Internal>
 <ClassMethod>1</ClassMethod>
-<FormalSpec>Widget:%DeepSee.Dashboard.Widget</FormalSpec>
+<FormalSpec>Widget:%DeepSee.Dashboard.Widget,CubeName:%String</FormalSpec>
 <ReturnType>%ZEN.proxyObject</ReturnType>
 <Implementation><![CDATA[
 	set obj = $$$NewDynObj
-
-	&sql(SELECT cubeName into :cube FROM %DeepSee_Dashboard.Pivot WHERE fullName=:Widget.dataSource)
-	set:(SQLCODE'=0) cube=""
 
 	if (Widget.dataSource '= "") {
 		set st = ..GetMdx(Widget.dataSource, .mdx, .basemdx)
@@ -156,13 +153,13 @@ Converts relevant parts of %DeepSee.Dashboard.Widget object into %ZEN.proxyObjec
 	set obj.title = ##class(%DeepSee.UserPortal.Utils).%ResolveText(Widget.title) /// $$$ support
 	set obj.key =  Widget.key
 	set obj.drillDownDataSource = Widget.drillDownDataSource
-	set obj.cube = cube
+	set obj.cube = CubeName
 	set obj.displayInfo = ..GetWidgetDisplayInfo(Widget)
 	set obj.controls = $$$NewDynObjList
 
 	for i=1:1:Widget.controls.Count()
 	{
-		set control = ..WidgetControlToProxyObject(Widget,i,cube)
+		set control = ..WidgetControlToProxyObject(Widget, i, CubeName)
 		if $IsObject(control) {
 			$$$Insert(obj.controls,control)
 		}
@@ -236,7 +233,7 @@ Converts relevant parts of %DeepSee.Dashboard.Widget object into %ZEN.proxyObjec
 Converts %DeepSee.Dashboard.Control object into %ZEN.proxyObject, handles run-time DeepSee variables.</Description>
 <Internal>1</Internal>
 <ClassMethod>1</ClassMethod>
-<FormalSpec>Widget:%DeepSee.Dashboard.Widget,Number:%Integer,Cube:%String</FormalSpec>
+<FormalSpec>Widget:%DeepSee.Dashboard.Widget,Number:%Integer,CubeName:%String</FormalSpec>
 <ReturnType>%ZEN.proxyObject</ReturnType>
 <Implementation><![CDATA[
 	set obj = $$$NewDynObj
@@ -257,7 +254,7 @@ Converts %DeepSee.Dashboard.Control object into %ZEN.proxyObject, handles run-ti
 		}
 	}
 
-	set:((obj.action="applyFilter") || (obj.action="setFilter")) obj.values = ..GetMembersForFilter(Cube,obj.targetProperty)
+	set:((obj.action="applyFilter") || (obj.action="setFilter")) obj.values = ..GetMembersForFilter(CubeName,obj.targetProperty)
 	return obj
 ]]></Implementation>
 </Method>
@@ -378,6 +375,55 @@ Converts %DeepSee.Dashboard.Definition display information into %ZEN.proxyObject
 	set Info.title = ##class(%DeepSee.UserPortal.Utils).%ResolveText(Dashboard.title)
 
 	return Info
+]]></Implementation>
+</Method>
+
+<Method name="GetWidgetCube">
+<Description>
+Returns name of widget's pivot source cube.</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>Dashboard:%DeepSee.Dashboard.Definition,WidgetNumber:%Integer</FormalSpec>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[
+	set datasource = ..DetermineWidgetDataSource(Dashboard, WidgetNumber)
+	
+	if ##class(%DeepSee.UserLibrary.Utils).%FolderItemExists(datasource,.id) {
+		set cube = ##class(%DeepSee.Dashboard.Pivot).cubeNameGetStored(id)
+	} else {
+		// KPIs and Worksheets
+		set cube = ""
+	}
+	return cube
+]]></Implementation>
+</Method>
+
+<Method name="DetermineWidgetDataSource">
+<Description>
+Return datasource ifone exist, if it's a linked widget then follow the link and get that datasource.</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>Dashboard:%DeepSee.Dashboard.Definition,WidgetNumber:%Integer</FormalSpec>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[
+	set datasource = Dashboard.widgets.GetAt(WidgetNumber).dataSource
+	return:datasource'="" datasource
+	
+	set datalink =  Dashboard.widgets.GetAt(WidgetNumber).dataLink
+	set WidgetNumber = ..GetWidgetNumberByName(Dashboard, datalink)
+	return ..DetermineWidgetDataSource(Dashboard, WidgetNumber)
+]]></Implementation>
+</Method>
+
+<Method name="GetWidgetNumberByName">
+<Description>
+Determines position of a widget in dashboard's widget list. </Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>Dashboard:%DeepSee.Dashboard.Definition,WidgetName:%String</FormalSpec>
+<ReturnType>%Integer</ReturnType>
+<Implementation><![CDATA[
+	for i=1:1:Dashboard.widgets.Count() {
+		return:(Dashboard.widgets.GetAt(i).name = WidgetName) i
+	}
+	return ""
 ]]></Implementation>
 </Method>
 
