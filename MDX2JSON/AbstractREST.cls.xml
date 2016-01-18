@@ -233,8 +233,8 @@ Called for a REST page in the event of a login being required</Description>
 	#; Don't want the session token
 	Set %response.OutputSessionToken = 0
 
-	#; We want Basic authentication
-	//Do %response.SetHeader("WWW-Authenticate","Basic")
+	#; We don't want Basic authentication usually
+	Do:$$$Debug %response.SetHeader("WWW-Authenticate","Basic")
 
 	#; We need to manually write out the headers here because PAGE has not been called
 	Do %response.WriteHTTPHeader()
