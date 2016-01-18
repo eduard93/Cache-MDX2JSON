@@ -218,13 +218,13 @@ Determine if cell is an invisyble system cell.</Description>
 <Implementation><![CDATA[
 	return:((Cell.type = "axis") || (Cell.type = "set")) 1 // for top-level cells
 
-	return:(Cell.caption=0) 1
-	return:(Cell.caption=1) 1
-	return:(Cell.caption="") 1
+	return:(Cell.caption=0) 1 // typical caption for top-level cell
+	return:(Cell.caption=1) 1 // typical caption for top-level cell
+	return:(Cell.caption="") 1 // typical caption for top-level cell
 	//return:(caption'="") 0
 	//return:(path="") 1
 	set children = Cell.children
-	return:(($isobject(children)) && ($$$ListSize(children)>0)) 0
+	return:(($isobject(children)) && ($$$ListSize(children)>0)) 0 // cell has children
 
 	if (Cell.type'="lit") {
 		set key = $O($$$DeepSeeResultsGLVN(..%CubeKey, ..%QueryKey, "leaf", AxisNumber, ""))
@@ -232,6 +232,9 @@ Determine if cell is an invisyble system cell.</Description>
 			return:(Node=$$$DeepSeeResultsGLVN(..%CubeKey, ..%QueryKey, "leaf", AxisNumber, key)) 0 //for leafs
 			set key = $O($$$DeepSeeResultsGLVN(..%CubeKey, ..%QueryKey, "leaf", AxisNumber, key))
 		}
+	} else {
+		/// lit cell: SELECT %LABEL("Const","Title") ON 0 FROM [HoleFoodsBudget]
+		return 0
 	}
 
 	return 1
