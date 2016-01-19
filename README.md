@@ -38,7 +38,7 @@ Offline Installation
       {SourceDir} is a directory where you unpacked zip \ MDX2JSON (see 1).
 
  On this step installer would create (if needed) MDX2JSON Namespace and corresponding database, import source code and compile it, create required web application (named /MDX2JSON) if one does not exist (skipping web application creation process if one does exist), and map MDX2JSON package to %All namespace (which will be created if it does not exist).
-3. Give the correct roles to /{Namespace} webapplication for it to be able to query desired cubes.
+3. Give the correct roles to /MDX2JSON webapplication for it to be able to query desired cubes.
 
 
 For information on how to work with this RESTful web API please refer to included documentation.
