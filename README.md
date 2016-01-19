@@ -9,13 +9,10 @@ Installation
 1. Download Installer.cls.xml (from MDX2JSON folder in repository or releases page) into Caché manager directory.
 2. Run in terminal (any namespace) under user with %All role: 
 
-        do ##class(%Installer.Installer).InstallFromCommandLine(##class(%File).ManagerDirectory()_"Installer.cls.xml","Namespace={Namespace}")
+        do ##class(%Installer.Installer).InstallFromCommandLine(##class(%File).ManagerDirectory()_"Installer.cls.xml")
 
-  where: 
-  
-      {Namespace} is a namespace you want to install to. If it does not exist it would be created automatically. If it does exist only MDX2JSON package would be overwritten. 
-On this step installer would create (if needed) Namespace and corresponding database, download source code from GitHub and compile it, create required web application (named /{Namespace}) if one does not exist (skipping web application creation process if one does exist), and map MDX2JSON package to %All namespace (which will be created if it does not exist).
-3. Give the correct roles to /{Namespace} webapplication for it to be able to query desired cubes.
+ On this step installer would create (if needed) MDX2JSON namespace and corresponding database, download source code from GitHub and compile it, create required web application (named /MDX2JSON) if one does not exist (skipping web application creation process if one does exist), and map MDX2JSON package to %All namespace (which will be created if it does not exist).
+3. Give the correct roles to /MDX2JSON webapplication for it to be able to query desired cubes (It usually just works, but depending on your security settings you may be required to have resources: %Admin_Secure:U and %DB_CACHESYS:RW).
 
 Installation without fs access to server
 -----------
@@ -23,14 +20,10 @@ Installation without fs access to server
 1. Download Installer.cls.xml (from MDX2JSON folder in repository or releases page) into Caché Studio (any namespace)
 2. Run in terminal (any namespace) under user with %All role: 
 
-        set pVars("Namespace")="{Namespace}"
-        do ##class(MDX2JSON.Installer).setup(.pVars)
-
-  where: 
-  
-      {Namespace} is a namespace you want to install to. If it does not exist it would be created automatically. If it does exist only MDX2JSON package would be overwritten. 
-On this step installer would create (if needed) Namespace and corresponding database, download source code from GitHub and compile it, create required web application (named /{Namespace}) if one does not exist (skipping web application creation process if one does exist), and map MDX2JSON package to %All namespace (which will be created if it does not exist).
-3. Give the correct roles to /{Namespace} webapplication for it to be able to query desired cubes.
+        do ##class(MDX2JSON.Installer).setup()
+        
+ On this step installer would create (if needed) MDX2JSON namespace and corresponding database, download source code from GitHub and compile it, create required web application (named /MDX2JSON) if one does not exist (skipping web application creation process if one does exist), and map MDX2JSON package to %All namespace (which will be created if it does not exist).
+3. Give the correct roles to /MDX2JSON webapplication for it to be able to query desired cubes (It usually just works, but depending on your security settings you may be required to have resources: %Admin_Secure:U and %DB_CACHESYS:RW).
 
 Offline Installation
 -----------
@@ -38,14 +31,13 @@ Offline Installation
 1. Download zip and unpack it.
 2. Run in terminal (any namespace) under user with %All role: 
 
-        do ##class(%Installer.Installer).InstallFromCommandLine("{SourceDir}\Installer.cls.xml","Namespace={Namespace},SourceDir={SourceDir}")
+        do ##class(%Installer.Installer).InstallFromCommandLine("{SourceDir}\Installer.cls.xml","SourceDir={SourceDir}")
 
   where: 
-  
-      {Namespace} is a namespace you want to install to. If it does not exist it would be created automatically. If it does exist only MDX2JSON package would be overwritten.
-  
+    
       {SourceDir} is a directory where you unpacked zip \ MDX2JSON (see 1).
-On this step installer would create (if needed) Namespace and corresponding database, import source code and compile it, create required web application (named /{Namespace}) if one does not exist (skipping web application creation process if one does exist), and map MDX2JSON package to %All namespace (which will be created if it does not exist).
+
+ On this step installer would create (if needed) MDX2JSON Namespace and corresponding database, import source code and compile it, create required web application (named /MDX2JSON) if one does not exist (skipping web application creation process if one does exist), and map MDX2JSON package to %All namespace (which will be created if it does not exist).
 3. Give the correct roles to /{Namespace} webapplication for it to be able to query desired cubes.
 
 
@@ -56,9 +48,16 @@ Additional installation parameters
 
 As a second parameter to `do ##class(%Installer.Installer).InstallFromCommandLine()` you can supply a comma-separated list of additional variables. Eg: User=MDX2JSON,Password=123456
 
-      User is a Caché user to create or modify. He will be given SELECT access to all tables in {Namespace} 
+- `Namespace` is a namespace you want to install MDX2JSON to (Not namespace with dashes). If it does not exist it would be created automatically. If it does exist only MDX2JSON package would be overwritten. WebApplication would be named `/Namespace`. Strongly not recommended to use.
+- `User` is a Caché user to create or modify. He will be given SELECT access to %DeepSee_Dashboard.Definition table in `Namespace`
+- `Password` must be supplied alongside User parameters
 
-      Password must be supplied alongside User parameters
+Role creation
+-----------
+You can also automatically create MDx2JSON role with all the required procedures. To do that run in terminal (any namespace) under user with %All role: 
+
+    set pVars("Namespace")="comma-separated list of namespaces"
+    do ##class(MDX2JSON.Installer).createrole(.pVars)
  
 Update
 -----------
