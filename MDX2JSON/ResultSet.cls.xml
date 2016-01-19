@@ -148,6 +148,7 @@ Returns array of Axes</Description>
 	set tLevelNo = $LG(tNode,11)
 
 	set cell.caption = ##class(%DeepSee.UserPortal.Utils).%ResolveText($LG(tNode,5)) // text caption
+	set cell.vis = $LG(tNode,2) // visibility helper 
 	set cell.format = $LG(tNode,12) // format for numbers, eg: $## ###.##
 	set cell.total = $LG(tNode,8) //COUNT,AVG function
 	set cell.type = $LG(tNode,1) // mbr,cmbr,lit,exp
@@ -234,7 +235,8 @@ Determine if cell is an invisyble system cell.</Description>
 		}
 	} else {
 		/// lit cell: SELECT %LABEL("Const","Title") ON 0 FROM [HoleFoodsBudget]
-		return 0
+		/// but also a lot of top-pevel cells
+		return 'Cell.vis
 	}
 
 	return 1
