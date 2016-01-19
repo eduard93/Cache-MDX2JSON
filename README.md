@@ -12,7 +12,7 @@ Installation
         do ##class(%Installer.Installer).InstallFromCommandLine(##class(%File).ManagerDirectory()_"Installer.cls.xml")
 
  On this step installer would create (if needed) MDX2JSON namespace and corresponding database, download source code from GitHub and compile it, create required web application (named /MDX2JSON) if one does not exist (skipping web application creation process if one does exist), and map MDX2JSON package to %All namespace (which will be created if it does not exist).
-3. Give the correct roles to /MDX2JSON webapplication for it to be able to query desired cubes (It usually just works, but depending on your security settings you may be required to have resources: %Admin_Secure:U and %DB_CACHESYS:RW).
+3. Give the correct roles to /MDX2JSON webapplication for it to be able to query desired cubes (It usually just works, but depending on your security settings you may be required to have resources: `%Admin_Secure:U` and `%DB_CACHESYS:RW`).
 
 Installation without fs access to server
 -----------
@@ -23,7 +23,7 @@ Installation without fs access to server
         do ##class(MDX2JSON.Installer).setup()
         
  On this step installer would create (if needed) MDX2JSON namespace and corresponding database, download source code from GitHub and compile it, create required web application (named /MDX2JSON) if one does not exist (skipping web application creation process if one does exist), and map MDX2JSON package to %All namespace (which will be created if it does not exist).
-3. Give the correct roles to /MDX2JSON webapplication for it to be able to query desired cubes (It usually just works, but depending on your security settings you may be required to have resources: %Admin_Secure:U and %DB_CACHESYS:RW).
+3. Give the correct roles to /MDX2JSON webapplication for it to be able to query desired cubes.
 
 Offline Installation
 -----------
