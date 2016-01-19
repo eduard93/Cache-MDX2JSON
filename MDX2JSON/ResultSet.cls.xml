@@ -103,7 +103,6 @@ Returns array of Axes</Description>
 		set tAxisCount = 2 //because filters count as axes before 2015.1
 	}
 
-
 	set axes=$$$NewDynObjList
 
 	for a = 1:1:tAxisCount {
