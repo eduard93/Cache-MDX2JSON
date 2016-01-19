@@ -19,8 +19,6 @@ Installation
   - Resource %DB_CACHESYS:RW
   - Resource Database:R - Usually %DB_Name (all namespaces with dashboards)
 
-  (It usually just works, but depending on your security settings you may be required to have resources: `%Admin_Secure:U` and `%DB_CACHESYS:RW`).
-
 Installation without fs access to server
 -----------
 
