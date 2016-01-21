@@ -56,6 +56,8 @@ As a second parameter to `do ##class(%Installer.Installer).InstallFromCommandLin
 - `Namespace` is a namespace you want to install MDX2JSON to (Not namespace with dashes). If it does not exist it would be created automatically. If it does exist only MDX2JSON package would be overwritten. WebApplication would be named `/Namespace`. Strongly not recommended to use.
 - `User` is a Caché user to create or modify. He will be given SELECT access to %DeepSee_Dashboard.Definition table in `Namespace`
 - `Password` must be supplied alongside User parameters
+- `NSList` is a comma-separated list, you want to give access to MDX2JSON. Default - "*" and evaluates to all namespaces
+- `SourceDir` - all xmls from this directory would be imported and compiled
 
 Role creation
 -----------
