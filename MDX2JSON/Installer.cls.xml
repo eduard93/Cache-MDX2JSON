@@ -587,7 +587,7 @@ Grant EXECUTE access to User to all procedures of MDX2JSON package in comma-sepa
 	set st = $$$OK
 	for i=1:1:$l(NamespacesList,",") {
 		zn $p(NamespacesList,",",i)
-		CONTINUE:'$$$comClassDefined("MDX2JSON.REST")
+		CONTINUE:'$$$comClassDefined("MDX2JSON.Dashboard")
 		set sql = "GRANT EXECUTE ON MDX2JSON.ResolveText,MDX2JSON.IsItemVisible,MDX2JSON.GetDashCover TO " _ User
 		set statement = ##class(%SQL.Statement).%New()
 		set st = statement.%Prepare(sql)
