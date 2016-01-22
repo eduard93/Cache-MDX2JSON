@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="MDX2JSON.Task">
+<TimeCreated>63939,44120.745474</TimeCreated>
+
+<Parameter name="TaskName">
+<Default>MDX2JSON access task</Default>
+</Parameter>
+
+<Property name="Namespace">
+<Description>
+Namespace, where to give access to role</Description>
+<Type>%String</Type>
+<InitialExpression>"*"</InitialExpression>
+</Property>
+
+<Property name="Role">
+<Description>
+User or Role to give access to</Description>
+<Type>%String</Type>
+<InitialExpression>"MDX2JSON"</InitialExpression>
+</Property>
+
+<Method name="OnTask">
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	set resourcelist = ##class(MDX2JSON.Installer).BuildResourceList(..Namespace)
+	set ns = $Namespace 
+	zn "%SYS"
+	if ##class(Security.Roles).Exists(..Role) {
+		set properties("Resources")=resourcelist
+		set st = ##class(Security.Roles).Modify(..Role, .properties)
+		zn ns
+		set st1 = ##class(MDX2JSON.Installer).GrantSelectToUser(..Role, ..Namespace)
+		set st2 = ##class(MDX2JSON.Installer).GrantExecuteToUser(..Role, ..Namespace)
+		set st = $$$ADDSC(st,$$$ADDSC(st1,st2))
+	} else {
+		zn ns
+		set st = $$$ERROR($$$RoleDoesNotExist,..Role)
+	}
+	return st
+]]></Implementation>
+</Method>
+</Class>
+</Export>
