@@ -43,9 +43,9 @@ Regardless of installation method chosen, here's the list (by the order of appea
 2. If `Namespace` does not exist then create it
 3. If `SourceDir` is provided then import and compile all files from there. Otherwise download import and compile all required files from [GitHub](https://github.com/intersystems-ru/Cache-MDX2JSON/)
 4. If `/Namespace` web application does not exist then create it and give it MDX2JSON role
-5. If [%All namespace](http://docs.intersystems.com/cache20152/csp/docbook/DocBook.UI.Page.cls?KEY=GSA_config#GSA_config_namespace_addmap_all) (used for mapping purposes) does not exist then create it
-6. Map MDX2JSON package into %All and SAMPLES namespaces
-7. Modify MDX2JSON role and give it following priveleges
+5. If [%All namespace](http://docs.intersystems.com/cache20152/csp/docbook/DocBook.UI.Page.cls?KEY=GSA_config#GSA_config_namespace_addmap_all) (used for mapping purposes) does not exist then create it and map MDX2JSON package there
+6. Map MDX2JSON package into SAMPLES namespace
+7. Modify MDX2JSON role and give it following privileges
   - Resources: `%DB_CACHESYS:RW`, `%Admin_Secure:U`
   - SELECT on `%DeepSee_Dashboard.Definition` table in all namespaces from `NSList` (all by default)
   - EXECUTE on `MDX2JSON.ResolveText`, `MDX2JSON.IsItemVisible`, `MDX2JSON.GetDashCover` procedures in all namespaces from `NSList` (all by default)
@@ -55,7 +55,7 @@ Regardless of installation method chosen, here's the list (by the order of appea
 Additional installation parameters
 -----------
 
-As a second parameter to `do ##class(%Installer.Installer).InstallFromCommandLine()`  you can supply a comma-separated list of additional variables. Eg: User=MDX2JSON,Password=123456
+As a second parameter to `do ##class(%Installer.Installer).InstallFromCommandLine()`  you can supply a comma-separated list of additional variables. E.g.: User=MDX2JSON,Password=123456
 
 - `Namespace` is a namespace you want to install MDX2JSON to (Not namespace with dashes). If it does not exist it would be created automatically. If it does exist only MDX2JSON package would be overwritten. WebApplication would be named `/Namespace`. Strongly not recommended to change the default. [MDX2JSON]
 - `User` is a Caché user to create or modify. He will be given SELECT access to %DeepSee_Dashboard.Definition table in `Namespace`
