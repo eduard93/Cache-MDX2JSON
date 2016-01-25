@@ -46,15 +46,13 @@ todo add optional parameter WEBAPP to Alter web app name if it needs to have ano
 
 <If Condition='(##class(Config.Namespaces).Exists("%All")=0)'>
 <Log Text="Creating namespace %All" Level="0"/>
-<Namespace Name="%All" Create="yes" Code="CACHETEMP" Data="CACHETEMP" Ensemble="0"/>
-</If>
-
-<Namespace Name="%All" Create="no">
+<Namespace Name="%All" Create="yes" Code="CACHETEMP" Data="CACHETEMP" Ensemble="0">
 <Configuration>
 	<Log Text="Mapping MDX2JSON package to %All namespace" Level="0"/>
 	<ClassMapping From="${Namespace}" Package="MDX2JSON"/>
 </Configuration>
 </Namespace>
+</If>
 
 <Log Text="Mapping MDX2JSON package to Samples namespace" Level="0"/>
 <Namespace Name="Samples" Create="no" Code="SAMPLES" Data="SAMPLES" Ensemble="0">
@@ -95,12 +93,14 @@ Creates role with all rights to use MDX2JSON</Description>
 <RunInstall Class="MDX2JSON.Installer" Method="BuildResourceListInstaller"/>
 <Log Text="List of MDX2JSON role resources: ${ResourceList}" Level="0"/>
 <RunInstall Class="MDX2JSON.Installer" Method="CreateRoleInstaller"/>
-
+<Var Name="BackupUser" Value="${User}"/>
 <Var Name="User" Value="MDX2JSON"/>
 <RunInstall Class="MDX2JSON.Installer" Method="GrantExecuteToUserInstaller"/>
 <Log Text="MDX2JSON Role granted EXECUTE access to all procedures of MDX2JSON package in ${NSList}" Level="0"/>
 <RunInstall Class="MDX2JSON.Installer" Method="GrantSelectToUserInstaller"/>
 <Log Text="MDX2JSON Role granted SELECT access to %DeepSee_Dashboard.Definition table in ${NSList}" Level="0"/>
+
+<RunInstall Class="MDX2JSON.Installer" Method="CleanupAfterRoleCreationInstaller"/>
 <Log Text="End role creation" Level="0"/>
 </Manifest>
 ]]></Data>
@@ -562,6 +562,25 @@ Grant EXECUTE access to User to all procedures of MDX2JSON package in comma-sepa
 	}
 	zn basens
 	return st
+]]></Implementation>
+</Method>
+
+<Method name="CleanupAfterRoleCreationInstaller">
+<Description>
+Restore original value of User variable, delete BackupUser variable</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>pVars,pLogLevel,tInstaller</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	set user = tInstaller.Evaluate("${BackupUser}")
+	if user '= "" {
+		do tInstaller.SetVariable("User",user)
+	} else {
+		do tInstaller.DeleteVariable("User")
+		
+	}
+	do tInstaller.DeleteVariable("BackupUser")
+	return $$$OK
 ]]></Implementation>
 </Method>
 </Class>
