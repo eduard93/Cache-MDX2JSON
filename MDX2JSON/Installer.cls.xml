@@ -46,13 +46,15 @@ todo add optional parameter WEBAPP to Alter web app name if it needs to have ano
 
 <If Condition='(##class(Config.Namespaces).Exists("%All")=0)'>
 <Log Text="Creating namespace %All" Level="0"/>
-<Namespace Name="%All" Create="yes" Code="CACHETEMP" Data="CACHETEMP" Ensemble="0">
+<Namespace Name="%All" Create="yes" Code="CACHETEMP" Data="CACHETEMP" Ensemble="0"/>
+</If>
+
+<Namespace Name="%All" Create="no">
 <Configuration>
 	<Log Text="Mapping MDX2JSON package to %All namespace" Level="0"/>
 	<ClassMapping From="${Namespace}" Package="MDX2JSON"/>
 </Configuration>
 </Namespace>
-</If>
 
 <Log Text="Mapping MDX2JSON package to Samples namespace" Level="0"/>
 <Namespace Name="Samples" Create="no" Code="SAMPLES" Data="SAMPLES" Ensemble="0">
