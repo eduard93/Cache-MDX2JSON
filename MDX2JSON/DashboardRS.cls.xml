@@ -11,8 +11,12 @@ Folder, from which we get Dashboards.</Description>
 <Default>Mobile</Default>
 </Parameter>
 
-<Parameter name="Global">
+<Parameter name="global">
 <Default>^DeepSee.FolderItemD</Default>
+</Parameter>
+
+<Parameter name="dashclass">
+<Default>%DeepSee.Dashboard.Definition</Default>
 </Parameter>
 
 <Method name="GetDashboardListSQL">
@@ -70,7 +74,16 @@ Get SQL for folder, from which we get Dashboards. </Description>
 <Implementation><![CDATA[
     set sc = $$$OK
     do ..SetNextId()
-    return:..id="" $$$NO
+    set id = ..id
+    return:id="" $$$NO
+    
+    set ..title = ##class(%DeepSee.UserPortal.Utils).%ResolveText(##class(%DeepSee.UserLibrary.FolderItem).titleGetStored(id))
+    set folder = ##class(%DeepSee.UserLibrary.FolderItem).folderGetStored(id)
+    set name = ##class(%DeepSee.UserLibrary.FolderItem).nameGetStored(id)
+    //zw folder,name
+    set ..path =  ##class(%DeepSee.Dashboard.Definition).fullNameCompute(id, folder, name)
+    
+    set ..Cover = ##class(MDX2JSON.Dashboard).GetDashCover(##class(%DeepSee.UserLibrary.FolderItem).bookCoverGetStored(id))
         
     //w $lg(val,1)
     //Set ..Prop1 = $Lg(val,2)
@@ -83,11 +96,11 @@ Get SQL for folder, from which we get Dashboards. </Description>
 <Description>
 Iterate over data global till we find dashboard definition</Description>
 <Implementation><![CDATA[
-	set ..id = $Order(@..#Global@(..id),1,val)
+	set ..id = $Order(@..#global@(..id),1,val)
     return:..id=""
     set oid = ##class(%DeepSee.UserLibrary.FolderItem).%ComposeOid(..id)
     do ##class(%DeepSee.UserLibrary.FolderItem).%OnDetermineClass(oid, .class)
-    do:class'="%DeepSee.Dashboard.Definition" ..SetNextId()
+    do:class'=..#dashclass ..SetNextId()
 ]]></Implementation>
 </Method>
 
