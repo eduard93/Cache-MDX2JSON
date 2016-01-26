@@ -20,7 +20,7 @@
 <Type>%String</Type>
 </Property>
 
-<Property name="Cover">
+<Property name="cover">
 <Type>%String</Type>
 </Property>
 
@@ -59,7 +59,7 @@
     set folder = ##class(%DeepSee.UserLibrary.FolderItem).folderGetStored(id)
     set name = ##class(%DeepSee.UserLibrary.FolderItem).nameGetStored(id)
     set ..path =  ##class(%DeepSee.Dashboard.Definition).fullNameCompute(id, folder, name)
-    set ..Cover = ##class(MDX2JSON.Dashboard).GetDashCover(##class(%DeepSee.UserLibrary.FolderItem).bookCoverGetStored(id))
+    set ..cover = ##class(MDX2JSON.Dashboard).GetDashCover(##class(%DeepSee.UserLibrary.FolderItem).bookCoverGetStored(id))
     
     return $$$YES
 ]]></Implementation>
@@ -160,12 +160,47 @@ Get the resource value for this folder.</Description>
 Get all dashes from SAMPLES namespace
 do ##class(MDX2JSON.DashboardRS).Test()</Description>
 <ClassMethod>1</ClassMethod>
-<FormalSpec>folderName=""</FormalSpec>
+<FormalSpec>folderName:%String=""</FormalSpec>
 <Implementation><![CDATA[
 	new $namespace
 	set $namespace = "Samples"
 	set rs = ..%New(,folderName)
 	do rs.%Display()
+]]></Implementation>
+</Method>
+
+<Method name="WriteJSON">
+<Description>
+ Execute query and output results as JSON</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>folderName:%String=""</FormalSpec>
+<Implementation><![CDATA[
+	#define CRLF $c(13,10)
+	#define ZENJSISNUM(%val)	($IsValidNum(%val)&&(%val=+(%val)))
+	#define ZENJSNUM(%num)		$fnumber(%num,"LON")
+	#; JSON utility macros that use the JSON translation table instead of the JS translation table
+	#define ZENJSTABLE(%format)				("JS"_$S(%format["u":"ML",1:""))
+	#define ZENJSONTABLE(%format)			("JSON"_$S((%format["u"):"ML",1:""))
+	#define ZENJSONESCAPE(%str,%format)		$S(%format["s":$ZCVT(%str,"O",$$$ZENJSONTABLE(%format)),1:$Replace($ZCVT(%str,"O",$$$ZENJSTABLE(%format)),"\'","'"))
+	#define ZENJSONSTR(%str,%format)		(""""_$$$ZENJSONESCAPE(%str,%format)_"""")
+	#define ZENJSONPROP(%prop,%format)		$$$ZENJSONSTR(%prop,%format)
+	#define ZENJSONVALUE(%val,%format)		$S($$$ZENJSISNUM(%val):$$$ZENJSNUM(%val),$C(0)=(%val)||$ListValid(%val):"""""",1:$$$ZENJSONSTR(%val,%format))
+	#define ZENJSONPAIR(%pr,%val,%format)	$$$ZENJSONPROP(%pr,%format)_":"_$$$ZENJSONVALUE(%val,%format)
+	
+	set rs = ..%New(,folderName)
+	write "{ ""children"":["
+	set separator=0
+	while rs.%Next() {
+		write:separator ",",$$$CRLF
+		write "{"
+        write $$$ZENJSONPAIR("title",rs.title,"u"),","
+        write $$$ZENJSONPAIR("path",rs.path,"u"),","
+        write $$$ZENJSONPAIR("Cover",rs.cover,"u")
+        write "}"
+        
+        set separator = 1
+    }
+    write "]}"
 ]]></Implementation>
 </Method>
 </Class>
