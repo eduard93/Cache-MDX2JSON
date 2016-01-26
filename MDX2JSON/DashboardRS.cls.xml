@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="MDX2JSON.DashboardRS">
+<Super>%SQL.CustomResultSet</Super>
+<TimeCreated>63943,47866.588743</TimeCreated>
+
+<Parameter name="folderName">
+<Description>
+Folder, from which we get Dashboards.</Description>
+<Type>%String</Type>
+<Default>Mobile</Default>
+</Parameter>
+
+<Parameter name="Global">
+<Default>^DeepSee.FolderItemD</Default>
+</Parameter>
+
+<Method name="GetDashboardListSQL">
+<Description>
+Get SQL for folder, from which we get Dashboards. </Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>folderName:%String=..#folderName</FormalSpec>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[
+	set basesql = "SELECT MDX2JSON.ResolveText(title) AS title, fullName AS path, MDX2JSON.GetDashCover(bookCover) AS Cover FROM %DeepSee_Dashboard.Definition "
+	set basefilter = "WHERE ((NOT (foldername %STARTSWITH '$TRASH' or foldername %STARTSWITH 'HIDDEN')) OR foldername IS NULL) AND (MDX2JSON.IsItemVisible(fullName) = 1) "
+	return:folderName="" basesql _ basefilter
+	set filter = "AND folderName %STARTSWITH '" _ folderName _"'"
+	return basesql _ basefilter _ filter
+]]></Implementation>
+</Method>
+
+<Property name="title">
+<Type>%String</Type>
+</Property>
+
+<Property name="path">
+<Type>%String</Type>
+</Property>
+
+<Property name="Cover">
+<Type>%String</Type>
+</Property>
+
+<Property name="id">
+<Type>%String</Type>
+<Private>1</Private>
+</Property>
+
+<Property name="folder">
+<Type>%String</Type>
+<Private>1</Private>
+</Property>
+
+<Method name="%OpenCursor">
+<FormalSpec>folderName:%String=""</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	return:((folderName'="") && ('$IsObject(##class(%DeepSee.UserLibrary.Utils).%FindFolder(folderName)))) $$$ERROR($$$GeneralError,"Folder " _ folderName _ " does not exist")
+    set ..id = ""
+    set ..folder = folderName
+    return $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="%Next">
+<FormalSpec><![CDATA[&sc:%Library.Status]]></FormalSpec>
+<PlaceAfter>%Execute</PlaceAfter>
+<ReturnType>%Integer</ReturnType>
+<Implementation><![CDATA[
+    set sc = $$$OK
+    do ..SetNextId()
+    return:..id="" $$$NO
+        
+    //w $lg(val,1)
+    //Set ..Prop1 = $Lg(val,2)
+    //Set ..Prop2 = $Lg(val,3)
+    return $$$YES
+]]></Implementation>
+</Method>
+
+<Method name="SetNextId">
+<Description>
+Iterate over data global till we find dashboard definition</Description>
+<Implementation><![CDATA[
+	set ..id = $Order(@..#Global@(..id),1,val)
+    return:..id=""
+    set oid = ##class(%DeepSee.UserLibrary.FolderItem).%ComposeOid(..id)
+    do ##class(%DeepSee.UserLibrary.FolderItem).%OnDetermineClass(oid, .class)
+    do:class'="%DeepSee.Dashboard.Definition" ..SetNextId()
+]]></Implementation>
+</Method>
+
+<Method name="Test">
+<Description>
+do ##class(MDX2JSON.DashboardRS).Test()</Description>
+<ClassMethod>1</ClassMethod>
+<Implementation><![CDATA[
+	new $namespace
+	set $namespace = "Samples"
+	set rs = ..%New("aa")
+	do rs.%Display()
+]]></Implementation>
+</Method>
+</Class>
+</Export>
