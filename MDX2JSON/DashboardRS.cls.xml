@@ -145,8 +145,7 @@ Test if the current user has access to this item.</Description>
 
 <Method name="GetItemResource">
 <Description>
-Get the resource value for this item.
-Also return the name of the folder that defines the resource or "" if it originates here.</Description>
+Get the resource value for this item.</Description>
 <ClassMethod>1</ClassMethod>
 <FormalSpec>id:%String</FormalSpec>
 <ReturnType>%String</ReturnType>
@@ -164,8 +163,7 @@ Also return the name of the folder that defines the resource or "" if it origina
 
 <Method name="GetFolderResource">
 <Description>
-Get the resource value for this folder.
-Also return the name of the folder that defines the resource.</Description>
+Get the resource value for this folder.</Description>
 <ClassMethod>1</ClassMethod>
 <FormalSpec>folderId:%String</FormalSpec>
 <ReturnType>%String</ReturnType>
@@ -181,6 +179,7 @@ Also return the name of the folder that defines the resource.</Description>
 
 <Method name="Test">
 <Description>
+Get all dashes from SAMPLES namespace
 do ##class(MDX2JSON.DashboardRS).Test()</Description>
 <ClassMethod>1</ClassMethod>
 <FormalSpec>folderName=""</FormalSpec>
