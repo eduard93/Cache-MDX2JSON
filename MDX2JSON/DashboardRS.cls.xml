@@ -80,14 +80,9 @@ Get SQL for folder, from which we get Dashboards. </Description>
     set ..title = ##class(%DeepSee.UserPortal.Utils).%ResolveText(##class(%DeepSee.UserLibrary.FolderItem).titleGetStored(id))
     set folder = ##class(%DeepSee.UserLibrary.FolderItem).folderGetStored(id)
     set name = ##class(%DeepSee.UserLibrary.FolderItem).nameGetStored(id)
-    //zw folder,name
     set ..path =  ##class(%DeepSee.Dashboard.Definition).fullNameCompute(id, folder, name)
-    
     set ..Cover = ##class(MDX2JSON.Dashboard).GetDashCover(##class(%DeepSee.UserLibrary.FolderItem).bookCoverGetStored(id))
-        
-    //w $lg(val,1)
-    //Set ..Prop1 = $Lg(val,2)
-    //Set ..Prop2 = $Lg(val,3)
+    
     return $$$YES
 ]]></Implementation>
 </Method>
@@ -96,7 +91,7 @@ Get SQL for folder, from which we get Dashboards. </Description>
 <Description>
 Iterate over data global till we find dashboard definition</Description>
 <Implementation><![CDATA[
-	set ..id = $Order(@..#global@(..id),1,val)
+	set ..id = $Order(@..#global@(..id),1)
     return:..id=""
     set oid = ##class(%DeepSee.UserLibrary.FolderItem).%ComposeOid(..id)
     do ##class(%DeepSee.UserLibrary.FolderItem).%OnDetermineClass(oid, .class)
