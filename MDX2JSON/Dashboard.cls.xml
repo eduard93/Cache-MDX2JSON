@@ -88,14 +88,24 @@ Opens DeepSee dashboard by it's name. Returns status of aatempt to locate and op
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
 	 kill Dashboard
-	 &sql(
-		SELECT TOP 1 ID into :tDashId
-		FROM %DeepSee_Dashboard.Definition
-		WHERE fullName=:DashName
-	 )
-	 return:(SQLCODE'=0) $$$ERROR($$$SQLError, SQLCODE)
-
-	 set Dashboard = ##class(%DeepSee.Dashboard.Definition).%OpenId(tDashId,,.st)
+	 
+	 set id = ""
+	 set global = ##class(MDX2JSON.DashboardRS).#global
+	 set dashclass = ##class(MDX2JSON.DashboardRS).#dashclass
+	 for {
+	 	set id = $order(@global@(id))
+	 	quit:id=""
+	 		
+	 	/// first we check that it's a dashboard (not a pivot, etc.)
+		set oid = ##class(%DeepSee.UserLibrary.FolderItem).%ComposeOid(id)
+	    do ##class(%DeepSee.UserLibrary.FolderItem).%OnDetermineClass(oid, .class)
+	    CONTINUE:class'=dashclass
+	    
+	    /// second we check that it's the one we need
+	    quit:##class(MDX2JSON.DashboardRS).GetDashFullName(id)=DashName
+	 }
+	 return:id="" $$$ERROR($$$GeneralError,"Dashboard " _ DashName _ " does not exist")
+	 set Dashboard = ##class(%DeepSee.Dashboard.Definition).%OpenId(id,,.st)
 	 return st
 ]]></Implementation>
 </Method>

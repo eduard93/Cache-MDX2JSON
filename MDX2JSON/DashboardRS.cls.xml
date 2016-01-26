@@ -68,7 +68,7 @@
 Iterate over data global till we find dashboard definition
 thet satisfies all conditions</Description>
 <Implementation><![CDATA[
-	set ..id = $Order(@..#global@(..id))
+	set ..id = $order(@..#global@(..id))
     if ((..id'="") && ('..CheckConditions(..id))) {
 	    // we are not at the last row and we failed condition check
 	    // so we get the next id
@@ -91,10 +91,10 @@ Check if element with that id satisfies our conditions</Description>
     /// second that it's not a hidden or deleted dashboard
     set folder = ##class(%DeepSee.UserLibrary.FolderItem).folderGetStored(id)
     set folderpath = ##class(%DeepSee.UserLibrary.Folder).%GetFullName(folder)
-    return:(($e(folderpath,1,6)="$TRASH") || ($e(folderpath,1,6)="$TRASH")) $$$NO
+    return:(($extract(folderpath,1,6)="$TRASH") || ($extract(folderpath,1,6)="$TRASH")) $$$NO
 
     /// third we check if a dashboard is in a correct folder
-    return:($e(folderpath,1,$l(..folder))'=..folder) $$$NO
+    return:($extract(folderpath,1,$length(..folder))'=..folder) $$$NO
     
     /// fourth we check if the user has access to a dashboard
 	return:'..CheckItemResource(id) $$$NO
