@@ -4,13 +4,6 @@
 <Super>%SQL.CustomResultSet</Super>
 <TimeCreated>63943,47866.588743</TimeCreated>
 
-<Parameter name="folderName">
-<Description>
-Folder, from which we get Dashboards.</Description>
-<Type>%String</Type>
-<Default>Mobile</Default>
-</Parameter>
-
 <Parameter name="global">
 <Default>^DeepSee.FolderItemD</Default>
 </Parameter>
@@ -18,21 +11,6 @@ Folder, from which we get Dashboards.</Description>
 <Parameter name="dashclass">
 <Default>%DeepSee.Dashboard.Definition</Default>
 </Parameter>
-
-<Method name="GetDashboardListSQL">
-<Description>
-Get SQL for folder, from which we get Dashboards. </Description>
-<ClassMethod>1</ClassMethod>
-<FormalSpec>folderName:%String=..#folderName</FormalSpec>
-<ReturnType>%String</ReturnType>
-<Implementation><![CDATA[
-	set basesql = "SELECT MDX2JSON.ResolveText(title) AS title, fullName AS path, MDX2JSON.GetDashCover(bookCover) AS Cover FROM %DeepSee_Dashboard.Definition "
-	set basefilter = "WHERE ((NOT (foldername %STARTSWITH '$TRASH' or foldername %STARTSWITH 'HIDDEN')) OR foldername IS NULL) AND (MDX2JSON.IsItemVisible(fullName) = 1) "
-	return:folderName="" basesql _ basefilter
-	set filter = "AND folderName %STARTSWITH '" _ folderName _"'"
-	return basesql _ basefilter _ filter
-]]></Implementation>
-</Method>
 
 <Property name="title">
 <Type>%String</Type>
