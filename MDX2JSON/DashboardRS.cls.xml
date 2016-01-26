@@ -56,9 +56,7 @@
     return:id="" $$$NO
     
     set ..title = ##class(%DeepSee.UserPortal.Utils).%ResolveText(##class(%DeepSee.UserLibrary.FolderItem).titleGetStored(id))
-    set folder = ##class(%DeepSee.UserLibrary.FolderItem).folderGetStored(id)
-    set name = ##class(%DeepSee.UserLibrary.FolderItem).nameGetStored(id)
-    set ..path =  ##class(%DeepSee.Dashboard.Definition).fullNameCompute(id, folder, name)
+    set ..path =  ..GetDashFullName(id)
     set ..cover = ##class(MDX2JSON.Dashboard).GetDashCover(##class(%DeepSee.UserLibrary.FolderItem).bookCoverGetStored(id))
     
     return $$$YES
@@ -102,6 +100,18 @@ Check if element with that id satisfies our conditions</Description>
 	return:'..CheckItemResource(id) $$$NO
 	
 	return $$$YES
+]]></Implementation>
+</Method>
+
+<Method name="GetDashFullName">
+<Description>
+Get dashboard full name by id</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>id:%String</FormalSpec>
+<Implementation><![CDATA[
+	set folder = ##class(%DeepSee.UserLibrary.FolderItem).folderGetStored(id)
+    set name = ##class(%DeepSee.UserLibrary.FolderItem).nameGetStored(id)
+    return ##class(%DeepSee.Dashboard.Definition).fullNameCompute(id, folder, name)
 ]]></Implementation>
 </Method>
 
