@@ -177,10 +177,8 @@ Returns JSON array of (title, path) for all dashboards in namespace (accessible 
 		set folderName = ##class(MDX2JSON.Dashboard).#folderName
 	}
 
-	return:((folderName'="") && ('$IsObject(##class(%DeepSee.UserLibrary.Utils).%FindFolder(folderName)))) $$$ERROR($$$GeneralError,"Folder " _ folderName _ " does not exist")
-	set sql = ##class(MDX2JSON.Dashboard).GetDashboardListSQL(folderName)
 	try {
-		do ##class(%ZEN.Auxiliary.jsonSQLProvider).%WriteJSONFromSQL(,sql)
+		do ##class(MDX2JSON.DashboardRS).WriteJSON(folderName)
 	} catch ex {
 		set st = ex.AsStatus()
 	}
