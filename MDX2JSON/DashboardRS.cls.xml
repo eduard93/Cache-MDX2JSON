@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Export generator="Cache" version="25">
 <Class name="MDX2JSON.DashboardRS">
+<Description>
+Custom result set to get dashboard list, visible to user in a specific folder</Description>
 <Super>%SQL.CustomResultSet</Super>
 <TimeCreated>63943,47866.588743</TimeCreated>
 
