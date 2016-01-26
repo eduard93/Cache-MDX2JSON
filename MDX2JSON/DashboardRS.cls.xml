@@ -89,13 +89,93 @@ Get SQL for folder, from which we get Dashboards. </Description>
 
 <Method name="SetNextId">
 <Description>
-Iterate over data global till we find dashboard definition</Description>
+Iterate over data global till we find dashboard definition
+thet satisfies all conditions</Description>
 <Implementation><![CDATA[
 	set ..id = $Order(@..#global@(..id),1)
-    return:..id=""
-    set oid = ##class(%DeepSee.UserLibrary.FolderItem).%ComposeOid(..id)
+    if ((..id'="") && ('..CheckConditions(..id))) {
+	    // we are not at the last row and we failed condition check
+	    // so we get the next id
+	    do ..SetNextId()	
+    }
+]]></Implementation>
+</Method>
+
+<Method name="CheckConditions">
+<Description>
+Check if element with that id satisfies our conditions</Description>
+<FormalSpec>id</FormalSpec>
+<ReturnType>%Boolean</ReturnType>
+<Implementation><![CDATA[
+	/// first we check that it's a dashboard (not a pivot, etc.)
+	set oid = ##class(%DeepSee.UserLibrary.FolderItem).%ComposeOid(id)
     do ##class(%DeepSee.UserLibrary.FolderItem).%OnDetermineClass(oid, .class)
-    do:class'=..#dashclass ..SetNextId()
+    return:class'=..#dashclass $$$NO
+    
+    /// second that it's not a hidden or deleted dashboard
+    set folder = ##class(%DeepSee.UserLibrary.FolderItem).folderGetStored(id)
+    set folderpath = ##class(%DeepSee.UserLibrary.Folder).%GetFullName(folder)
+    return:(($e(folderpath,1,6)="$TRASH") || ($e(folderpath,1,6)="$TRASH")) $$$NO
+
+    /// third we check if a dashboard is in a correct folder
+    return:($e(folderpath,1,$l(..folder))'=..folder) $$$NO
+    
+    /// fourth we check if the user has access to a dashboard
+	return:'..%CheckResource(id) $$$NO
+	
+	return $$$YES
+]]></Implementation>
+</Method>
+
+<Method name="%CheckResource">
+<Description>
+Test if the current user has access to this item.</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>id:%String,privilege:%String="USE"</FormalSpec>
+<ReturnType>%Boolean</ReturnType>
+<Implementation><![CDATA[
+	set access = $$$NO
+	set resource = ..%GetResource(id)
+	if ((resource="")||($System.Security.Check(resource, privilege))) {
+		set access = $$$YES
+	}
+	return access
+]]></Implementation>
+</Method>
+
+<Method name="%GetResource">
+<Description>
+Get the resource value for this item.
+Also return the name of the folder that defines the resource or "" if it originates here.</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>id</FormalSpec>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[
+	set resource = ##class(%DeepSee.UserLibrary.FolderItem).resourceGetStored(id)
+	if (resource="") {
+		// inherit from folder
+		if ##class(%DeepSee.UserLibrary.FolderItem).folderGetStored(id)'="" {
+			set resource = ..%GetFolderResource(##class(%DeepSee.UserLibrary.FolderItem).folderGetStored(id))
+		}
+	}
+	return resource
+]]></Implementation>
+</Method>
+
+<Method name="%GetFolderResource">
+<Description>
+Get the resource value for this folder.
+Also return the name of the folder that defines the resource.</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>folderId</FormalSpec>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[
+	if (##class(%DeepSee.UserLibrary.Folder).resourceGetStored(folderId)'="") {
+		return ##class(%DeepSee.UserLibrary.Folder).resourceGetStored(folderId)
+	} elseif (##class(%DeepSee.UserLibrary.Folder).folderGetStored(folderId)'="") {
+		return ..%GetFolderResource(##class(%DeepSee.UserLibrary.Folder).folderGetStored(folderId))
+	}
+	return ""
 ]]></Implementation>
 </Method>
 
@@ -103,10 +183,11 @@ Iterate over data global till we find dashboard definition</Description>
 <Description>
 do ##class(MDX2JSON.DashboardRS).Test()</Description>
 <ClassMethod>1</ClassMethod>
+<FormalSpec>folderName=""</FormalSpec>
 <Implementation><![CDATA[
 	new $namespace
 	set $namespace = "Samples"
-	set rs = ..%New("aa")
+	set rs = ..%New(,folderName)
 	do rs.%Display()
 ]]></Implementation>
 </Method>
