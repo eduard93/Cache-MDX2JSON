@@ -50,6 +50,7 @@ todo add optional parameter WEBAPP to Alter web app name if it needs to have ano
 <Configuration>
 	<Log Text="Mapping MDX2JSON package to %All namespace" Level="0"/>
 	<ClassMapping From="${Namespace}" Package="MDX2JSON"/>
+	<GlobalMapping From="${Namespace}" Global="MDX2JSON"/>
 </Configuration>
 </Namespace>
 </If>
@@ -58,6 +59,7 @@ todo add optional parameter WEBAPP to Alter web app name if it needs to have ano
 <Namespace Name="Samples" Create="no" Code="SAMPLES" Data="SAMPLES" Ensemble="0">
 <Configuration>
 <ClassMapping From="${Namespace}" Package="MDX2JSON"/>
+<GlobalMapping From="${Namespace}" Global="MDX2JSON"/>
 </Configuration>
 </Namespace>
 
