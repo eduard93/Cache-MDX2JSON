@@ -4,7 +4,7 @@
 <Description><![CDATA[
 Class for Setting/Getting User <b>settings</b> for various <b>apps</b>.<br>
 Can also export/import dettings to/from <b>files</b>.]]></Description>
-<Super>%RegisteredObject</Super>
+<IncludeCode>MDX2JSON.MDX2JSON</IncludeCode>
 <TimeCreated>63669,64053.502396</TimeCreated>
 
 <Method name="SetConfig">
@@ -14,12 +14,8 @@ Set <b>App</b> configuration for <b>User</b> equal to <b>Config</b>]]></Descript
 <FormalSpec>App:%String,Config:%String="",User:%String=$Username</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-	set ns = $Namespace
-	zn "%SYS"
-	set Properties("Attributes",App)= $lb(Config)
-	set st =##class(Security.Users).Modify(User,.Properties)
-	zn ns
-	return st
+	set $$$Global($$$Settings, User, App) = Config
+	return $$$OK
 ]]></Implementation>
 </Method>
 
@@ -44,9 +40,58 @@ Set <b>App</b> configuration for all Users equal to <b>Config</b>]]></Descriptio
 ]]></Implementation>
 </Method>
 
-<Method name="GetConfig">
+<Method name="MoveConfig">
 <Description><![CDATA[
-Get <b>App</b> configuration for <b>User</b>]]></Description>
+Move <b>App</b> configuration for all Users from Security.Users:Attributes property to $$$Global($$$Settings, App)]]></Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>App:%String</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	set ns = $Namespace
+	zn "%SYS"
+	return:'($$$IOwnAllRole) $$$ERROR($$$AccessDenied)
+
+	set rs = ##Class(%ResultSet).%New("Security.Users:List")
+	set st = rs.Execute()
+	while rs.Next() {
+		set Config = ..OldGetConfig(App, rs.Get("Name"))
+		set st = $$$ADDSC(st,..SetConfig(App, Config, rs.Get("Name")))
+	}
+	
+	zn ns
+	return st
+]]></Implementation>
+</Method>
+
+<Method name="MapSettingsGlobal">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>Namespace:%String,Global:%String,From:%String</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	new $Namespace
+	set $Namespace = "%SYS"
+	set Namespace=$ZCVT(Namespace,"U")
+
+	if '##Class(Config.MapGlobals).Exists(Namespace,Global) {
+		kill p
+		set p("Database")=From
+		set st = ##Class(Config.MapGlobals).Create(Namespace,Global,.p,,1)
+		return:$$$ISERR(st) st
+	}
+	
+	set st = ##Class(Config.CPF).Write()
+	return:$$$ISERR(st) st
+	set st = ##Class(Config.Map).MoveToActive(Namespace)
+	return:$$$ISERR(st) st
+ 	set st = ##Class(Config.Namespaces).Load(Namespace)
+	
+	return st
+]]></Implementation>
+</Method>
+
+<Method name="OldGetConfig">
+<Description><![CDATA[
+Get <b>App</b> configuration for <b>User</b> from Security.Users:Attributes property]]></Description>
 <ClassMethod>1</ClassMethod>
 <FormalSpec>App:%String,User:%String=$Username</FormalSpec>
 <ReturnType>%String</ReturnType>
@@ -56,6 +101,16 @@ Get <b>App</b> configuration for <b>User</b>]]></Description>
 	set st =##class(Security.Users).Get(User,.Properties)
 	zn ns
 	return $lg($g(Properties("Attributes",App)))
+]]></Implementation>
+</Method>
+
+<Method name="GetConfig">
+<Description><![CDATA[
+Get <b>App</b> configuration for <b>User</b>]]></Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>App:%String,User:%String=$Username</FormalSpec>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[	return $g($$$Global($$$Settings, User, App))
 ]]></Implementation>
 </Method>
 
