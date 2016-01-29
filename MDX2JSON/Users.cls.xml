@@ -63,7 +63,9 @@ Move <b>App</b> configuration for all Users from Security.Users:Attributes prope
 ]]></Implementation>
 </Method>
 
-<Method name="MapSettingsGlobal">
+<Method name="MapGlobal">
+<Description><![CDATA[
+Map <b>Global</b> From <b>Database</b> into <b>Namespace</b>]]></Description>
 <ClassMethod>1</ClassMethod>
 <FormalSpec>Namespace:%String,Global:%String,From:%String</FormalSpec>
 <ReturnType>%Status</ReturnType>
