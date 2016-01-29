@@ -187,9 +187,9 @@ do ##class(MDX2JSON.DashboardRS).Test()</Description>
 <ClassMethod>1</ClassMethod>
 <FormalSpec>folderName:%String=""</FormalSpec>
 <Implementation><![CDATA[
-	#define CRLF $c(13,10)
-	#define ZENJSISNUM(%val)	($IsValidNum(%val)&&(%val=+(%val)))
-	#define ZENJSNUM(%num)		$fnumber(%num,"LON")
+	#define CRLF 							$c(13,10)
+	#define ZENJSISNUM(%val)				($IsValidNum(%val)&&(%val=+(%val)))
+	#define ZENJSNUM(%num)					$fnumber(%num,"LON")
 	#; JSON utility macros that use the JSON translation table instead of the JS translation table
 	#define ZENJSTABLE(%format)				("JS"_$S(%format["u":"ML",1:""))
 	#define ZENJSONTABLE(%format)			("JSON"_$S((%format["u"):"ML",1:""))
