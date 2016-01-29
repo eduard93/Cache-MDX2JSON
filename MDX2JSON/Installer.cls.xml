@@ -15,7 +15,7 @@ todo add optional parameter WEBAPP to Alter web app name if it needs to have ano
 <Log Text="Set namespace to ${Namespace}" Level="0"/>
 </IfNotDef>
 
-<Role Name="MDX2JSON" Description="Role to access and use MDX2JSON API" Resources="%DB_CACHESYS:RW,%Admin_Secure:U" />
+<!--<Role Name="MDX2JSON" Description="Role to access and use MDX2JSON API" Resources="%DB_CACHESYS:RW,%Admin_Secure:U" />-->
 
 <If Condition='(##class(Config.Namespaces).Exists("${Namespace}")=0)'>
 <Log Text="Creating namespace ${Namespace}" Level="0"/>
@@ -63,7 +63,7 @@ todo add optional parameter WEBAPP to Alter web app name if it needs to have ano
 </Configuration>
 </Namespace>
 
-<RunInstall Class="MDX2JSON.Installer" Method="createrole" />
+<!--<RunInstall Class="MDX2JSON.Installer" Method="createrole" />-->
 
 <IfDef Var="User" >
 <IfDef Var="Password">
@@ -157,7 +157,6 @@ Do ##class(MDX2JSON.Installer).createrole(.pVars)</Description>
 	Set cspProperties("NameSpace") = Namespace
 	Set cspProperties("IsNameSpaceDefault") = 1
 	Set cspProperties("DispatchClass") = "MDX2JSON.REST"
-	Set cspProperties("MatchRoles") = ":MDX2JSON"
 	Set tSC = ##class(Security.Applications).Create("/"_Namespace, .cspProperties)
 	Do tInstaller.PopNS()
 	If $$$ISERR(tSC) Throw ##class(%Installer.Exception).CreateFromStatus(tSC)
