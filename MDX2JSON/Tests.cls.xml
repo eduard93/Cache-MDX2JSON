@@ -8,7 +8,7 @@ Classes with support methods for testing MDX2JSON</Description>
 
 <Parameter name="LastCommit">
 <Type>%String</Type>
-<Default>ed6e58ebd6e4906797a2a4ec585f5332f3c9d3cf</Default>
+<Default>969851325be200620736fce8fb6a9d753f75c496</Default>
 </Parameter>
 
 <Method name="ProjectLength">
@@ -199,10 +199,6 @@ Sets LastCommit parameter to last successful commit and exports this class.]]></
 	set Parameter = ##class(%Dictionary.ParameterDefinition).IDKEYOpen($classname(), "LastCommit")
 	set Parameter.Default = SHAHash
 	set Status = Parameter.%Save()
-	return:$$$ISERR(Status) Status
-	set Class = ##class(%Dictionary.ClassDefinition).%OpenId($classname())
-	do Class.%Save()
-	set Status = $System.OBJ.Compile($ClassName(), "cuks /checkuptodate=expandedonly /displaylog=0 /displayerror=0")
 	return:$$$ISERR(Status) Status
 	do ##class(%SourceControl.Git.Utils).UpdateRoutineTSH("MDX2JSON.Tests.cls")
 	return ##class(%SourceControl.Git.Utils).ExportItem("MDX2JSON.Tests.cls")
