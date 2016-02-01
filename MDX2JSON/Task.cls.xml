@@ -12,7 +12,7 @@ Task to check a role and add to privileges to it for MDX2JSON access</Descriptio
 
 <Property name="NamespaceList">
 <Description>
-Comma separated list of namespaces, to give access to Role. * means all.</Description>
+Comma separated list of namespaces, to give access to Role.  * means all.</Description>
 <Type>%String</Type>
 <InitialExpression>"*"</InitialExpression>
 </Property>
