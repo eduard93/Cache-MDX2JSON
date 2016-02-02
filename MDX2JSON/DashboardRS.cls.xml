@@ -205,9 +205,9 @@ do ##class(MDX2JSON.DashboardRS).Test()</Description>
 	while rs.%Next() {
 		write:separator ",",$$$CRLF
 		write "{"
-        write $$$ZENJSONPAIR("title",rs.title,"u"),","
-        write $$$ZENJSONPAIR("path",rs.path,"u"),","
-        write $$$ZENJSONPAIR("Cover",rs.cover,"u")
+        write $$$ZENJSONPAIR("title",rs.title,""),","
+        write $$$ZENJSONPAIR("path",rs.path,""),","
+        write $$$ZENJSONPAIR("Cover",rs.cover,"")
         write "}"
         
         set separator = 1
