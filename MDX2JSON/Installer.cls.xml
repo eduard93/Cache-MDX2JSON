@@ -331,14 +331,78 @@ Download list of files on https://raw.githubusercontent.com/ server.<br>
 ]]></Implementation>
 </Method>
 
+<Method name="DeleteDirectory">
+<Description><![CDATA[
+Deletes <var>Directory</var>]]></Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>Directory:%String</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	Set st = $$$OK
+	Set Directory = ##class(%File).NormalizeDirectory(Directory)
+	If ##class(%File).DirectoryExists(Directory) {
+		Try {
+			// Build resultset of all files and subfolders in a directory
+			Set rs = ##class(%SQL.Statement).%ExecDirect(,"SELECT Name,Type FROM %Library.File_FileSet(?,'*',,1)", Directory)
+			While rs.%Next() {
+				If rs.Type'="D" { 
+					Do ##class(%File).Delete(rs.Name)
+				} Else {
+					// First clear all files and subdirs
+					Set st1 = ..DeleteDirectory(rs.Name)
+					#Include %occFile
+					// After we cleared all files delete the dir itself
+					Set st1 = $$$FileRemoveDirectory(rs.Name)
+				}
+			}
+			Set st1 = $$$FileRemoveDirectory(Directory)
+		} Catch ex {
+			Set st=ex.AsStatus()
+		}
+	} Else {
+		Set st = $$$ERROR($$$DirectoryNotExist, Directory)
+	}
+	Return st
+]]></Implementation>
+</Method>
+
+<Method name="DeleteWebApps">
+<Description><![CDATA[
+Delete all webapps in a <var>Namespace</var>, also dele]]></Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>Namespace:%String="MDX2JSON",ClearPath:%Boolean=0</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	New $Namespace
+	Set $Namespace = "%SYS"
+	Set st = $$$OK
+	Try {
+		#Dim rs  As %SQL.StatementResult 
+		Set rs = ##class(%SQL.Statement).%ExecDirect(,"SELECT Name, Path FROM Security.Applications WHERE NameSpace = ?", Namespace)
+		While rs.%Next() {
+			Set st1 = ##class(Security.Applications).Delete(rs.Name)
+			Set st = $$$ADDSC(st,st1)
+			If ((ClearPath) && (rs.Path'="")) {
+				Set st1 = ..DeleteDirectory(rs.Path)
+				Set st = $$$ADDSC(st,st1)
+			}
+		}
+	} Catch(ex) {
+		Set st = $$$ADDSC(st,ex.AsStatus())
+	}
+	Return st
+]]></Implementation>
+</Method>
+
 <Method name="DeletePackageMappings">
 <Description><![CDATA[
 Delete all mappings of <var>Package</var> in <var>Database</var> from all Namespaces]]></Description>
 <ClassMethod>1</ClassMethod>
 <FormalSpec>Package:%String="MDX2JSON",Database:%String="MDX2JSON"</FormalSpec>
+<ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-	New $namespace
-	Set $namespace = "%SYS"
+	New $Namespace
+	Set $Namespace = "%SYS"
 	Set st = $$$OK
 	Try {
 		#Dim rs  As %SQL.StatementResult 
@@ -346,7 +410,7 @@ Delete all mappings of <var>Package</var> in <var>Database</var> from all Namesp
 		While rs.%Next() {
 			Set st1 = ##Class(Config.MapPackages).Delete(rs.%Get("Namespace"), Database)
 			Set st = $$$ADDSC(st,st1)
-			Set st1 = ..ActivateConfiguration(rs.%Get("Namespace"))
+			Set st1 = ..ActivateConfiguration(rs.Namespace)
 			Set st = $$$ADDSC(st,st1)
 		}
 	} Catch(ex) {
@@ -361,17 +425,18 @@ Delete all mappings of <var>Package</var> in <var>Database</var> from all Namesp
 Delete all mappings of <var>Global</var> in <var>Database</var> from all Namespaces]]></Description>
 <ClassMethod>1</ClassMethod>
 <FormalSpec>Global:%String="MDX2JSON",Database:%String="MDX2JSON"</FormalSpec>
+<ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-	New $namespace
-	Set $namespace = "%SYS"
+	New $Namespace
+	Set $Namespace = "%SYS"
 	Set st = $$$OK
 	Try {
 		#Dim rs  As %SQL.StatementResult 
 		Set rs = ##class(%SQL.Statement).%ExecDirect(,"SELECT Namespace FROM Config.MapGlobals where Name= ? AND Database = ?", Global, Database)
 		While rs.%Next() {
-			Set st1 = ##Class(Config.MapGlobals).Delete(rs.%Get("Namespace"), Database)
+			Set st1 = ##Class(Config.MapGlobals).Delete(rs.Namespace, Database)
 			Set st = $$$ADDSC(st,st1)
-			Set st1 = ..ActivateConfiguration(rs.%Get("Namespace"))
+			Set st1 = ..ActivateConfiguration(rs.Namespace)
 			Set st = $$$ADDSC(st,st1)
 		}
 	} Catch(ex) {
