@@ -338,11 +338,36 @@ Delete all mappings of <var>Package</var> in <var>Database</var> from all Namesp
 <FormalSpec>Package:%String="MDX2JSON",Database:%String="MDX2JSON"</FormalSpec>
 <Implementation><![CDATA[
 	New $namespace
-	Set $namespace="%SYS"
+	Set $namespace = "%SYS"
 	Set st = $$$OK
 	Try {
 		#Dim rs  As %SQL.StatementResult 
 		Set rs = ##class(%SQL.Statement).%ExecDirect(,"SELECT Namespace FROM Config.MapPackages where Name= ? AND Database = ?", Package, Database)
+		While rs.%Next() {
+			Set st1 = ##Class(Config.MapPackages).Delete(rs.%Get("Namespace"), Database)
+			Set st = $$$ADDSC(st,st1)
+			Set st1 = ..ActivateConfiguration(rs.%Get("Namespace"))
+			Set st = $$$ADDSC(st,st1)
+		}
+	} Catch(ex) {
+		Set st = $$$ADDSC(st,ex.AsStatus())
+	}
+	Return st
+]]></Implementation>
+</Method>
+
+<Method name="DeleteGlobalMappings">
+<Description><![CDATA[
+Delete all mappings of <var>Global</var> in <var>Database</var> from all Namespaces]]></Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>Global:%String="MDX2JSON",Database:%String="MDX2JSON"</FormalSpec>
+<Implementation><![CDATA[
+	New $namespace
+	Set $namespace = "%SYS"
+	Set st = $$$OK
+	Try {
+		#Dim rs  As %SQL.StatementResult 
+		Set rs = ##class(%SQL.Statement).%ExecDirect(,"SELECT Namespace FROM Config.MapGlobals where Name= ? AND Database = ?", Global, Database)
 		While rs.%Next() {
 			Set st1 = ##Class(Config.MapGlobals).Delete(rs.%Get("Namespace"), Database)
 			Set st = $$$ADDSC(st,st1)
