@@ -45,12 +45,7 @@ Regardless of installation method chosen, here's the list (by the order of appea
 4. If `/Namespace` web application does not exist then create it and give it MDX2JSON role
 5. If [%All namespace](http://docs.intersystems.com/cache20152/csp/docbook/DocBook.UI.Page.cls?KEY=GSA_config#GSA_config_namespace_addmap_all) (used for mapping purposes) does not exist then create it and map MDX2JSON package there
 6. Map MDX2JSON package into SAMPLES namespace
-7. Modify MDX2JSON role and give it following privileges
-  - Resources: `%DB_CACHESYS:RW`, `%Admin_Secure:U`
-  - SELECT on `%DeepSee_Dashboard.Definition` table in all namespaces from `NSList` (all by default)
-  - EXECUTE on `MDX2JSON.ResolveText`, `MDX2JSON.IsItemVisible`, `MDX2JSON.GetDashCover` procedures in all namespaces from `NSList` (all by default)
-  - Read on database resource for all data databases of namespaces from `NSList` (all by default)
-8.  If `User` and `Password` variables are provided, then create User and give him MDX2JSON role
+7. If `User` and `Password` variables are provided, then create User and give him MDX2JSON role
 
 Additional installation parameters
 -----------
@@ -60,16 +55,9 @@ As a second parameter to `do ##class(%Installer.Installer).InstallFromCommandLin
 - `Namespace` is a namespace you want to install MDX2JSON to (Not namespace with dashes). If it does not exist it would be created automatically. If it does exist only MDX2JSON package would be overwritten. WebApplication would be named `/Namespace`. Strongly not recommended to change the default. [MDX2JSON]
 - `User` is a Caché user to create or modify. He will be given SELECT access to %DeepSee_Dashboard.Definition table in `Namespace`
 - `Password` must be supplied alongside User parameters
-- `NSList` is a comma-separated list, you want to give access to MDX2JSON. `*` evaluates to all namespaces [*]
 - `SourceDir` - all xmls from this directory would be imported and compiled
 
-Role creation
------------
-You can also automatically create MDX2JSON role with all the required procedures. To do that run in terminal (any namespace) under user with %All role: 
 
-    set pVars("NSList")="comma-separated list of namespaces"
-    do ##class(MDX2JSON.Installer).createrole(.pVars)
- 
 Update
 -----------
 
