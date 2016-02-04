@@ -330,5 +330,49 @@ Download list of files on https://raw.githubusercontent.com/ server.<br>
 	Return st
 ]]></Implementation>
 </Method>
+
+<Method name="DeletePackageMappings">
+<Description><![CDATA[
+Delete all mappings of <var>Package</var> in <var>Database</var> from all Namespaces]]></Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>Package:%String="MDX2JSON",Database:%String="MDX2JSON"</FormalSpec>
+<Implementation><![CDATA[
+	New $namespace
+	Set $namespace="%SYS"
+	Set st = $$$OK
+	Try {
+		#Dim rs  As %SQL.StatementResult 
+		Set rs = ##class(%SQL.Statement).%ExecDirect(,"SELECT Namespace FROM Config.MapPackages where Name= ? AND Database = ?", Package, Database)
+		While rs.%Next() {
+			Set st1 = ##Class(Config.MapGlobals).Delete(rs.%Get("Namespace"), Database)
+			Set st = $$$ADDSC(st,st1)
+			Set st1 = ..ActivateConfiguration(rs.%Get("Namespace"))
+			Set st = $$$ADDSC(st,st1)
+		}
+	} Catch(ex) {
+		Set st = $$$ADDSC(st,ex.AsStatus())
+	}
+	Return st
+]]></Implementation>
+</Method>
+
+<Method name="ActivateConfiguration">
+<Description><![CDATA[
+Activate a configuration in a <var>Namespace</var>]]></Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>Namespace:%String</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	Set st = $$$OK
+	s Namespace=$ZCVT(Namespace,"U")
+	
+	Set st = ##Class(Config.CPF).Write()
+	Return:$$$ISERR(st) st
+	Set st = ##Class(Config.Map).MoveToActive(Namespace)
+	Return:$$$ISERR(st) st
+ 	Set st = ##Class(Config.Namespaces).Load(Namespace)
+	Return st
+]]></Implementation>
+</Method>
 </Class>
 </Export>
