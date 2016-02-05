@@ -8,7 +8,7 @@ Classes with support methods for testing MDX2JSON</Description>
 
 <Parameter name="LastCommit">
 <Type>%String</Type>
-<Default>b29b440b66c3884c9caad8bcbaf5793ee073ec3b</Default>
+<Default>f3937b7e134e66618f2714131ee26648687de479</Default>
 </Parameter>
 
 <Method name="ProjectLength">

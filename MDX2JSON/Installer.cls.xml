@@ -119,40 +119,6 @@ Do ##class(MDX2JSON.Installer).setup(.pVars)</Description>
 ]]></Implementation>
 </Method>
 
-<Method name="DeleteNamespace">
-<ClassMethod>1</ClassMethod>
-<FormalSpec>Namespace=$Namespace</FormalSpec>
-<ReturnType>%Status</ReturnType>
-<Implementation><![CDATA[
-	// Based on %CSP.UI.Portal.Dialog.NamespaceDelete:SaveData
-	Try {
-		Set st = ##class(MDX2JSON.AbstractREST).CheckNamespace(.Namespace)
-		Return:$$$ISERR(st) st
-
-		Set ns=$Namespace
-		Zn:ns'="%SYS" "%SYS"
-		Set st = ##class(Config.Namespaces).Delete(Namespace)
-		Return:$$$ISERR(st) st
-
-		
-
-		#; remove Ensemble namespace
-	 	If ((##class(%Library.EnsembleMgr).IsEnsembleInstalled() || ##class(%Library.EnsembleMgr).IsHealthShareInstalled())) {
-	 		Set tSC = ##class(%Library.EnsembleMgr).DisableNamespace(Namespace)
-	 		Return:$$$ISERR(st) st
-	 	}
-	
-		#; remove the session data so System link (from locator bar) will not have the old namespace built into URL.
-		Kill %session.Data("$NAMESPACE")
-	} catch Error {
-		Set st = er.AsStatus()
-	}
-	zn:((ns'="%SYS") && (ns'=Namespace)) ns
-
-	Quit st
-]]></Implementation>
-</Method>
-
 <Method name="DownloadFromGitHub">
 <ClassMethod>1</ClassMethod>
 <FormalSpec>pVars,pLogLevel,tInstaller</FormalSpec>
@@ -308,6 +274,85 @@ Download list of files on https://raw.githubusercontent.com/ server.<br>
 ]]></Implementation>
 </Method>
 
+<Method name="DeleteNamespace">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>Namespace=$Namespace</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	// Based on %CSP.UI.Portal.Dialog.NamespaceDelete:SaveData and 
+	// %CSP.UI.Portal.Dialog.DatabaseDelete:Delete
+	Try {
+		New $Namespace
+		Set $Namespace = "%SYS"
+		Set st = $$$OK
+		If ##Class(Config.Namespaces).Exists(Namespace,.NamespaceObj) {
+			// Get databases names
+			Set Routines = NamespaceObj.Routines
+			Set Globals = NamespaceObj.Globals
+			Kill NamespaceObj
+			
+			// Remove Ensemble namespace
+		 	If ((##class(%Library.EnsembleMgr).IsEnsembleInstalled() || ##class(%Library.EnsembleMgr).IsHealthShareInstalled())) {
+		 		Set st1 = ##class(%Library.EnsembleMgr).DisableNamespace(Namespace)
+		 		Set st = $$$ADDSC(st, st1)
+		 	}
+		
+			Set st1 = ..DeleteWebApps(Namespace)
+			Set st = $$$ADDSC(st, st1)
+			Set st1 = ..DeletePackageMappings("", Routines)
+			Set st = $$$ADDSC(st, st1)
+			Set st1 = ..DeleteGlobalMappings("", Globals)
+			Set st = $$$ADDSC(st, st1)
+			
+			Set st1 = ##class(Config.Namespaces).Delete(Namespace)
+			Set st = $$$ADDSC(st, st1)
+			
+			Set st1 = ..DeleteDatabase(Routines)
+			Set st = $$$ADDSC(st, st1)
+			
+			If Globals'=Routines {
+				Set st1 = ..DeleteDatabase(Globals)
+				Set st = $$$ADDSC(st, st1)
+			}
+		} Else {
+			Set st = $$$ERROR($$$GeneralError, "Namespace " _ Namespace _ " does not exist")
+		}
+	} Catch ex {
+		Set st =  $$$ADDSC(st, ex.AsStatus())
+	}
+	Return st
+]]></Implementation>
+</Method>
+
+<Method name="DeleteDatabase">
+<Description><![CDATA[
+Delete all webapps in a <var>Namespace</var>, also dele]]></Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>Database:%String="MDX2JSON"</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	New $Namespace
+	Set $Namespace = "%SYS"
+	Set st = $$$OK
+	Try {
+		If ##Class(Config.Databases).Get(Database,.Properties) {
+  			Set Directory = $G(Properties("Directory"))
+  			Set st1 = ##class(SYS.Database).DismountDatabase(Directory)
+  			Set st = $$$ADDSC(st, st1)
+			Set st1 = ##class(Config.Databases).Delete(Database)
+			Set st = $$$ADDSC(st, st1)
+			Set st1 = ##class(SYS.Database).DeleteDatabase(Directory)
+			Set st = $$$ADDSC(st, st1)
+		} Else {
+			Set st = $$$ERROR($$$GeneralError, "Database " _ Database _ " does not exist")
+		}
+	} Catch(ex) {
+		Set st = $$$ADDSC(st ,ex.AsStatus())
+	}
+	Return st
+]]></Implementation>
+</Method>
+
 <Method name="DeleteWebApps">
 <Description><![CDATA[
 Delete all webapps in a <var>Namespace</var>, also dele]]></Description>
@@ -330,7 +375,7 @@ Delete all webapps in a <var>Namespace</var>, also dele]]></Description>
 			}
 		}
 	} Catch(ex) {
-		Set st = $$$ADDSC(st,ex.AsStatus())
+		Set st = $$$ADDSC(st, ex.AsStatus())
 	}
 	Return st
 ]]></Implementation>
@@ -356,7 +401,7 @@ Delete all mappings of <var>Package</var> in <var>Database</var> from all Namesp
 			Set st = $$$ADDSC(st, st1)
 		}
 	} Catch(ex) {
-		Set st = $$$ADDSC(st,ex.AsStatus())
+		Set st = $$$ADDSC(st, ex.AsStatus())
 	}
 	Return st
 ]]></Implementation>
@@ -382,7 +427,7 @@ Delete all mappings of <var>Global</var> in <var>Database</var> from all Namespa
 			Set st = $$$ADDSC(st, st1)
 		}
 	} Catch(ex) {
-		Set st = $$$ADDSC(st,ex.AsStatus())
+		Set st = $$$ADDSC(st, ex.AsStatus())
 	}
 	Return st
 ]]></Implementation>
