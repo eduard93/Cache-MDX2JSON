@@ -340,7 +340,7 @@ Delete all webapps in a <var>Namespace</var>, also dele]]></Description>
 <Description><![CDATA[
 Delete all mappings of <var>Package</var> in <var>Database</var> from all Namespaces]]></Description>
 <ClassMethod>1</ClassMethod>
-<FormalSpec>Package:%String="MDX2JSON",Database:%String="MDX2JSON"</FormalSpec>
+<FormalSpec>Package:%String="",Database:%String="MDX2JSON"</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
 	New $Namespace
@@ -348,7 +348,7 @@ Delete all mappings of <var>Package</var> in <var>Database</var> from all Namesp
 	Set st = $$$OK
 	Try {
 		#Dim rs  As %SQL.StatementResult 
-		Set rs = ##class(%SQL.Statement).%ExecDirect(,"SELECT Namespace FROM Config.MapPackages where Name= ? AND Database = ?", Package, Database)
+		Set rs = ##class(%SQL.Statement).%ExecDirect(,"SELECT Namespace FROM Config.MapPackages WHERE Name %STARTSWITH ? AND Database = ?", Package, Database)
 		While rs.%Next() {
 			Set st1 = ##Class(Config.MapPackages).Delete(rs.%Get("Namespace"), Database)
 			Set st = $$$ADDSC(st, st1)
@@ -366,7 +366,7 @@ Delete all mappings of <var>Package</var> in <var>Database</var> from all Namesp
 <Description><![CDATA[
 Delete all mappings of <var>Global</var> in <var>Database</var> from all Namespaces]]></Description>
 <ClassMethod>1</ClassMethod>
-<FormalSpec>Global:%String="MDX2JSON",Database:%String="MDX2JSON"</FormalSpec>
+<FormalSpec>Global:%String="",Database:%String="MDX2JSON"</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
 	New $Namespace
@@ -374,7 +374,7 @@ Delete all mappings of <var>Global</var> in <var>Database</var> from all Namespa
 	Set st = $$$OK
 	Try {
 		#Dim rs  As %SQL.StatementResult 
-		Set rs = ##class(%SQL.Statement).%ExecDirect(,"SELECT Namespace FROM Config.MapGlobals where Name= ? AND Database = ?", Global, Database)
+		Set rs = ##class(%SQL.Statement).%ExecDirect(,"SELECT Namespace FROM Config.MapGlobals WHERE Name %STARTSWITH ? AND Database = ?", Global, Database)
 		While rs.%Next() {
 			Set st1 = ##Class(Config.MapGlobals).Delete(rs.Namespace, Database)
 			Set st = $$$ADDSC(st, st1)
