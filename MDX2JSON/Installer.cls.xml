@@ -323,15 +323,10 @@ Delete all webapps in a <var>Namespace</var>, also dele]]></Description>
 		Set rs = ##class(%SQL.Statement).%ExecDirect(,"SELECT Name, Path FROM Security.Applications WHERE NameSpace = ?", Namespace)
 		While rs.%Next() {
 			Set st1 = ##class(Security.Applications).Delete(rs.Name)
-			Set st = $$$ADDSC(st,st1)
+			Set st = $$$ADDSC(st, st1)
 			If ((ClearPath) && (rs.Path'="")) {
-				Set suc = ##class(%File).RemoveDirectoryTree(rs.Path)
-				If suc {
-					Set st1 = $$$OK
-				} Else {
-					Set st1 = $$$ERROR($$$GeneralError, "Error removing directory " _ rs.Path)
-				}
-				Set st = $$$ADDSC(st,st1)
+				Do ##class(%File).RemoveDirectoryTree(rs.Path)
+				Set st = $$$ADDSC(st, %objlasterror)
 			}
 		}
 	} Catch(ex) {
@@ -356,9 +351,9 @@ Delete all mappings of <var>Package</var> in <var>Database</var> from all Namesp
 		Set rs = ##class(%SQL.Statement).%ExecDirect(,"SELECT Namespace FROM Config.MapPackages where Name= ? AND Database = ?", Package, Database)
 		While rs.%Next() {
 			Set st1 = ##Class(Config.MapPackages).Delete(rs.%Get("Namespace"), Database)
-			Set st = $$$ADDSC(st,st1)
+			Set st = $$$ADDSC(st, st1)
 			Set st1 = ..ActivateConfiguration(rs.Namespace)
-			Set st = $$$ADDSC(st,st1)
+			Set st = $$$ADDSC(st, st1)
 		}
 	} Catch(ex) {
 		Set st = $$$ADDSC(st,ex.AsStatus())
@@ -382,9 +377,9 @@ Delete all mappings of <var>Global</var> in <var>Database</var> from all Namespa
 		Set rs = ##class(%SQL.Statement).%ExecDirect(,"SELECT Namespace FROM Config.MapGlobals where Name= ? AND Database = ?", Global, Database)
 		While rs.%Next() {
 			Set st1 = ##Class(Config.MapGlobals).Delete(rs.Namespace, Database)
-			Set st = $$$ADDSC(st,st1)
+			Set st = $$$ADDSC(st, st1)
 			Set st1 = ..ActivateConfiguration(rs.Namespace)
-			Set st = $$$ADDSC(st,st1)
+			Set st = $$$ADDSC(st, st1)
 		}
 	} Catch(ex) {
 		Set st = $$$ADDSC(st,ex.AsStatus())
