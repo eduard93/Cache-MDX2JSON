@@ -275,6 +275,8 @@ Download list of files on https://raw.githubusercontent.com/ server.<br>
 </Method>
 
 <Method name="DeleteNamespace">
+<Description><![CDATA[
+Delete <var>Namespace</var>, related web apps and databases]]></Description>
 <ClassMethod>1</ClassMethod>
 <FormalSpec>Namespace=$Namespace</FormalSpec>
 <ReturnType>%Status</ReturnType>
@@ -443,7 +445,7 @@ Activate a configuration in a <var>Namespace</var>]]></Description>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
 	Set st = $$$OK
-	s Namespace=$ZCVT(Namespace,"U")
+	Set Namespace=$ZCVT(Namespace,"U")
 	
 	Set st = ##Class(Config.CPF).Write()
 	Return:$$$ISERR(st) st
