@@ -343,6 +343,8 @@ Delete all webapps in a <var>Namespace</var>, also dele]]></Description>
 			Set st = $$$ADDSC(st, st1)
 			Set st1 = ##class(SYS.Database).DeleteDatabase(Directory)
 			Set st = $$$ADDSC(st, st1)
+			Do ##class(%File).RemoveDirectoryTree(Directory)
+			Set st = $$$ADDSC(st, %objlasterror)
 		} Else {
 			Set st = $$$ERROR($$$GeneralError, "Database " _ Database _ " does not exist")
 		}
