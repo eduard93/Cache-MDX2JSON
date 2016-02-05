@@ -285,7 +285,26 @@ Wrapper method. Uninstalls MDX2JSON (deletes MDX2JSON and %All namespaces, DBs, 
 		Write "Start deleting " _ Namespace,!
 		Write $System.Status.GetErrorText(..DeleteNamespace(Namespace))
 		Write "End deleting " _ Namespace,!
+		Write "Start deleting roles",!
+		Write $System.Status.GetErrorText(..DeleteAccess("%DB_MDX2JSON"))
+		Write "End deleting roles"
 	}
+]]></Implementation>
+</Method>
+
+<Method name="DeleteAccess">
+<Description><![CDATA[
+Delete <var>Role</var> (and resource)]]></Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>Role="%DB_MDX2JSON"</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	New $Namespace
+	Set $Namespace = "%SYS"
+	Set st = $$$OK
+	Set st = ##class(Security.Resources).Delete(Role)
+	Set st = $$$ADDSC(st, ##class(Security.Roles).Delete(Role))
+	Return st
 ]]></Implementation>
 </Method>
 
