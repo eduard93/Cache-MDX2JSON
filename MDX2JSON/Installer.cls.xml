@@ -274,6 +274,21 @@ Download list of files on https://raw.githubusercontent.com/ server.<br>
 ]]></Implementation>
 </Method>
 
+<Method name="Uninstall">
+<Description>
+Wrapper method. Uninstalls MDX2JSON (deletes MDX2JSON and %All namespaces, DBs, web apps)</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>NamespaceList="%All,MDX2JSON"</FormalSpec>
+<Implementation><![CDATA[
+	For i=1:1:$L(NamespaceList,",") {
+		Set Namespace = $P(NamespaceList,",",i)
+		Write "Start deleting " _ Namespace,!
+		Write $System.Status.GetErrorText(..DeleteNamespace(Namespace))
+		Write "End deleting " _ Namespace,!
+	}
+]]></Implementation>
+</Method>
+
 <Method name="DeleteNamespace">
 <Description><![CDATA[
 Delete <var>Namespace</var>, related web apps and databases]]></Description>
