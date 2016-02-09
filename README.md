@@ -9,7 +9,7 @@ Installation
 1. Download Installer.cls.xml (from MDX2JSON folder in repository or releases page) into Caché manager directory.
 2. Run in terminal (any namespace) under user with %All role: 
 
-        do ##class(%Installer.Installer).InstallFromCommandLine(##class(%File).ManagerDirectory()_"Installer.cls.xml")
+        Do ##class(%Installer.Installer).InstallFromCommandLine(##class(%File).ManagerDirectory()_"Installer.cls.xml")
 
 Installation without fs access to server
 -----------
@@ -17,7 +17,7 @@ Installation without fs access to server
 1. Download Installer.cls.xml (from MDX2JSON folder in repository or releases page) into Caché Studio (any namespace)
 2. Run in terminal (any namespace) under user with %All role: 
 
-        do ##class(MDX2JSON.Installer).setup()
+        Do ##class(MDX2JSON.Installer).setup()
         
 Offline Installation
 -----------
@@ -25,7 +25,7 @@ Offline Installation
 1. Download zip and unpack it.
 2. Run in terminal (any namespace) under user with %All role: 
 
-        do ##class(%Installer.Installer).InstallFromCommandLine("{SourceDir}\Installer.cls.xml","SourceDir={SourceDir}")
+        Do ##class(%Installer.Installer).InstallFromCommandLine("{SourceDir}\Installer.cls.xml","SourceDir={SourceDir}")
 
   where: 
     
@@ -43,8 +43,8 @@ Regardless of installation method chosen, here's the list (by the order of appea
 2. If `Namespace` does not exist then create it
 3. If `SourceDir` is provided then import and compile all files from there. Otherwise download import and compile all required files from [GitHub](https://github.com/intersystems-ru/Cache-MDX2JSON/)
 4. If `/Namespace` web application does not exist then create it and give it MDX2JSON role
-5. If [%All namespace](http://docs.intersystems.com/cache20152/csp/docbook/DocBook.UI.Page.cls?KEY=GSA_config#GSA_config_namespace_addmap_all) (used for mapping purposes) does not exist then create it and map MDX2JSON package there
-6. Map MDX2JSON package into SAMPLES namespace
+5. If [%All namespace](http://docs.intersystems.com/cache20152/csp/docbook/DocBook.UI.Page.cls?KEY=GSA_config#GSA_config_namespace_addmap_all) (used for mapping purposes) does not exist then create it and map MDX2JSON package and ^MDX2JSON global there
+6. Map MDX2JSON package and ^MDX2JSON global into SAMPLES namespace
 7. If `User` and `Password` variables are provided, then create User and give him MDX2JSON role
 
 Additional installation parameters
@@ -63,9 +63,18 @@ Update
 
 1.  Run in terminal (namespace where you installed MDX2JSON): 
 
-        do ##class(MDX2JSON.Installer).Update()
+        Do ##class(MDX2JSON.Installer).Update()
 	  
 You can also supply parameters such as fork, desired branch/commit, target namespace, authorization information. Please refer to Caché documentation of MDX2JSON.Installer class for correct syntax. 
+
+Uninstall
+-----------
+
+1.  Run in terminal (any namespace from where MDX2JSON package can be accessed): 
+
+        Do ##class(MDX2JSON.Installer).Uninstall()
+	  
+This action would delete MDX2JSON namespace, database (with physical directory) and web application. Mappings and `%DB_MDX2JSON` role and resource would also be deleted.
 
 Requests
 -----------
