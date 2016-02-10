@@ -169,5 +169,66 @@ Get Current user favorites</Description>
 	return $$$OK
 ]]></Implementation>
 </Method>
+
+<Method name="MoveConfigNS">
+<Description>
+Move config from old storage schema to a new one</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>TargetNS="MDX2JSON"</FormalSpec>
+<Implementation><![CDATA[
+	new $Namespace
+	#dim mappedlist As %ListOfDataTypes
+	#dim userlist As %ListOfDataTypes
+	set mappedlist = ##class(MDX2JSON.AbstractREST).GetMappings().GetAt("Mapped")
+	set userlist = ..GetUserList()
+	for i = 1:1:mappedlist.Count() {
+		zn mappedlist.GetAt(i)
+		for j=1:1:userlist.Count() {
+			if ..GetConfig("DeepSeeWeb",userlist.GetAt(j))'="" {
+				set settings($$$Settings, userlist.GetAt(j), $Namespace) = ..GetConfig("DeepSeeWeb",userlist.GetAt(j))
+			}
+		}
+		m ^MDX2JSONOld = $$$Global
+		k $$$Global	
+	}
+	zn TargetNS
+	m $$$Global = settings
+]]></Implementation>
+</Method>
+
+<Method name="MoveBack">
+<Description>
+Move config from new storage schema to an old one</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>TargetNS="MDX2JSON"</FormalSpec>
+<Implementation><![CDATA[
+	new $Namespace
+	set mappedlist = ##class(MDX2JSON.AbstractREST).GetMappings().GetAt("Mapped")
+	for i = 1:1:mappedlist.Count() {
+		zn mappedlist.GetAt(i) 
+		m $$$Global = ^MDX2JSONOld
+	}
+]]></Implementation>
+</Method>
+
+<Method name="GetUserList">
+<Description>
+Get list of all users</Description>
+<ClassMethod>1</ClassMethod>
+<ReturnType>%ListOfDataTypes</ReturnType>
+<Implementation><![CDATA[
+	new $Namespace
+	set $Namespace = "%SYS"
+	set userlist = ##class(%ListOfDataTypes).%New()
+	set statement = ##class(%SQL.Statement).%New()
+    set status = statement.%PrepareClassQuery("Security.Users","List")
+    if $$$ISERR(status) { do $system.OBJ.DisplayError(status) }
+    set resultset = statement.%Execute()
+    while resultset.%Next() {
+        do userlist.Insert(resultset.%Get("Name"))
+	}
+	return userlist
+]]></Implementation>
+</Method>
 </Class>
 </Export>
