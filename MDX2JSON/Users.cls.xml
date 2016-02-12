@@ -185,7 +185,7 @@ Move config from old storage schema to a new one</Description>
 		zn mappedlist.GetAt(i)
 		for j=1:1:userlist.Count() {
 			if ..GetConfig("DeepSeeWeb",userlist.GetAt(j))'="" {
-				set settings($$$Settings, userlist.GetAt(j), $Namespace) = ..GetConfig("DeepSeeWeb",userlist.GetAt(j))
+				set settings($$$Settings, userlist.GetAt(j), $ZCVT($Namespace,"U")) = ..GetConfig("DeepSeeWeb",userlist.GetAt(j))
 			}
 		}
 		m ^MDX2JSONOld = $$$Global
