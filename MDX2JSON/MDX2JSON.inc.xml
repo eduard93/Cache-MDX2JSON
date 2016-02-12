@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Export generator="Cache" version="25">
-<Routine name="MDX2JSON.MDX2JSON" type="INC"><![CDATA[
+<Export generator="Cache" version="25" zv="Cache for Windows (x86-64) 2015.1.1 (Build 505U)" ts="2016-02-12 16:02:44">
+<Routine name="MDX2JSON.MDX2JSON" type="INC" timestamp="63960,57751.483094"><![CDATA[
 #include %occErrors
 #include %ZEN.Utils
 #include %DeepSee
@@ -13,9 +13,10 @@
 #define Private '$$$Public
 #define Global ^MDX2JSON
 #define Settings "Settings"
+#define Features "Features"
 
 #; For work with dynamic objects
-#if $$$comClassDefined("%Library.AbstractObject")
+#if (($$$comClassDefined("%Library.AbstractObject"))&&($get($$$Global($$$Features))["newjson"))
 	#define NewDynObj ##class(%Object).%New()
 	#define NewDynDTList ##class(%Array).%New()
 	#;define NewDynDTArray $$$NewDynDTList
