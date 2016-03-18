@@ -6,16 +6,8 @@ RESTful web api for MDX2JSON transformation (also JSONP and XML/A). Also support
 Installation
 -----------
 
-1. Download Installer.cls.xml (from MDX2JSON folder in repository or releases page) into Caché manager directory.
-2. Run in terminal (any namespace) under user with %All role: 
-
-        Do ##class(%Installer.Installer).InstallFromCommandLine(##class(%File).ManagerDirectory()_"Installer.cls.xml")
-
-Installation without fs access to server
------------
-
-1. Download Installer.cls.xml (from MDX2JSON folder in repository or releases page) into Caché Studio (any namespace)
-2. Run in terminal (any namespace) under user with %All role: 
+1. Download Installer.cls.xml (from MDX2JSON folder in repository or releases page) and import it into any namespace (via Studio or SMP or `$System.OBJ.Load()`) 
+2. Run in terminal (import namespace) under user with %All role: 
 
         Do ##class(MDX2JSON.Installer).setup()
         
