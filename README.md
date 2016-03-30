@@ -15,9 +15,11 @@ Offline Installation
 -----------
 
 1. Download zip and unpack it.
-2. Run in terminal (any namespace) under user with %All role: 
+2. Import Installer.cls.xml (from MDX2JSON folder in unpacked archive) and import it into any namespace (via Studio or SMP or `$System.OBJ.Load()`)
+3. Run in terminal (same namespace as 2) under user with %All role: 
 
-        Do ##class(%Installer.Installer).InstallFromCommandLine("{SourceDir}\Installer.cls.xml","SourceDir={SourceDir}")
+        Set pVars("SourceDir") = {SourceDir}
+        Do ##class(MDX2JSON.Installer).setup(.pVars)
 
   where: 
     
