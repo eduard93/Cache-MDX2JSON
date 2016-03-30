@@ -44,7 +44,7 @@ Regardless of installation method chosen, here's the list (by the order of appea
 Additional installation parameters
 -----------
 
-As a second parameter to `do ##class(%Installer.Installer).InstallFromCommandLine()`  you can supply a comma-separated list of additional variables. E.g.: User=MDX2JSON,Password=123456
+As a first parameter to `Do ##class(MDX2JSON.Installer).setup(.pVars)` you can pass pVars - a local array of additional variables (see sample in Offline Installation step 3).
 
 - `Namespace` is a namespace you want to install MDX2JSON to (Not namespace with dashes). If it does not exist it would be created automatically. If it does exist only MDX2JSON package would be overwritten. WebApplication would be named `/Namespace`. Strongly not recommended to change the default. [MDX2JSON]
 - `User` is a Caché user to create or modify. He will be given SELECT access to %DeepSee_Dashboard.Definition table in `Namespace`
