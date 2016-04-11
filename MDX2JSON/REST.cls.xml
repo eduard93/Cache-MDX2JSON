@@ -321,6 +321,8 @@ Wrapper for ##class(MDX2JSON.Users).SetConfig()</Description>
 </Method>
 
 <Method name="GetFavorites">
+<Description>
+Get a list of favorites for a current user</Description>
 <ClassMethod>1</ClassMethod>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
