@@ -120,7 +120,7 @@ Test method, outputs <b>%request</b>, <b>%response</b> and <b>%session</b> objec
 	if $$$Debug {
 		set obj.Roles = $Roles
 		set obj.Namespace = $Namespace
-		set obj.Cache = $zv
+		set obj.Cache = $ZVersion
 		set obj.SessionId = %session.SessionId
 		set obj.Request = %request
 		set obj.Response = %response
