@@ -93,7 +93,7 @@ Example: send HTTP GET request to web application with Dispatch class <b>MDX2JSO
 
 <Method name="Logout">
 <Description>
-End user session.</Description>
+End user session by force.</Description>
 <ClassMethod>1</ClassMethod>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
