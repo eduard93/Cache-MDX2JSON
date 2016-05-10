@@ -102,7 +102,7 @@ Opens DeepSee dashboard by it's name. Returns status of aatempt to locate and op
 	    CONTINUE:class'=dashclass
 	    
 	    /// second we check that it's the one we need
-	    quit:##class(MDX2JSON.DashboardRS).GetDashFullName(id)=DashName
+	    quit:$ZCVT(##class(MDX2JSON.DashboardRS).GetDashFullName(id),"L")=$ZCVT(DashName,"L")
 	 }
 	 return:id="" $$$ERROR($$$GeneralError,"Dashboard " _ DashName _ " does not exist")
 	 set Dashboard = ##class(%DeepSee.Dashboard.Definition).%OpenId(id,,.st)
@@ -407,6 +407,10 @@ Returns name of widget's pivot source cube.</Description>
 ]]></Implementation>
 </Method>
 
+<Storage name="Default">
+<Type>%Library.CacheStorage</Type>
+</Storage>
+
 <Method name="DetermineWidgetDataSource">
 <Description>
 Return datasource ifone exist, if it's a linked widget then follow the link and get that datasource.</Description>
@@ -436,9 +440,5 @@ Determines position of a widget in dashboard's widget list. </Description>
 	return ""
 ]]></Implementation>
 </Method>
-
-<Storage name="Default">
-<Type>%Library.CacheStorage</Type>
-</Storage>
 </Class>
 </Export>
