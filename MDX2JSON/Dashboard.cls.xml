@@ -46,7 +46,7 @@ Usage: Select MDX2JSON.Dashboard_GetDashCover(bookCover) FROM %DeepSee_Dashboard
 
 <Method name="IsItemVisible">
 <Description><![CDATA[
-Check visibility of folder item to user.<br>
+Check visibility of folder item to current user.<br>
 Usage: Select fullname, MDX2JSON.IsItemVisible(fullname) FROM %DeepSee_Dashboard.Definition]]></Description>
 <ClassMethod>1</ClassMethod>
 <FormalSpec>fullName:%String=""</FormalSpec>
