@@ -118,6 +118,7 @@ Converts %DeepSee.Dashboard.Definition widgets into %ZEN.proxyObject.</Descripti
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
 	#Dim widget As %DeepSee.Dashboard.Widget
+	
 	set Widgetlist = $$$NewDynObj
 	set Widgetlist.children = $$$NewDynObjList
 	set Widgetlist.displayInfo = ..GetDashboardDisplayInfo(Dashboard)
