@@ -62,7 +62,7 @@ Usage: Select fullname, MDX2JSON.IsItemVisible(fullname) FROM %DeepSee_Dashboard
 
 <Method name="ResolveText">
 <Description><![CDATA[
-Resolve a localized text string at run time.
+Resolve a localized text string at run time.<br>
 A localized string can take the following forms:<br>
 "String" -- not localized.<br>
 "$$$String" -- equivalent to $$$Text("String","DeepSeeUser")<br>
