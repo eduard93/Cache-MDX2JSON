@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Export generator="Cache" version="25" zv="Cache for Windows (x86-64) 2015.1.1 (Build 505U)" ts="2016-02-12 16:02:44">
-<Routine name="MDX2JSON.MDX2JSON" type="INC" timestamp="63960,57751.483094"><![CDATA[
+<Export generator="Cache" version="25" zv="Cache for Windows (x86-64) 2016.1 (Build 656U)" ts="2016-05-21 22:52:22">
+<Routine name="MDX2JSON.MDX2JSON" type="INC" timestamp="64059,82175.763423"><![CDATA[
 #include %occErrors
 #include %ZEN.Utils
 #include %DeepSee
@@ -40,5 +40,6 @@
 	#define ListGet(%obj,%i) %obj.GetAt(%i)
 #endif
 #define IsNewJSON ##Expression($$$comClassDefined("%Library.AbstractObject"))
+#define JSONEnabled ($get($$$Global($$$Features))["newjson")
 ]]></Routine>
 </Export>
