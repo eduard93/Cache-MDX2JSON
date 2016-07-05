@@ -465,22 +465,34 @@ pArgs - additional arguments]]></Description>
 <ProcedureBlock>0</ProcedureBlock>
 <ReturnType>%String</ReturnType>
 <Implementation><![CDATA[
-	set str=""
+	set tOldIORedirected = ##class(%Device).ReDirectIO()
+	set tOldMnemonic = ##class(%Device).GetMnemonicRoutine()
+	set tOldIO = $io
+	try {
+		set str=""
 
-	//Redirect IO to the current routine - makes use of the labels defined below
-	use $io::("^"_$ZNAME)
+		//Redirect IO to the current routine - makes use of the labels defined below
+		use $io::("^"_$ZNAME)
 
-	//Enable redirection
-	do ##class(%Device).ReDirectIO(1)
+		//Enable redirection
+		do ##class(%Device).ReDirectIO(1)
 
-	if $isobject(pObj) {
-		do $Method(pObj,pMethod,pArgs...)
-	} elseif $$$comClassDefined(pObj) {
-		do $ClassMethod(pObj,pMethod,pArgs...)
+		if $isobject(pObj) {
+			do $Method(pObj,pMethod,pArgs...)
+		} elseif $$$comClassDefined(pObj) {
+			do $ClassMethod(pObj,pMethod,pArgs...)
+		}
+	} catch ex {
+		set str = ""
 	}
 
-	//Disable redirection
-	do ##class(%Device).ReDirectIO(0)
+	//Return to original redirection/mnemonic routine settings
+	if (tOldMnemonic '= "") {
+		use tOldIO::("^"_tOldMnemonic)
+	} else {
+		use tOldIO
+	}
+	do ##class(%Device).ReDirectIO(tOldIORedirected)
 
 	quit str
 
