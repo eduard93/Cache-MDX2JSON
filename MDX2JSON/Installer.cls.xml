@@ -197,7 +197,7 @@ Process one directory of GitHub repository. Recursive.<br>
 	Set location = Request.Location
 	Set Request.Location = Request.Location _ Path
 
-	Set st = Request.Get()
+	Set st = Request.Get(,,$$$NO)
 	Return:$$$ISERR(st) st
 	Return:(Request.HttpResponse.StatusCode = 404) $$$ERROR($$$GeneralError,"Repository doesn't exist OR you don't have access")
 	Return:((Request.HttpResponse.StatusCode = 403) && (Request.HttpResponse.GetHeader("X-RATELIMIT-REMAINING")=0)) $$$ERROR($$$GeneralError,"API rate limit exceeded. Try logging in.")
