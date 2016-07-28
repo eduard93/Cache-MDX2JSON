@@ -112,7 +112,10 @@ Get <b>App</b> configuration for <b>User</b>]]></Description>
 <ClassMethod>1</ClassMethod>
 <FormalSpec>App:%String,User:%String=$Username</FormalSpec>
 <ReturnType>%String</ReturnType>
-<Implementation><![CDATA[	return $g($$$Global($$$Settings, User, App))
+<Implementation><![CDATA[
+	set config = $g($$$Global($$$Settings, User, App))
+	set:(config="") config = $g($$$Global($$$Settings, "DeepSeeWeb", App))
+	return config
 ]]></Implementation>
 </Method>
 
