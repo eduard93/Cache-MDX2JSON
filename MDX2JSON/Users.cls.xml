@@ -43,8 +43,8 @@ Set <b>App</b> configuration for all Users equal to <b>Config</b>]]></Descriptio
 <FormalSpec>App:%String,Config:%String=""</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-	set ns = $Namespace
-	zn "%SYS"
+	new $Namespace
+	set $Namespace = "%SYS"
 	return:'($$$IOwnAllRole) $$$ERROR($$$AccessDenied)
 
 	set rs=##Class(%ResultSet).%New("Security.Users:List")
@@ -52,7 +52,7 @@ Set <b>App</b> configuration for all Users equal to <b>Config</b>]]></Descriptio
 	while rs.Next() {
 		set st=$$$ADDSC(st,..SetConfig(App, Config, rs.Get("Name")))
 	}
-	zn ns
+	kill rs
 	return st
 ]]></Implementation>
 </Method>
