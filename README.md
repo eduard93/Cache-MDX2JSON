@@ -163,6 +163,16 @@ Open installed extension and set the following parameters:
 
 Press Send button to view results (depending on your server configuration you may be asked to provide valid login/password to access MDX2JSON api).
 
+Settings
+-----------
+
+User can save and get arbitrary settings for an abstract application (usually - Namespace). Settings are accessible throughout the system.
+To set a setting for a user, execute: `do ##class(MDX2JSON.Users).SetConfig(Application, SettingsValue, Username)` or send a request at a corresponding `POST /Config` with the JSON body containing `Application` property and `Config` property which can be a string or a JSON object. Note that in a WEB context user is not allowed to specify a username, it's calculated automatically. 
+To get a setting  for an abstract application  `write ##class(MDX2JSON.Users).GetConfig(Application, Username)` or send a request at a corresponding `GET /Config/:Application` path.
+
+User can have a `MDX2JSONSettings` role which allows him to get/set a default setting for an application. If the user (any user) does not have a setting for an Application, the default setting for an application would be used.
+
+
 Development
 -----------
 

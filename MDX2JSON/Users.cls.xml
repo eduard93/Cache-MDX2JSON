@@ -7,6 +7,19 @@ Can also export/import dettings to/from <b>files</b>.]]></Description>
 <IncludeCode>MDX2JSON.MDX2JSON</IncludeCode>
 <TimeCreated>63669,64053.502396</TimeCreated>
 
+<Method name="GetConfig">
+<Description><![CDATA[
+Get <b>App</b> configuration for <b>User</b>]]></Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>App:%String,User:%String=$Username</FormalSpec>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[
+	set config = $g($$$Global($$$Settings, User, App))
+	set:((config="")||($Roles[$$$DefaultSettingsRole)) config = $g($$$Global($$$Settings, $$$DefaultUser, App))
+	return config
+]]></Implementation>
+</Method>
+
 <Method name="SetConfig">
 <Description><![CDATA[
 Set <b>App</b> configuration for <b>User</b> equal to <b>Config</b>]]></Description>
@@ -14,7 +27,11 @@ Set <b>App</b> configuration for <b>User</b> equal to <b>Config</b>]]></Descript
 <FormalSpec>App:%String,Config:%String="",User:%String=$Username</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-	set $$$Global($$$Settings, User, App) = Config
+	if ($Roles[$$$DefaultSettingsRole) {
+		set $$$Global($$$Settings, $$$DefaultUser, App) = Config
+	} else {
+		set $$$Global($$$Settings, User, App) = Config
+	}
 	return $$$OK
 ]]></Implementation>
 </Method>
@@ -103,19 +120,6 @@ Get <b>App</b> configuration for <b>User</b> from Security.Users:Attributes prop
 	set st =##class(Security.Users).Get(User,.Properties)
 	zn ns
 	return $lg($g(Properties("Attributes",App)))
-]]></Implementation>
-</Method>
-
-<Method name="GetConfig">
-<Description><![CDATA[
-Get <b>App</b> configuration for <b>User</b>]]></Description>
-<ClassMethod>1</ClassMethod>
-<FormalSpec>App:%String,User:%String=$Username</FormalSpec>
-<ReturnType>%String</ReturnType>
-<Implementation><![CDATA[
-	set config = $g($$$Global($$$Settings, User, App))
-	set:(config="") config = $g($$$Global($$$Settings, "DeepSeeWeb", App))
-	return config
 ]]></Implementation>
 </Method>
 

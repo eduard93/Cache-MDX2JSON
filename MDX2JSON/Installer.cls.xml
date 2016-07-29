@@ -15,7 +15,7 @@ todo add optional parameter WEBAPP to Alter web app name if it needs to have ano
 <Log Text="Set namespace to ${Namespace}" Level="0"/>
 </IfNotDef>
 
-<!--<Role Name="MDX2JSON" Description="Role to access and use MDX2JSON API" Resources="%DB_CACHESYS:RW,%Admin_Secure:U" />-->
+<Role Name="MDX2JSONSettings" Description="Role to access and set default MDX2JSON settings for an App"/>
 
 <If Condition='(##class(Config.Namespaces).Exists("${Namespace}")=0)'>
 <Log Text="Creating namespace ${Namespace}" Level="0"/>
