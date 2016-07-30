@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Export generator="Cache" version="25" zv="Cache for Windows (x86-64) 2016.1 (Build 656U)" ts="2016-05-21 22:52:22">
-<Routine name="MDX2JSON.MDX2JSON" type="INC" timestamp="64059,82175.763423"><![CDATA[
+<Export generator="Cache" version="25" zv="Cache for Windows (x86-64) 2016.1 (Build 656U)" ts="2016-07-30 12:25:42">
+<Routine name="MDX2JSON.MDX2JSON" type="INC" timestamp="64128,34461.753456"><![CDATA[
 #include %occErrors
 #include %ZEN.Utils
 #include %DeepSee
@@ -14,6 +14,8 @@
 #define Global ^MDX2JSON
 #define Settings "Settings"
 #define Features "Features"
+#define DefaultUser "DeepSeeWeb"
+#define DefaultSettingsRole "MDX2JSONSettings"
 
 #; For work with dynamic objects
 #if (($$$comClassDefined("%Library.AbstractObject"))&&($get($$$Global($$$Features))["newjson"))
