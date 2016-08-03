@@ -173,6 +173,11 @@ To get a setting  for an abstract application  `write ##class(MDX2JSON.Users).Ge
 
 User can have a `MDX2JSONSettings` role which allows him to get/set a default setting for an application. If the user (any user) does not have a setting for an Application, the default setting for an application would be used.
 
+Calling MDX2JSON from another server
+-----------
+
+Here's an [example](https://github.com/eduard93/Utils/blob/master/Utils/MDX2JSON.cls.xml).
+
 
 Development
 -----------
