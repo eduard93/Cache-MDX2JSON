@@ -95,6 +95,7 @@ These are the possible requests to web application (add param ?Namespace={Desire
 | Favorites                   | GET  |                             | JSON      | Array of current user favorites|
 | Favorites/:Item             | POST |                             | JSON      | Add favorite item              |
 | Favorites/:Item             |DELETE|                             | JSON      | Remove item from favorites     |
+| PivotVariables/:Cube        | GET  |                             | JSON      |Get all pivot variables for cube|
 | Test                        | GET  |                             | JSON      | Test info                      |
 | Logout                      | GET  |                             | JSON      | Close session                  |
 

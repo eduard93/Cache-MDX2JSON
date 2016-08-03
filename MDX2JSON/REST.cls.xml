@@ -70,6 +70,9 @@ Example: send HTTP GET request to web application with Dispatch class <b>MDX2JSO
 
    <!-- Get info about pivot-->
    <Route Url="/TermList" Method="POST" Call="GetTermList" Body="TermList"/>
+   
+   <!-- Get info about pivot variables-->
+   <Route Url="/PivotVariables/:Cube" Method="GET" Call="WritePivotVariablesForCube"/>
 
    <!-- Get info about user config-->
    <Route Url="/Config" Method="POST" Call="SetConfig" Body="Application"/>
@@ -360,6 +363,19 @@ Get a list of favorites for a current user</Description>
 	set Cube = $ZCONVERT($ZCONVERT(Cube ,"I","URL") ,"I","UTF8")
 	set Action = $ZCONVERT($ZCONVERT(Action ,"I","URL") ,"I","UTF8")
 	return ##class(MDX2JSON.Utils).ExecuteAction(Cube,Action,%request.Content)
+]]></Implementation>
+</Method>
+
+<Method name="WritePivotVariablesForCube">
+<Description><![CDATA[
+Return a list of available pivot variables for <var>Cupe</var>.
+See correspontding method from DeepSee.REST.v1.InfoServer ]]></Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>Cube:%String</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	set Cube = $ZCONVERT($ZCONVERT(Cube,"I","URL") ,"I","UTF8")
+	return ##class(MDX2JSON.Utils).WritePivotVariablesForCube(Cube)
 ]]></Implementation>
 </Method>
 </Class>

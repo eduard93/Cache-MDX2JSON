@@ -357,5 +357,34 @@ Get format defaults.</Description>
 	return st
 ]]></Implementation>
 </Method>
+
+<Method name="WritePivotVariablesForCube">
+<Description><![CDATA[
+Return a list of available pivot variables for <var>Cupe</var>.
+See correspontding method from DeepSee.REST.v1.InfoServer ]]></Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>Cube:%String</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	set st = $$$OK
+	try {
+		quit:'##class(%DeepSee.Utils).%CubeExists(Cube, .st) 
+		
+		set st = ##class(%DeepSee.Utils).%GetPivotVariables(Cube, .vars)
+		
+		if $$$ISOK(st)&&('$data(vars)) {
+			set st = $$$ERROR($$$GeneralError,$$$FormatText("No pivot variables available for %1", Cube))
+		}
+		quit:$$$ISERR(st)
+		
+		set st = ##class(%ZEN.Auxiliary.jsonProvider).%ArrayToJSON($lb("name", "caption", "defValue", "context", "desc"),.vars)
+	}
+	catch ex {
+		set st = ex.AsStatus()
+	}
+	
+	quit st
+]]></Implementation>
+</Method>
 </Class>
 </Export>
