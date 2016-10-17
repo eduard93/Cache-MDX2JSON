@@ -86,6 +86,8 @@ Example: send HTTP GET request to web application with Dispatch class <b>MDX2JSO
    <!-- Valid but illicit, do not use-->
    <Route Url="/MDX/:query" Method="GET" Call="WriteJSONfromMDXURL"/>
    <Route Url="/MDXfilters/:query" Method="GET" Call="WriteFiltersForMDX"/>
+   
+    <Route Url="/KPI" Method="POST" Call="%DeepSee.REST.v1.DataServer:WriteJSONfromKPI"/>
 
    <!-- Test method-->
    <Route Url="/Test" Method="GET" Call="Test"/>
