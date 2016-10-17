@@ -156,6 +156,13 @@ Converts relevant parts of %DeepSee.Dashboard.Widget object into %ZEN.proxyObjec
 		set basemdx = ""
 		set obj.Link = Widget.dataLink
 	}
+	
+	// datasource is a kpi
+	if $piece(Widget.dataSource, ".", *) = "kpi" {
+		set kpiName = $zcvt($piece(Widget.dataSource, ".", 1, *-1), "U")
+		set kpiClass = $$$DeepSeeMetaGLVN("kpis", kpiName)
+		set obj.kpitype = $classmethod(kpiClass, "%GetSourceType")
+	}
 
 	set obj.mdx = mdx
 	set obj.name = Widget.name
