@@ -159,8 +159,7 @@ Converts relevant parts of %DeepSee.Dashboard.Widget object into %ZEN.proxyObjec
 	
 	// datasource is a kpi
 	if $piece(Widget.dataSource, ".", *) = "kpi" {
-		set kpiName = $zcvt($piece(Widget.dataSource, ".", 1, *-1), "U")
-		set kpiClass = $$$DeepSeeMetaGLVN("kpis", kpiName)
+		set kpiClass = ##class(%DeepSee.Utils).%GetKPIClass(Widget.dataSource)
 		set obj.kpitype = $classmethod(kpiClass, "%GetSourceType")
 	}
 
