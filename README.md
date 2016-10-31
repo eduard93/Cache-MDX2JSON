@@ -193,3 +193,18 @@ To develop MDX2JSON you need:
 
 4. Activate Cache-Tort-Git for `MDX2JSON` namespace
 5. Commit all changes via Studio
+
+
+KPI
+-----------
+
+To use KPIs and display row name add this method to KPI class 
+
+    ClassMethod %OnGetKPIPropertyInfo(ByRef pList As %String, pPropNo As %Integer, pModelId As %String = "") As %Status
+    {
+	    Set pPropNo = pPropNo + 1
+	    Set pList(pPropNo) = "%series"
+	    Set pList(pPropNo, "defaultValue") = ""
+	    Set pList(pPropNo, "columnNo") = pPropNo
+	    Quit $$$OK
+    }
