@@ -8,7 +8,12 @@ Classes with support methods for testing MDX2JSON</Description>
 
 <Parameter name="LastCommit">
 <Type>%String</Type>
-<Default>03f17b4de55ca112aebe64c5190825a73a3ab8d4</Default>
+<Default>f366db5c593e9a23063ee3b5822a2542a793579c</Default>
+</Parameter>
+
+<Parameter name="LastCommitTS">
+<Type>%TimeStamp</Type>
+<Default>2016-11-24 14:11:59.150</Default>
 </Parameter>
 
 <Method name="ProjectLength">
@@ -195,10 +200,9 @@ Sets LastCommit parameter to last successful commit and exports this class.]]></
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
 	return:Command'="commit" $$$OK
-	set SHAHash = ..GetLastCommitHash()	
-	set Parameter = ##class(%Dictionary.ParameterDefinition).IDKEYOpen($classname(), "LastCommit")
-	set Parameter.Default = SHAHash
-	set Status = Parameter.%Save()
+	set Status = ..SetParameter(, "LastCommit", ..GetLastCommitHash())
+	return:$$$ISERR(Status) Status
+	set Status = ..SetParameter(, "LastCommitTS", $ZDT($ZTIMESTAMP, 3, 1, 3))
 	return:$$$ISERR(Status) Status
 	do ##class(%SourceControl.Git.Utils).UpdateRoutineTSH("MDX2JSON.Tests.cls")
 	return ##class(%SourceControl.Git.Utils).ExportItem("MDX2JSON.Tests.cls")
@@ -224,6 +228,19 @@ Cache-Tort-Git source-control plug-in]]></Description>
 	set SHAHash = HeadRefFile.ReadLine()
 	do HeadRefFile.Close()
 	return SHAHash
+]]></Implementation>
+</Method>
+
+<Method name="SetParameter">
+<Description><![CDATA[
+Set Class Parameter equal to Value<]]></Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>Class:%String=$classname(),Parameter:%String,Value:%String</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	set Parameter = ##class(%Dictionary.ParameterDefinition).IDKEYOpen(Class, Parameter)
+	set Parameter.Default = Value
+	return Parameter.%Save()
 ]]></Implementation>
 </Method>
 </Class>
