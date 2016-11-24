@@ -89,9 +89,12 @@ Example: send HTTP GET request to web application with Dispatch class <b>MDX2JSO
    
     <Route Url="/KPI" Method="POST" Call="%DeepSee.REST.v1.DataServer:WriteJSONfromKPI"/>
 
-   <!-- Test method-->
+   <!-- Test methods-->
    <Route Url="/Test" Method="GET" Call="Test"/>
    <Route Url="/Logout" Method="GET" Call="Logout"/>
+   
+   <!-- DSW specific methods-->
+   <Route Url="/Addons" Method="GET" Call="WriteAddons"/>
  </Routes>
 ]]></Data>
 </XData>
@@ -378,6 +381,36 @@ See correspontding method from DeepSee.REST.v1.InfoServer ]]></Description>
 <Implementation><![CDATA[
 	set Cube = $ZCONVERT($ZCONVERT(Cube,"I","URL") ,"I","UTF8")
 	return ##class(MDX2JSON.Utils).WritePivotVariablesForCube(Cube)
+]]></Implementation>
+</Method>
+
+<Method name="WriteAddons">
+<Description>
+DSW Specific method, returns available addons</Description>
+<ClassMethod>1</ClassMethod>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	#dim sc As %Status = $$$OK
+	new $namespace
+	set $namespace = "%SYS"
+	
+	set sc = ##class(Security.Applications).Get("/dsw", .prop)
+	if ($$$ISERR(sc) && ($system.Status.GetErrorCodes(sc) = $$$ApplicationDoesNotExist)) {
+		set sc = ##class(Security.Applications).Get("/dsweb", .prop)
+	}
+	quit:$$$ISERR(sc) sc
+	
+	set path = ##class(%File).NormalizeDirectory(prop("Path")) 
+	set path = ##class(%File).NormalizeDirectory(path _ "addons")
+	
+	#dim rs As %SQL.ClassQueryResultSet = ##class(%File).FileSetFunc(path, "*.js")
+	
+	set list = $$$NewDynDTList
+	while rs.%Next() {
+		$$$Insert(list, rs.ItemName)
+	}
+	$$$ListToJSON(list)
+    quit $$$OK
 ]]></Implementation>
 </Method>
 </Class>
