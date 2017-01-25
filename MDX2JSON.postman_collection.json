@@ -1,0 +1,925 @@
+{
+	"variables": [],
+	"info": {
+		"name": "MDX2JSON",
+		"_postman_id": "4f4197a2-af94-b40d-5797-352848f70631",
+		"description": "A collection to query MDX2JSON REST API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Test",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"response code is 401\"] = responseCode.code === 401;",
+							"tests[\"response has WWW-Authenticate header\"] = (postman.getResponseHeader('WWW-Authenticate'));",
+							"",
+							"var authenticateHeader = postman.getResponseHeader('WWW-Authenticate'),",
+							"    realmStart = authenticateHeader.indexOf('\"',authenticateHeader.indexOf(\"realm\")) + 1 ,",
+							"    realmEnd = authenticateHeader.indexOf('\"',realmStart),",
+							"    realm = authenticateHeader.slice(realmStart,realmEnd),",
+							"    nonceStart = authenticateHeader.indexOf('\"',authenticateHeader.indexOf(\"nonce\")) + 1,",
+							"    nonceEnd = authenticateHeader.indexOf('\"',nonceStart),",
+							"    nonce = authenticateHeader.slice(nonceStart,nonceEnd);",
+							"    ",
+							"postman.setGlobalVariable('echo_digest_realm', realm);",
+							"postman.setGlobalVariable('echo_digest_nonce', nonce);"
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"username": "{{user}}",
+						"password": "{{pass}}",
+						"saveHelperData": true,
+						"showPassword": false
+					}
+				},
+				"url": "http://{{host}}:{{port}}/MDX2JSON/Test?Namespace={{ns}}",
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Basic e3t1c2VyfX06e3twYXNzfX0=",
+						"description": ""
+					}
+				],
+				"body": {},
+				"description": "Test information. Add Debug url param for more information"
+			},
+			"response": []
+		},
+		{
+			"name": "Format",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"response code is 401\"] = responseCode.code === 401;",
+							"tests[\"response has WWW-Authenticate header\"] = (postman.getResponseHeader('WWW-Authenticate'));",
+							"",
+							"var authenticateHeader = postman.getResponseHeader('WWW-Authenticate'),",
+							"    realmStart = authenticateHeader.indexOf('\"',authenticateHeader.indexOf(\"realm\")) + 1 ,",
+							"    realmEnd = authenticateHeader.indexOf('\"',realmStart),",
+							"    realm = authenticateHeader.slice(realmStart,realmEnd),",
+							"    nonceStart = authenticateHeader.indexOf('\"',authenticateHeader.indexOf(\"nonce\")) + 1,",
+							"    nonceEnd = authenticateHeader.indexOf('\"',nonceStart),",
+							"    nonce = authenticateHeader.slice(nonceStart,nonceEnd);",
+							"    ",
+							"postman.setGlobalVariable('echo_digest_realm', realm);",
+							"postman.setGlobalVariable('echo_digest_nonce', nonce);"
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"username": "{{user}}",
+						"password": "{{pass}}",
+						"saveHelperData": true,
+						"showPassword": false
+					}
+				},
+				"url": "http://{{host}}:{{port}}/MDX2JSON/Format?Namespace={{ns}}",
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Basic e3t1c2VyfX06e3twYXNzfX0=",
+						"description": ""
+					}
+				],
+				"body": {},
+				"description": "Default formatting values for this system"
+			},
+			"response": []
+		},
+		{
+			"name": "Dashboards",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"username": "{{user}}",
+						"password": "{{pass}}",
+						"saveHelperData": true,
+						"showPassword": false
+					}
+				},
+				"url": "http://{{host}}:{{port}}/MDX2JSON/Dashboards?Namespace={{ns}}",
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Basic e3t1c2VyfX06e3twYXNzfX0=",
+						"description": ""
+					}
+				],
+				"body": {},
+				"description": "Get a list of dashboards"
+			},
+			"response": []
+		},
+		{
+			"name": "Dashboard",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"response code is 401\"] = responseCode.code === 401;",
+							"tests[\"response has WWW-Authenticate header\"] = (postman.getResponseHeader('WWW-Authenticate'));",
+							"",
+							"var authenticateHeader = postman.getResponseHeader('WWW-Authenticate'),",
+							"    realmStart = authenticateHeader.indexOf('\"',authenticateHeader.indexOf(\"realm\")) + 1 ,",
+							"    realmEnd = authenticateHeader.indexOf('\"',realmStart),",
+							"    realm = authenticateHeader.slice(realmStart,realmEnd),",
+							"    nonceStart = authenticateHeader.indexOf('\"',authenticateHeader.indexOf(\"nonce\")) + 1,",
+							"    nonceEnd = authenticateHeader.indexOf('\"',nonceStart),",
+							"    nonce = authenticateHeader.slice(nonceStart,nonceEnd);",
+							"    ",
+							"postman.setGlobalVariable('echo_digest_realm', realm);",
+							"postman.setGlobalVariable('echo_digest_nonce', nonce);"
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"username": "{{user}}",
+						"password": "{{pass}}",
+						"saveHelperData": true,
+						"showPassword": false
+					}
+				},
+				"url": "http://{{host}}:{{port}}/MDX2JSON/Dashboard?Namespace={{ns}}",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Basic e3t1c2VyfX06e3twYXNzfX0=",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"Dashboard\":\"Widget Examples/All Charts.dashboard\"\n}"
+				},
+				"description": "Get information about dashboard. Returns all widgets in a dashboard, with filters as part of dashboard"
+			},
+			"response": []
+		},
+		{
+			"name": "Widgets",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"response code is 401\"] = responseCode.code === 401;",
+							"tests[\"response has WWW-Authenticate header\"] = (postman.getResponseHeader('WWW-Authenticate'));",
+							"",
+							"var authenticateHeader = postman.getResponseHeader('WWW-Authenticate'),",
+							"    realmStart = authenticateHeader.indexOf('\"',authenticateHeader.indexOf(\"realm\")) + 1 ,",
+							"    realmEnd = authenticateHeader.indexOf('\"',realmStart),",
+							"    realm = authenticateHeader.slice(realmStart,realmEnd),",
+							"    nonceStart = authenticateHeader.indexOf('\"',authenticateHeader.indexOf(\"nonce\")) + 1,",
+							"    nonceEnd = authenticateHeader.indexOf('\"',nonceStart),",
+							"    nonce = authenticateHeader.slice(nonceStart,nonceEnd);",
+							"    ",
+							"postman.setGlobalVariable('echo_digest_realm', realm);",
+							"postman.setGlobalVariable('echo_digest_nonce', nonce);"
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"username": "{{user}}",
+						"password": "{{pass}}",
+						"saveHelperData": true,
+						"showPassword": false
+					}
+				},
+				"url": "http://{{host}}:{{port}}/MDX2JSON/Widgets?Namespace={{ns}}",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Basic e3t1c2VyfX06e3twYXNzfX0=",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"Dashboard\":\"Widget Examples/All Charts.dashboard\"\n}"
+				},
+				"description": "Get information about dashboard. Returns all widgets in a dashboard, with filters as part of widgets."
+			},
+			"response": []
+		},
+		{
+			"name": "DataSource",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"response code is 401\"] = responseCode.code === 401;",
+							"tests[\"response has WWW-Authenticate header\"] = (postman.getResponseHeader('WWW-Authenticate'));",
+							"",
+							"var authenticateHeader = postman.getResponseHeader('WWW-Authenticate'),",
+							"    realmStart = authenticateHeader.indexOf('\"',authenticateHeader.indexOf(\"realm\")) + 1 ,",
+							"    realmEnd = authenticateHeader.indexOf('\"',realmStart),",
+							"    realm = authenticateHeader.slice(realmStart,realmEnd),",
+							"    nonceStart = authenticateHeader.indexOf('\"',authenticateHeader.indexOf(\"nonce\")) + 1,",
+							"    nonceEnd = authenticateHeader.indexOf('\"',nonceStart),",
+							"    nonce = authenticateHeader.slice(nonceStart,nonceEnd);",
+							"    ",
+							"postman.setGlobalVariable('echo_digest_realm', realm);",
+							"postman.setGlobalVariable('echo_digest_nonce', nonce);"
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"username": "{{user}}",
+						"password": "{{pass}}",
+						"saveHelperData": true,
+						"showPassword": false
+					}
+				},
+				"url": "http://{{host}}:{{port}}/MDX2JSON/DataSource?Namespace={{ns}}",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Basic e3t1c2VyfX06e3twYXNzfX0=",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"DataSource\":\"Chart Demos/Bar Chart.pivot\"\n}"
+				},
+				"description": "Information about pivot"
+			},
+			"response": []
+		},
+		{
+			"name": "MDX",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"response code is 401\"] = responseCode.code === 401;",
+							"tests[\"response has WWW-Authenticate header\"] = (postman.getResponseHeader('WWW-Authenticate'));",
+							"",
+							"var authenticateHeader = postman.getResponseHeader('WWW-Authenticate'),",
+							"    realmStart = authenticateHeader.indexOf('\"',authenticateHeader.indexOf(\"realm\")) + 1 ,",
+							"    realmEnd = authenticateHeader.indexOf('\"',realmStart),",
+							"    realm = authenticateHeader.slice(realmStart,realmEnd),",
+							"    nonceStart = authenticateHeader.indexOf('\"',authenticateHeader.indexOf(\"nonce\")) + 1,",
+							"    nonceEnd = authenticateHeader.indexOf('\"',nonceStart),",
+							"    nonce = authenticateHeader.slice(nonceStart,nonceEnd);",
+							"    ",
+							"postman.setGlobalVariable('echo_digest_realm', realm);",
+							"postman.setGlobalVariable('echo_digest_nonce', nonce);"
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"username": "{{user}}",
+						"password": "{{pass}}",
+						"saveHelperData": true,
+						"showPassword": false
+					}
+				},
+				"url": "http://{{host}}:{{port}}/MDX2JSON/MDX?Namespace={{ns}}",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Basic e3t1c2VyfX06e3twYXNzfX0=",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"MDX\":\"SELECT FROM [HOLEFOODS]\"\n}"
+				},
+				"description": "Execute MDX query and get results in JSON"
+			},
+			"response": []
+		},
+		{
+			"name": "MDXDrillthrough",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"username": "{{user}}",
+						"password": "{{pass}}",
+						"saveHelperData": true,
+						"showPassword": false
+					}
+				},
+				"url": "http://{{host}}:{{port}}/MDX2JSON/MDXDrillthrough?Namespace={{ns}}",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Basic e3t1c2VyfX06e3twYXNzfX0=",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"MDX\":\"DRILLTHROUGH SELECT FROM [HOLEFOODS]\"\n}"
+				},
+				"description": "Execute MDX Drillthrough query and get results as JSON"
+			},
+			"response": []
+		},
+		{
+			"name": "Filters",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"response code is 401\"] = responseCode.code === 401;",
+							"tests[\"response has WWW-Authenticate header\"] = (postman.getResponseHeader('WWW-Authenticate'));",
+							"",
+							"var authenticateHeader = postman.getResponseHeader('WWW-Authenticate'),",
+							"    realmStart = authenticateHeader.indexOf('\"',authenticateHeader.indexOf(\"realm\")) + 1 ,",
+							"    realmEnd = authenticateHeader.indexOf('\"',realmStart),",
+							"    realm = authenticateHeader.slice(realmStart,realmEnd),",
+							"    nonceStart = authenticateHeader.indexOf('\"',authenticateHeader.indexOf(\"nonce\")) + 1,",
+							"    nonceEnd = authenticateHeader.indexOf('\"',nonceStart),",
+							"    nonce = authenticateHeader.slice(nonceStart,nonceEnd);",
+							"    ",
+							"postman.setGlobalVariable('echo_digest_realm', realm);",
+							"postman.setGlobalVariable('echo_digest_nonce', nonce);"
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"username": "{{user}}",
+						"password": "{{pass}}",
+						"saveHelperData": true,
+						"showPassword": false
+					}
+				},
+				"url": "http://{{host}}:{{port}}/MDX2JSON/Filters?Namespace={{ns}}",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Basic e3t1c2VyfX06e3twYXNzfX0=",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"DataSource\":\"HOLEFOODS.cube\",\n\t\"Values\": 1,\n\t\"Search\":\"North\"\n}"
+				},
+				"description": "All filters for DeepSee DataSource (cube, pivot, kpi, metric) with values (if Values = 1, set to 0 or omit otherwise). If Search is not empty only filter values, containing search term would be returned."
+			},
+			"response": []
+		},
+		{
+			"name": "TermList",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"response code is 401\"] = responseCode.code === 401;",
+							"tests[\"response has WWW-Authenticate header\"] = (postman.getResponseHeader('WWW-Authenticate'));",
+							"",
+							"var authenticateHeader = postman.getResponseHeader('WWW-Authenticate'),",
+							"    realmStart = authenticateHeader.indexOf('\"',authenticateHeader.indexOf(\"realm\")) + 1 ,",
+							"    realmEnd = authenticateHeader.indexOf('\"',realmStart),",
+							"    realm = authenticateHeader.slice(realmStart,realmEnd),",
+							"    nonceStart = authenticateHeader.indexOf('\"',authenticateHeader.indexOf(\"nonce\")) + 1,",
+							"    nonceEnd = authenticateHeader.indexOf('\"',nonceStart),",
+							"    nonce = authenticateHeader.slice(nonceStart,nonceEnd);",
+							"    ",
+							"postman.setGlobalVariable('echo_digest_realm', realm);",
+							"postman.setGlobalVariable('echo_digest_nonce', nonce);"
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"username": "{{user}}",
+						"password": "{{pass}}",
+						"saveHelperData": true,
+						"showPassword": false
+					}
+				},
+				"url": "http://{{host}}:{{port}}/MDX2JSON/TermList?Namespace={{ns}}",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Basic e3t1c2VyfX06e3twYXNzfX0=",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"TermList\":\"Region Colors\"\n}"
+				},
+				"description": "Termlist key-value array"
+			},
+			"response": []
+		},
+		{
+			"name": "Action/:cube/:action",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"response code is 401\"] = responseCode.code === 401;",
+							"tests[\"response has WWW-Authenticate header\"] = (postman.getResponseHeader('WWW-Authenticate'));",
+							"",
+							"var authenticateHeader = postman.getResponseHeader('WWW-Authenticate'),",
+							"    realmStart = authenticateHeader.indexOf('\"',authenticateHeader.indexOf(\"realm\")) + 1 ,",
+							"    realmEnd = authenticateHeader.indexOf('\"',realmStart),",
+							"    realm = authenticateHeader.slice(realmStart,realmEnd),",
+							"    nonceStart = authenticateHeader.indexOf('\"',authenticateHeader.indexOf(\"nonce\")) + 1,",
+							"    nonceEnd = authenticateHeader.indexOf('\"',nonceStart),",
+							"    nonce = authenticateHeader.slice(nonceStart,nonceEnd);",
+							"    ",
+							"postman.setGlobalVariable('echo_digest_realm', realm);",
+							"postman.setGlobalVariable('echo_digest_nonce', nonce);"
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"username": "{{user}}",
+						"password": "{{pass}}",
+						"saveHelperData": true,
+						"showPassword": false
+					}
+				},
+				"url": "http://{{host}}:{{port}}/MDX2JSON/Action/HOLEFOODS/ActionA?Namespace={{ns}}",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Basic e3t1c2VyfX06e3twYXNzfX0=",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"Propety\":\"Value\"\n}"
+				},
+				"description": "Execute custom cube action. \n\nBody should be a valid JSON. It is converted into dynamic object and passed as a second argument to %OnDashboardAction method of custom actions class for a cube. Action name is passed as a first argument."
+			},
+			"response": []
+		},
+		{
+			"name": "PivotVariables/:cube",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"response code is 401\"] = responseCode.code === 401;",
+							"tests[\"response has WWW-Authenticate header\"] = (postman.getResponseHeader('WWW-Authenticate'));",
+							"",
+							"var authenticateHeader = postman.getResponseHeader('WWW-Authenticate'),",
+							"    realmStart = authenticateHeader.indexOf('\"',authenticateHeader.indexOf(\"realm\")) + 1 ,",
+							"    realmEnd = authenticateHeader.indexOf('\"',realmStart),",
+							"    realm = authenticateHeader.slice(realmStart,realmEnd),",
+							"    nonceStart = authenticateHeader.indexOf('\"',authenticateHeader.indexOf(\"nonce\")) + 1,",
+							"    nonceEnd = authenticateHeader.indexOf('\"',nonceStart),",
+							"    nonce = authenticateHeader.slice(nonceStart,nonceEnd);",
+							"    ",
+							"postman.setGlobalVariable('echo_digest_realm', realm);",
+							"postman.setGlobalVariable('echo_digest_nonce', nonce);"
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"username": "{{user}}",
+						"password": "{{pass}}",
+						"saveHelperData": true,
+						"showPassword": false
+					}
+				},
+				"url": "http://{{host}}:{{port}}/MDX2JSON/PivotVariables/HOLEFOODS?Namespace={{ns}}",
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Basic e3t1c2VyfX06e3twYXNzfX0=",
+						"description": ""
+					}
+				],
+				"body": {},
+				"description": "Get all pivot variables for cube. \nDon't forget to provide cube name."
+			},
+			"response": []
+		},
+		{
+			"name": "Favorites",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"response code is 401\"] = responseCode.code === 401;",
+							"tests[\"response has WWW-Authenticate header\"] = (postman.getResponseHeader('WWW-Authenticate'));",
+							"",
+							"var authenticateHeader = postman.getResponseHeader('WWW-Authenticate'),",
+							"    realmStart = authenticateHeader.indexOf('\"',authenticateHeader.indexOf(\"realm\")) + 1 ,",
+							"    realmEnd = authenticateHeader.indexOf('\"',realmStart),",
+							"    realm = authenticateHeader.slice(realmStart,realmEnd),",
+							"    nonceStart = authenticateHeader.indexOf('\"',authenticateHeader.indexOf(\"nonce\")) + 1,",
+							"    nonceEnd = authenticateHeader.indexOf('\"',nonceStart),",
+							"    nonce = authenticateHeader.slice(nonceStart,nonceEnd);",
+							"    ",
+							"postman.setGlobalVariable('echo_digest_realm', realm);",
+							"postman.setGlobalVariable('echo_digest_nonce', nonce);"
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"username": "{{user}}",
+						"password": "{{pass}}",
+						"saveHelperData": true,
+						"showPassword": false
+					}
+				},
+				"url": "http://{{host}}:{{port}}/MDX2JSON/Favorites?Namespace={{ns}}",
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Basic e3t1c2VyfX06e3twYXNzfX0=",
+						"description": ""
+					}
+				],
+				"body": {},
+				"description": "Current user favorites"
+			},
+			"response": []
+		},
+		{
+			"name": "Favorites/:item",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"response code is 401\"] = responseCode.code === 401;",
+							"tests[\"response has WWW-Authenticate header\"] = (postman.getResponseHeader('WWW-Authenticate'));",
+							"",
+							"var authenticateHeader = postman.getResponseHeader('WWW-Authenticate'),",
+							"    realmStart = authenticateHeader.indexOf('\"',authenticateHeader.indexOf(\"realm\")) + 1 ,",
+							"    realmEnd = authenticateHeader.indexOf('\"',realmStart),",
+							"    realm = authenticateHeader.slice(realmStart,realmEnd),",
+							"    nonceStart = authenticateHeader.indexOf('\"',authenticateHeader.indexOf(\"nonce\")) + 1,",
+							"    nonceEnd = authenticateHeader.indexOf('\"',nonceStart),",
+							"    nonce = authenticateHeader.slice(nonceStart,nonceEnd);",
+							"    ",
+							"postman.setGlobalVariable('echo_digest_realm', realm);",
+							"postman.setGlobalVariable('echo_digest_nonce', nonce);"
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"username": "{{user}}",
+						"password": "{{pass}}",
+						"saveHelperData": true,
+						"showPassword": false
+					}
+				},
+				"url": "http://{{host}}:{{port}}/MDX2JSON/Favorites/Basic Dashboard Demo.dashboard?Namespace={{ns}}",
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Basic e3t1c2VyfX06e3twYXNzfX0=",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"description": "Remove item from favorites."
+			},
+			"response": []
+		},
+		{
+			"name": "Favorites/:item",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"response code is 401\"] = responseCode.code === 401;",
+							"tests[\"response has WWW-Authenticate header\"] = (postman.getResponseHeader('WWW-Authenticate'));",
+							"",
+							"var authenticateHeader = postman.getResponseHeader('WWW-Authenticate'),",
+							"    realmStart = authenticateHeader.indexOf('\"',authenticateHeader.indexOf(\"realm\")) + 1 ,",
+							"    realmEnd = authenticateHeader.indexOf('\"',realmStart),",
+							"    realm = authenticateHeader.slice(realmStart,realmEnd),",
+							"    nonceStart = authenticateHeader.indexOf('\"',authenticateHeader.indexOf(\"nonce\")) + 1,",
+							"    nonceEnd = authenticateHeader.indexOf('\"',nonceStart),",
+							"    nonce = authenticateHeader.slice(nonceStart,nonceEnd);",
+							"    ",
+							"postman.setGlobalVariable('echo_digest_realm', realm);",
+							"postman.setGlobalVariable('echo_digest_nonce', nonce);"
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"username": "{{user}}",
+						"password": "{{pass}}",
+						"saveHelperData": true,
+						"showPassword": false
+					}
+				},
+				"url": "http://{{host}}:{{port}}/MDX2JSON/Favorites/Basic Dashboard Demo.dashboard?Namespace={{ns}}",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Basic e3t1c2VyfX06e3twYXNzfX0=",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"description": "Add item to favorites."
+			},
+			"response": []
+		},
+		{
+			"name": "Config/:app",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"response code is 401\"] = responseCode.code === 401;",
+							"tests[\"response has WWW-Authenticate header\"] = (postman.getResponseHeader('WWW-Authenticate'));",
+							"",
+							"var authenticateHeader = postman.getResponseHeader('WWW-Authenticate'),",
+							"    realmStart = authenticateHeader.indexOf('\"',authenticateHeader.indexOf(\"realm\")) + 1 ,",
+							"    realmEnd = authenticateHeader.indexOf('\"',realmStart),",
+							"    realm = authenticateHeader.slice(realmStart,realmEnd),",
+							"    nonceStart = authenticateHeader.indexOf('\"',authenticateHeader.indexOf(\"nonce\")) + 1,",
+							"    nonceEnd = authenticateHeader.indexOf('\"',nonceStart),",
+							"    nonce = authenticateHeader.slice(nonceStart,nonceEnd);",
+							"    ",
+							"postman.setGlobalVariable('echo_digest_realm', realm);",
+							"postman.setGlobalVariable('echo_digest_nonce', nonce);"
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"username": "{{user}}",
+						"password": "{{pass}}",
+						"saveHelperData": true,
+						"showPassword": false
+					}
+				},
+				"url": "http://{{host}}:{{port}}/MDX2JSON/Config/DeepSeeWeb?Namespace={{ns}}",
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Basic e3t1c2VyfX06e3twYXNzfX0=",
+						"description": ""
+					}
+				],
+				"body": {},
+				"description": "Infoprmation about current user configuration"
+			},
+			"response": []
+		},
+		{
+			"name": "Config",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"response code is 401\"] = responseCode.code === 401;",
+							"tests[\"response has WWW-Authenticate header\"] = (postman.getResponseHeader('WWW-Authenticate'));",
+							"",
+							"var authenticateHeader = postman.getResponseHeader('WWW-Authenticate'),",
+							"    realmStart = authenticateHeader.indexOf('\"',authenticateHeader.indexOf(\"realm\")) + 1 ,",
+							"    realmEnd = authenticateHeader.indexOf('\"',realmStart),",
+							"    realm = authenticateHeader.slice(realmStart,realmEnd),",
+							"    nonceStart = authenticateHeader.indexOf('\"',authenticateHeader.indexOf(\"nonce\")) + 1,",
+							"    nonceEnd = authenticateHeader.indexOf('\"',nonceStart),",
+							"    nonce = authenticateHeader.slice(nonceStart,nonceEnd);",
+							"    ",
+							"postman.setGlobalVariable('echo_digest_realm', realm);",
+							"postman.setGlobalVariable('echo_digest_nonce', nonce);"
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"username": "{{user}}",
+						"password": "{{pass}}",
+						"saveHelperData": true,
+						"showPassword": false
+					}
+				},
+				"url": "http://{{host}}:{{port}}/MDX2JSON/Config?Namespace={{ns}}",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Basic e3t1c2VyfX06e3twYXNzfX0=",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"Application\":\"DeepSeeWeb\", \n\t\"Config\":\"123\"\n}"
+				},
+				"description": "Modify information about current user configuration.\nModifying DeepSeeWeb config to some random value may break it for user. "
+			},
+			"response": []
+		},
+		{
+			"name": "Logout",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"response code is 401\"] = responseCode.code === 401;",
+							"tests[\"response has WWW-Authenticate header\"] = (postman.getResponseHeader('WWW-Authenticate'));",
+							"",
+							"var authenticateHeader = postman.getResponseHeader('WWW-Authenticate'),",
+							"    realmStart = authenticateHeader.indexOf('\"',authenticateHeader.indexOf(\"realm\")) + 1 ,",
+							"    realmEnd = authenticateHeader.indexOf('\"',realmStart),",
+							"    realm = authenticateHeader.slice(realmStart,realmEnd),",
+							"    nonceStart = authenticateHeader.indexOf('\"',authenticateHeader.indexOf(\"nonce\")) + 1,",
+							"    nonceEnd = authenticateHeader.indexOf('\"',nonceStart),",
+							"    nonce = authenticateHeader.slice(nonceStart,nonceEnd);",
+							"    ",
+							"postman.setGlobalVariable('echo_digest_realm', realm);",
+							"postman.setGlobalVariable('echo_digest_nonce', nonce);"
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"username": "{{user}}",
+						"password": "{{pass}}",
+						"saveHelperData": true,
+						"showPassword": false
+					}
+				},
+				"url": "http://{{host}}:{{port}}/MDX2JSON/Logout",
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Basic e3t1c2VyfX06e3twYXNzfX0=",
+						"description": ""
+					}
+				],
+				"body": {},
+				"description": "Logout. Close session."
+			},
+			"response": []
+		}
+	]
+}

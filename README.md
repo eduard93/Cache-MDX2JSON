@@ -90,7 +90,7 @@ These are the possible requests to web application (add param ?Namespace={Desire
 | Filters                     | POST |{ "DataSource": "DataSourceName.ext", "Values":1, Search:"SearchTerm"}| JSON   | All filters for DeepSee DataSource (cube, pivot, kpi, metric) with values (if Values = 1, set to 0 or omit otherwise). If Search is not empty only filter values, containing search term would be returned.|
 | Format                      | GET  |                             | JSON      | Default formatting             |
 | TermList                    | POST | {"TermList":"TermListName"} | JSON      | Termlist key-value array       |
-| Config                      | POST |{"Application":"AppName", "Config","value"}| JSON      | Set config for arbitrary application for current user|
+| Config                      | POST |{"Application":"AppName", "Config":"value"}| JSON      | Set config for arbitrary application for current user|
 | Config/:Application         | GET  | {"Application":"AppName"}   | JSON      | Get config for Application for current user|
 | Favorites                   | GET  |                             | JSON      | Array of current user favorites|
 | Favorites/:Item             | POST |                             | JSON      | Add favorite item              |
@@ -208,3 +208,12 @@ To use KPIs and display row name add this method to KPI class
 	    Set pList(pPropNo, "columnNo") = pPropNo
 	    Quit $$$OK
     }
+
+	
+Postman
+-----------
+
+You can use [Postman](https://www.getpostman.com/) to query MDX2JSON API. [Collection](MDX2JSON.postman_collection.json). [Environment](CACHE.postman_environment.json).
+
+
+	
