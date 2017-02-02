@@ -350,7 +350,7 @@ Get format defaults.</Description>
 <Implementation><![CDATA[
 	set st = $$$OK
 	set Cube = $$$UPPER(Cube)
-	set ActionClass = $G($$$DeepSeeMetaGLVN("cubes",Cube,"actionClass"))
+	set ActionClass = $G($$$DeepSeeMetaGLVN("cubes",Cube,"actionClass"), $G($$$DeepSeeMetaGLVN("kpis",Cube)))
 	if (ActionClass'="") {
 		set st = $classmethod(ActionClass,"%OnDashboardAction",Action,Context)
 	}
