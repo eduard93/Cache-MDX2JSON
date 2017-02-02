@@ -395,20 +395,24 @@ DSW Specific method, returns available addons</Description>
 	new $namespace
 	set $namespace = "%SYS"
 	
-	set sc = ##class(Security.Applications).Get("/dsw", .prop)
+	set app = "/dsw"
+	set sc = ##class(Security.Applications).Get(app, .prop)
+	
 	if ($$$ISERR(sc) && ($system.Status.GetErrorCodes(sc) = $$$ApplicationDoesNotExist)) {
-		set sc = ##class(Security.Applications).Get("/dsweb", .prop)
+		set app = "/dsweb"
+		set sc = ##class(Security.Applications).Get(app, .prop)
 	}
 	quit:$$$ISERR(sc) sc
 	
 	set path = ##class(%File).NormalizeDirectory(prop("Path")) 
-	set path = ##class(%File).NormalizeDirectory(path _ "addons")
+	set path = ##class(%File).SubDirectoryName(path, "addons", $$$YES)
+	set url = app _ "/addons/"
 	
 	#dim rs As %SQL.ClassQueryResultSet = ##class(%File).FileSetFunc(path, "*.js")
 	
 	set list = $$$NewDynDTList
 	while rs.%Next() {
-		$$$Insert(list, rs.ItemName)
+		$$$Insert(list, url _ rs.ItemName)
 	}
 	$$$ListToJSON(list)
     quit $$$OK
