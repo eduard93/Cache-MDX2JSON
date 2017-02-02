@@ -56,12 +56,14 @@ todo add optional parameter WEBAPP to Alter web app name if it needs to have ano
 </If>
 
 <Log Text="Mapping MDX2JSON package to Samples namespace" Level="0"/>
+<If Condition='##class(Config.Namespaces).Exists("Samples")'>
 <Namespace Name="Samples" Create="no" Code="SAMPLES" Data="SAMPLES" Ensemble="0">
 <Configuration>
 <ClassMapping From="${Namespace}" Package="MDX2JSON"/>
 <GlobalMapping From="${Namespace}" Global="MDX2JSON"/>
 </Configuration>
 </Namespace>
+</If>
 
 <!--<RunInstall Class="MDX2JSON.Installer" Method="createrole" />-->
 
