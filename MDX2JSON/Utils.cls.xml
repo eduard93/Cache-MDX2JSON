@@ -394,8 +394,11 @@ See correspontding method from DeepSee.REST.v1.InfoServer ]]></Description>
 <Implementation><![CDATA[
 	#dim sc,sc1 As %Status = $$$OK
 	set base = "DSW.Addons."
-	for i=1:1:Addons.Count() {
-		set addon = Addons.GetAt(i)
+	for i=1:1:$$$ListSize(Addons) {
+		set file = $$$ListGet(Addons, i)
+		set file = ##class(%File).GetFilename(file)
+		set file = $p(file, ".", 1, *-1) // remove extension
+		
 		set class = base _ addon
 		if $$$comClassDefined(class) {
 			// compiled class exists - we're set 
