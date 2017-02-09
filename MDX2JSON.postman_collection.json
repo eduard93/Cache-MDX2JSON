@@ -565,6 +565,63 @@
 			"response": []
 		},
 		{
+			"name": "Addons",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"response code is 401\"] = responseCode.code === 401;",
+							"tests[\"response has WWW-Authenticate header\"] = (postman.getResponseHeader('WWW-Authenticate'));",
+							"",
+							"var authenticateHeader = postman.getResponseHeader('WWW-Authenticate'),",
+							"    realmStart = authenticateHeader.indexOf('\"',authenticateHeader.indexOf(\"realm\")) + 1 ,",
+							"    realmEnd = authenticateHeader.indexOf('\"',realmStart),",
+							"    realm = authenticateHeader.slice(realmStart,realmEnd),",
+							"    nonceStart = authenticateHeader.indexOf('\"',authenticateHeader.indexOf(\"nonce\")) + 1,",
+							"    nonceEnd = authenticateHeader.indexOf('\"',nonceStart),",
+							"    nonce = authenticateHeader.slice(nonceStart,nonceEnd);",
+							"    ",
+							"postman.setGlobalVariable('echo_digest_realm', realm);",
+							"postman.setGlobalVariable('echo_digest_nonce', nonce);"
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"username": "{{user}}",
+						"password": "{{pass}}",
+						"saveHelperData": true,
+						"showPassword": false
+					}
+				},
+				"url": "http://{{host}}:{{port}}/MDX2JSON/Addons",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Basic e3t1c2VyfX06e3twYXNzfX0=",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "[ \"A\", \"B\"]"
+				},
+				"description": "Add addons to server"
+			},
+			"response": []
+		},
+		{
 			"name": "PivotVariables/:cube",
 			"event": [
 				{
