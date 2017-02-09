@@ -397,7 +397,7 @@ See correspontding method from DeepSee.REST.v1.InfoServer ]]></Description>
 	for i=1:1:$$$ListSize(Addons) {
 		set file = $$$ListGet(Addons, i)
 		set file = ##class(%File).GetFilename(file)
-		set file = $p(file, ".", 1, *-1) // remove extension
+		set addon = $p(file, ".", 1, *-1) // remove extension
 		
 		set class = base _ addon
 		if $$$comClassDefined(class) {
