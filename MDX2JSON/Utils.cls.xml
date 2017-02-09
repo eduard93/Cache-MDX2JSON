@@ -400,7 +400,7 @@ See correspontding method from DeepSee.REST.v1.InfoServer ]]></Description>
 		if $$$comClassDefined(class) {
 			// compiled class exists - we're set 
 		} elseif $$$defClassDefined(class) {
-			// class exist uncompiled - add to compile local
+			// class exists but uncompiled - add to compile local
 			set classes(class) = ""
 		} else {
 			// class does not exist
@@ -411,6 +411,7 @@ See correspontding method from DeepSee.REST.v1.InfoServer ]]></Description>
 		}	
 	}
 	
+	// compile classes if we have any
 	if $d(classes)=10 {
 		set sc1 = $system.OBJ.Compile(.classes, "cuks /checkuptodate=expandedonly /displaylog=0 /displayerror=0")
 		set sc = $$$ADDSC(sc, sc1)
@@ -420,6 +421,8 @@ See correspontding method from DeepSee.REST.v1.InfoServer ]]></Description>
 </Method>
 
 <Method name="CreateAddonClass">
+<Description>
+Create class for an addon</Description>
 <ClassMethod>1</ClassMethod>
 <FormalSpec>Class:%Dictionary.CacheClassname</FormalSpec>
 <ReturnType>%Status</ReturnType>
