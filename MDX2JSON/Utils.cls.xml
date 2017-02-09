@@ -442,6 +442,14 @@ w ##class(MDX2JSON.Utils).CreateAddonClass("DSW.Addon.A")</Description>
 	set propertyObj.Type = "%String"
 	do classObj.Properties.Insert(propertyObj)
 	
+	set methodObj = ##class(%Dictionary.MethodDefinition).%New(Class _ ":%OnGetPortletSettings")
+	set methodObj.ClassMethod = $$$YES
+	set methodObj.FormalSpec = "*pInfo:%List,&pSettings"
+	set methodObj.ReturnType = "%Status"
+	do methodObj.Implementation.Write($c(9) _ "Kill pInfo" _ $$$NL _ $c(9) _ "Set pInfo(1) = $lb(""Data"", , , ""Data"", ""Data setting"")" _ $$$NL _ $c(9) _ "Quit $$$OK")
+
+	do classObj.Methods.Insert(methodObj)
+	
 	quit classObj.%Save()
 ]]></Implementation>
 </Method>
