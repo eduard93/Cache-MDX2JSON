@@ -162,10 +162,17 @@ Converts relevant parts of %DeepSee.Dashboard.Widget object into %ZEN.proxyObjec
 		set kpiClass = ##class(%DeepSee.Utils).%GetKPIClass(Widget.dataSource)
 		set obj.kpitype = $classmethod(kpiClass, "%GetSourceType")
 	}
+	
+	// Widget is a portlet
+	if Widget.type = "portlet" {
+		set portletClass = Widget.subtypeClass
+		set:portletClass="" portletClass = Widget.subtype
+		set obj.settings = ..PortletSettongsToArray(portletClass)
+	}
 
-	set obj.mdx = mdx
+	set obj.mdx = $g(mdx)
 	set obj.name = Widget.name
-	set obj.basemdx = basemdx
+	set obj.basemdx = $g(basemdx)
 	set obj.type =Widget.subtype
 	set obj.title = ##class(%DeepSee.UserPortal.Utils).%ResolveText(Widget.title) /// $$$ support
 	set obj.key =  Widget.key
@@ -420,7 +427,7 @@ Returns name of widget's pivot source cube.</Description>
 
 <Method name="DetermineWidgetDataSource">
 <Description>
-Return datasource ifone exist, if it's a linked widget then follow the link and get that datasource.</Description>
+Return datasource if one exists, if it's a linked widget then follow the link and get that datasource.</Description>
 <ClassMethod>1</ClassMethod>
 <FormalSpec>Dashboard:%DeepSee.Dashboard.Definition,WidgetNumber:%Integer</FormalSpec>
 <ReturnType>%String</ReturnType>
@@ -429,6 +436,7 @@ Return datasource ifone exist, if it's a linked widget then follow the link and 
 	return:datasource'="" datasource
 	
 	set datalink =  Dashboard.widgets.GetAt(WidgetNumber).dataLink
+	return:datalink="" ""
 	set WidgetNumber = ..GetWidgetNumberByName(Dashboard, datalink)
 	return ..DetermineWidgetDataSource(Dashboard, WidgetNumber)
 ]]></Implementation>
@@ -445,6 +453,46 @@ Determines position of a widget in dashboard's widget list. </Description>
 		return:(Dashboard.widgets.GetAt(i).name = WidgetName) i
 	}
 	return ""
+]]></Implementation>
+</Method>
+
+<Method name="PortletSettongsToArray">
+<Description><![CDATA[
+On return, <var>pInfo</var> can contain a list of settings in the form:<br/>
+pInfo(n) = $LB(name,value,type,caption,title)<br/>
+<var>name</var> is the logical name of the setting.<br/>
+<var>value</var> is the default value of the setting.<br/>
+<var>type</var> indicates the type of the setting. This determines the control
+displayed to get the value of the setting. If omitted the type is assumed to be a string.
+The type can be: "%Integer", "%Boolean", or "ENUM^caption1:value1,caption2:value2".<br/>
+<var>caption</var> is the localized caption of the setting.<br/>
+<var>title</var> is an optional tooltip displayed for the setting.<br/>
+Custom portlet settings can be controlled using the SETTINGS=PORTLET parameter in the 
+dashboard URL 
+set list = ##class(MDX2JSON.Dashboard).KPISettongsToArray("DeepSee.Model.PortletDemo.ClockPortlet")]]></Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>Class:%Dictionary.CacheClassname</FormalSpec>
+<ReturnType>%ListOfObjects</ReturnType>
+<Implementation><![CDATA[
+	do $classmethod(Class, "%OnGetPortletSettings", .info)
+	set list = $$$NewDynObjList
+	
+	set key = $o(info(""))
+	while key'="" {
+		set settingInfo = info(key)
+		
+		set setting = $$$NewDynObj
+		set setting.name = $lg(settingInfo, 1)
+		set setting.value = $lg(settingInfo, 2)
+		set setting.type = $lg(settingInfo, 3)
+		set setting.caption = $lg(settingInfo, 4)
+		set setting.title = $lg(settingInfo, 5)
+		
+		$$$Insert(list, setting)	
+		set key = $o(info(key))	
+	}
+	
+	return list
 ]]></Implementation>
 </Method>
 </Class>
