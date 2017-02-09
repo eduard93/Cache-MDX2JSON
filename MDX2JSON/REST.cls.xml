@@ -95,6 +95,7 @@ Example: send HTTP GET request to web application with Dispatch class <b>MDX2JSO
    
    <!-- DSW specific methods-->
    <Route Url="/Addons" Method="GET" Call="WriteAddons"/>
+   <Route Url="/Addons" Method="POST" Call="CreateAddons"/>
  </Routes>
 ]]></Data>
 </XData>
@@ -416,6 +417,18 @@ DSW Specific method, returns available addons</Description>
 	}
 	$$$ListToJSON(list)
     quit $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="CreateAddons">
+<Description>
+DSW Specific method, creates addons</Description>
+<ClassMethod>1</ClassMethod>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	#dim sc As %Status = $$$OK
+	set sc = ##class(MDX2JSON.Utils).CreateAddons(%request.Content)
+    quit sc
 ]]></Implementation>
 </Method>
 </Class>
