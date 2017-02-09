@@ -442,6 +442,10 @@ w ##class(MDX2JSON.Utils).CreateAddonClass("DSW.Addon.A")</Description>
 	set propertyObj.Type = "%String"
 	do classObj.Properties.Insert(propertyObj)
 	
+	set parameterOnj = ##class(%Dictionary.ParameterDefinition).%New(Class _ ":USECOMMONDIRECTORY")
+	set parameterOnj.Default = 1
+	do classObj.Parameters.Insert(parameterOnj)
+	
 	set methodObj = ##class(%Dictionary.MethodDefinition).%New(Class _ ":%OnGetPortletSettings")
 	set methodObj.ClassMethod = $$$YES
 	set methodObj.FormalSpec = "*pInfo:%List,&pSettings"
