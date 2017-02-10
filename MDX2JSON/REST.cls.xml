@@ -95,6 +95,7 @@ Example: send HTTP GET request to web application with Dispatch class <b>MDX2JSO
    
    <!-- DSW specific methods-->
    <Route Url="/Addons" Method="GET" Call="WriteAddons"/>
+   <Route Url="/Themes" Method="GET" Call="WriteThemes"/>
  </Routes>
 ]]></Data>
 </XData>
@@ -410,6 +411,32 @@ DSW specific method, returns available addons</Description>
 	if $$$ISOK(sc) {
 		$$$ListToJSON(list)
 	}
+    quit sc
+]]></Implementation>
+</Method>
+
+<Method name="WriteThemes">
+<Description>
+DSW specific method, returns available themes</Description>
+<ClassMethod>1</ClassMethod>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	#dim sc As %Status = $$$OK
+	
+	set app = "/dsw"
+	set path = $$GetFilename^%apiCSP(app _ "/")
+	set path = ##class(%File).NormalizeDirectory(path)
+	set path = ##class(%File).SubDirectoryName(path, "themes", $$$YES)	
+	set url = app _ "/themes/"
+	
+	#dim rs As %SQL.ClassQueryResultSet = ##class(%File).FileSetFunc(path, "*.css")
+	
+	set list = $$$NewDynDTList
+	while rs.%Next() {
+		$$$Insert(list, url _ rs.ItemName)
+	}
+	$$$ListToJSON(list)
+	
     quit sc
 ]]></Implementation>
 </Method>
