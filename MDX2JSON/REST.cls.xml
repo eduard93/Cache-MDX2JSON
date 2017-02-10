@@ -387,25 +387,16 @@ See correspontding method from DeepSee.REST.v1.InfoServer ]]></Description>
 
 <Method name="WriteAddons">
 <Description>
-DSW Specific method, returns available addons</Description>
+DSW specific method, returns available addons</Description>
 <ClassMethod>1</ClassMethod>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
 	#dim sc As %Status = $$$OK
-	new $namespace
-	set $namespace = "%SYS"
 	
 	set app = "/dsw"
-	set sc = ##class(Security.Applications).Get(app, .prop)
-	
-	if ($$$ISERR(sc) && ($system.Status.GetErrorCodes(sc) = $$$ApplicationDoesNotExist)) {
-		set app = "/dsweb"
-		set sc = ##class(Security.Applications).Get(app, .prop)
-	}
-	quit:$$$ISERR(sc) sc
-	
-	set path = ##class(%File).NormalizeDirectory(prop("Path")) 
-	set path = ##class(%File).SubDirectoryName(path, "addons", $$$YES)
+	set path = $$GetFilename^%apiCSP(app _ "/")
+	set path = ##class(%File).NormalizeDirectory(path)
+	set path = ##class(%File).SubDirectoryName(path, "addons", $$$YES)	
 	set url = app _ "/addons/"
 	
 	#dim rs As %SQL.ClassQueryResultSet = ##class(%File).FileSetFunc(path, "*.js")

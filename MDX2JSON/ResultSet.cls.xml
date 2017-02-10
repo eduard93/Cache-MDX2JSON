@@ -200,7 +200,7 @@ Returns array of Axes</Description>
 	}
 
 	//To filter out invisible сells
-	if 'cell.vis {
+	if (..IsCellNull(cell, AxisNumber, Node)=1) {
 		return cell.children
 	}
 
