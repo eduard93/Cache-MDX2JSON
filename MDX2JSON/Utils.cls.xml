@@ -400,6 +400,13 @@ See correspontding method from DeepSee.REST.v1.InfoServer ]]></Description>
 		set addon = $p(file, ".", 1, *-1) // remove extension
 		
 		set class = base _ addon
+		
+		set sc1 = ##class(%Dictionary.CacheClassname).IsValid(class)
+		if $$$ISERR(sc1) {
+			set sc = $$$ADDSC(sc, sc1)
+			CONTINUE
+		}
+		
 		if $$$comClassDefined(class) {
 			// compiled class exists - we're set 
 		} elseif $$$defClassDefined(class) {

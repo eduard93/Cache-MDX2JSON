@@ -415,7 +415,10 @@ DSW Specific method, returns available addons</Description>
 		$$$Insert(list, url _ rs.ItemName)
 	}
 	set sc = ##class(MDX2JSON.Utils).CreateAddons(list)
-	$$$ListToJSON(list)
+	
+	if $$$ISOK(sc) {
+		$$$ListToJSON(list)
+	}
     quit sc
 ]]></Implementation>
 </Method>
