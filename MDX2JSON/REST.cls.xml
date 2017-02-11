@@ -395,7 +395,7 @@ DSW specific method, returns available addons</Description>
 	#dim sc As %Status = $$$OK
 	
 	set app = "/dsw"
-	set path = $$GetFilename^%apiCSP(app _ "/")
+	set path = $system.CSP.GetFileName(app _ "/")
 	set path = ##class(%File).NormalizeDirectory(path)
 	set path = ##class(%File).SubDirectoryName(path, "addons", $$$YES)	
 	set url = app _ "/addons/"
@@ -424,7 +424,7 @@ DSW specific method, returns available themes</Description>
 	#dim sc As %Status = $$$OK
 	
 	set app = "/dsw"
-	set path = $$GetFilename^%apiCSP(app _ "/")
+	set path = $system.CSP.GetFileName(app _ "/")
 	set path = ##class(%File).NormalizeDirectory(path)
 	set path = ##class(%File).SubDirectoryName(path, "themes", $$$YES)	
 	set url = app _ "/themes/"
