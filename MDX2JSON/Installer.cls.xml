@@ -15,6 +15,11 @@ todo add optional parameter WEBAPP to Alter web app name if it needs to have ano
 <Log Text="Set namespace to ${Namespace}" Level="0"/>
 </IfNotDef>
 
+<IfNotDef Var="Import">
+<Var Name="Import" Value="1"/>
+<Log Text="Set Import to 1" Level="0"/>
+</IfNotDef>
+
 <Role Name="MDX2JSONSettings" Description="Role to access and set default MDX2JSON settings for an App"/>
 
 <If Condition='(##class(Config.Namespaces).Exists("${Namespace}")=0)'>
@@ -28,6 +33,8 @@ todo add optional parameter WEBAPP to Alter web app name if it needs to have ano
 </If>
 
 <Namespace Name="${Namespace}" Create="no">
+
+<If Condition="${Import}">
 <IfDef Var="SourceDir">
 <Log Text="SourceDir defined - offline install from ${SourceDir}" Level="0"/>
 <Import File="${SourceDir}"/>
@@ -36,6 +43,8 @@ todo add optional parameter WEBAPP to Alter web app name if it needs to have ano
 <Log Text="SourceDir undefined - online install from GitHub" Level="0"/>
 <RunInstall Class="MDX2JSON.Installer" Method="DownloadFromGitHub"/>
 </IfNotDef>
+</If>
+
 <If Condition='(##class(Security.Applications).Exists("/"_"${Namespace}")=0)'>
 	<Log Text="Creating web application /${Namespace}" Level="0"/>
 	<!-- This method creates conflits with web-server. Kept for reference purposes. See ##class(%EnsembleMgr).createPortalApp()
@@ -87,6 +96,7 @@ Main setup method
 Set pVars("User")="web"
 Set pVars("Password")="dsweb"
 Set pVars("Namespace")="TEMP3"
+Set pVars("Import")=1
 Set pVars("SourceDir")="C:\temp\MDX2JSON\MDX2JSON"
 Do ##class(MDX2JSON.Installer).setup(.pVars)</Description>
 <Internal>1</Internal>

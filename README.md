@@ -50,6 +50,7 @@ As a first parameter to `Do ##class(MDX2JSON.Installer).setup(.pVars)` you can p
 - `User` is a Caché user to create or modify. He will be given SELECT access to %DeepSee_Dashboard.Definition table in `Namespace`
 - `Password` must be supplied alongside User parameters
 - `SourceDir` - all xmls from this directory would be imported and compiled
+- `Import` - import code from GitHub or `SourceDir`, defaults to 1, set to 0 to skip import
 
 
 Update
