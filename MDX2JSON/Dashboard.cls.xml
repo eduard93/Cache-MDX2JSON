@@ -238,6 +238,13 @@ Converts relevant parts of %DeepSee.Dashboard.Widget object into %ZEN.proxyObjec
 ]]></Implementation>
 </Method>
 
+<Method name="ProcesstreeMapChart">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>Widget:%DeepSee.Dashboard.Widget,Obj:%ZEN.proxyObject</FormalSpec>
+<Implementation><![CDATA[	do ..ProcesscomboChart(Widget, Obj)
+]]></Implementation>
+</Method>
+
 <Method name="ProcesstextMeter">
 <ClassMethod>1</ClassMethod>
 <FormalSpec>Widget:%DeepSee.Dashboard.Widget,Obj:%ZEN.proxyObject</FormalSpec>
