@@ -14,6 +14,7 @@ Get <b>App</b> configuration for <b>User</b>]]></Description>
 <FormalSpec>App:%String,User:%String=$Username</FormalSpec>
 <ReturnType>%String</ReturnType>
 <Implementation><![CDATA[
+	set App = $zcvt(App, "U")
 	set config = $g($$$Global($$$Settings, User, App))
 	set:((config="")||($Roles[$$$DefaultSettingsRole)) config = $g($$$Global($$$Settings, $$$DefaultUser, App))
 	return config
@@ -27,6 +28,7 @@ Set <b>App</b> configuration for <b>User</b> equal to <b>Config</b>]]></Descript
 <FormalSpec>App:%String,Config:%String="",User:%String=$Username</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
+	set App = $zcvt(App, "U")
 	if ($Roles[$$$DefaultSettingsRole) {
 		set $$$Global($$$Settings, $$$DefaultUser, App) = Config
 	} else {
