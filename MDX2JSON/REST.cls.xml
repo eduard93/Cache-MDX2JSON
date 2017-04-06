@@ -247,8 +247,16 @@ Wrapper for ##class(MDX2JSON.Utils).WriteFiltersForDataSource(pDataSource, pValu
 	set DataSource = $$$R("DataSource")
 	set Values = $$$R("Values")
 	set Search = $$$R("Search")
+	
+	#dim RelatedFiltersList As %ListOfObjects = $$$R("RelatedFilters")
+	if $IsObject(RelatedFiltersList) {
+		for i=1:1:RelatedFiltersList.Count() {
+			set RelatedFilter = RelatedFiltersList.GetAt(i)
+			set RelatedFilters(RelatedFilter.Filter) = RelatedFilter.Value
+		}
+	}
 
-   	set st = ##class(MDX2JSON.Utils).WriteFiltersForDataSource(DataSource,Values,Search)
+   	set st = ##class(MDX2JSON.Utils).WriteFiltersForDataSource(DataSource, Values, Search, .RelatedFilters)
   	return st
 ]]></Implementation>
 </Method>
