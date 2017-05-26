@@ -142,15 +142,24 @@ Get all filters for DeepSee DataSource in JSON format.<br>
 <b>pDataSource</b> - name of DeepSee datasource (cube, pivot, kpi, metric).<br>
 <b>pValues</b> - write all filters' values. Takes time.]]></Description>
 <ClassMethod>1</ClassMethod>
-<FormalSpec><![CDATA[pDataSource:%String,pValues:%Boolean=0,pSearchKey:%String="",&pRelatedFilters]]></FormalSpec>
+<FormalSpec><![CDATA[pDataSource:%String,pValues:%Boolean=0,pSearchKey:%String="",&pRelatedFilters,pRequestedFilters:%ListOfDataTypes]]></FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-	set st = ##class(%DeepSee.Dashboard.Utils).%GetFiltersForDataSource(pDataSource,.tFilters)
+	set st = ##class(%DeepSee.Dashboard.Utils).%GetFiltersForDataSource(pDataSource, .tFilters)
 	return:$$$ISERR(st) st
 	return:($d(tFilters)=0) $$$ERROR($$$GeneralError,"Empty Filter values array. DataSource does not exist?")
 
+	if $isobject($g(pRequestedFilters)) {
+		set key = $order(tFilters(""))		
+		for {
+			quit:key=""
+			kill:'pRequestedFilters.Find($lg(tFilters(key),2)) tFilters(key)
+			set key = $order(tFilters(key))
+	   	}
+	}
+
 	if (pValues=1) {
-	set key = $order(tFilters(""))
+		set key = $order(tFilters(""))
 		while (key '= "") {
 			set st = ##class(%DeepSee.Dashboard.Utils).%GetMembersForFilter(pDataSource,$lg(tFilters(key),2),.tMembers,.tDefaultFilterValue,pSearchKey,.pRelatedFilters,0,,.tValueList)
 			return:$$$ISERR(st) st
