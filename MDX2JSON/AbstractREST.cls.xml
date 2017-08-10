@@ -305,15 +305,16 @@ Returns OK if namespace both exists and contains MDX2JSON package.<br>
 		return $$$OK
 	}
 
-	return:('##class(%SYS.Namespace).Exists(Namespace)) $$$ERROR($$$NamespaceUnavailable,Namespace)
-
-	if Namespace'=$Namespace {
-		set oldNS = $Namespace
-		zn Namespace
-		set exists = ##class(%Dictionary.CompiledClass).%ExistsId("MDX2JSON.Utils")
-		zn oldNS
-		return:(exists=0) $$$ERROR($$$GeneralError, "MDX2JSON package is not mapped to " _ Namespace)
-	}
+	return:('##class(%SYS.Namespace).Exists(Namespace)) $$$ERROR($$$NamespaceUnavailable, Namespace)
+	new $Namespace
+	set $Namespace = Namespace
+	
+	set exists = ##class(%Dictionary.CompiledClass).%ExistsId("MDX2JSON.Utils")
+	return:(exists=$$$NO) $$$ERROR($$$GeneralError, "MDX2JSON package is not mapped to " _ Namespace)
+	
+	// Strictly speaking this can be a false-positive check
+	set exists = ($data(@##class(MDX2JSON.DashboardRS).#global)>0)
+	return:(exists=$$$NO) $$$ERROR($$$GeneralError, "No dashboards exist in " _ Namespace)
 
 	return $$$OK
 ]]></Implementation>
