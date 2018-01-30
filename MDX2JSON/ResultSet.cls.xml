@@ -159,8 +159,6 @@ Returns array of Axes</Description>
 	set cell.cellStyle = $LG(tNode,18)
 	
 	set info = $LG(tNode,18)
-	set cell.info = info // expected structure is property1:value1;property2:value2;...;propertyN:valueN;
-
 	if info'="" { // extract aggregation information, leave the rest as css
 		set summaryposition = $f(info,"summary")
 		if summaryposition>0 {
@@ -169,13 +167,6 @@ Returns array of Axes</Description>
 			set $e(info,summaryposition-7,summaryposition + $l(summaryvalue) + 1) = ""
 		}
 		set cell.style = info // css
-
-		/*for i=1:1:($L(cell.info,";")-1) {
-		set part = $P(cell.info,";",i)
-		set property = $P(part,":",1)
-		set value = $P(part,":",2)
-		do cell.%DispatchSetProperty(property, value)
-		}*/
 	}
 
 	do ##class(%DeepSee.Utils).%GetDimensionCaption(CubeName,tDimNo, tHierNo,tLevelNo, .tAxisCaption)
@@ -203,7 +194,7 @@ Returns array of Axes</Description>
 	}
 
 	//To filter out invisible сells
-	if (..IsCellNull(cell, AxisNumber, Node)=1) {
+	if 'cell.vis {
 		return cell.children
 	}
 
