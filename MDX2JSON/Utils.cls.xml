@@ -11,32 +11,100 @@ Also has functionality for getting information about cubes, dashboards and widge
 <Method name="GetResultSet">
 <Description><![CDATA[
 Transforms MDX query into executed <b>MDX2JSON.ResultSet</b>.<br>
-<b>pMDX</b> - String containing MDX query.<br>
-<b>pStatus</b> - Status of query execution.<br>]]></Description>
+<b>MDX</b> - String containing MDX query.<br>
+<b>Status</b> - Status of query execution.<br>]]></Description>
 <ClassMethod>1</ClassMethod>
-<FormalSpec>pMDX:%String,*pStatus</FormalSpec>
+<FormalSpec>MDX:%String,*Status</FormalSpec>
 <ReturnType>MDX2JSON.ResultSet</ReturnType>
 <Implementation><![CDATA[
-	set Params = ""
-	set pStatus = $$$OK
+	set Status = $$$OK
 	set RS = ##class(MDX2JSON.ResultSet).%New()
-	set pStatus = RS.%PrepareMDX(pMDX)
-	return:$$$ISERR(pStatus) RS
-	set pStatus = RS.%ExecuteAsynch(,.Params,1)
+	set Status = RS.%PrepareMDX(MDX)
 	return RS
+]]></Implementation>
+</Method>
+
+<Method name="GetResultSetFromQuery">
+<Description><![CDATA[
+Transforms MDX query into executed <b>MDX2JSON.ResultSet</b>.<br>
+<b>MDX</b> - String containing MDX query.<br>
+<b>Status</b> - Status of query execution.<br>]]></Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>CubeKey:%String,QueryKey:%String,*Status</FormalSpec>
+<ReturnType>MDX2JSON.ResultSet</ReturnType>
+<Implementation><![CDATA[
+	set Status = $$$OK
+	set RS = ##class(MDX2JSON.ResultSet).%New()
+	set Status = RS.%PrepareKey(CubeKey, QueryKey)
+	return:$$$ISERR(Status) RS
+	
+	do:$$$ISOK(Status) RS.%GetQueryText()
+	return RS
+]]></Implementation>
+</Method>
+
+<Method name="ExecuteResultSet">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>RS:MDX2JSON.ResultSet,QueryKey:%String="",Timeout:%Integer=0</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	set Params = ""
+	set Status = $$$OK
+	
+	if Timeout = 0 {
+		set Status = RS.%ExecuteAsynch(QueryKey ,.Params, $$$YES)
+	} else {
+		set Status = RS.%ExecuteAsynch(QueryKey ,.Params, $$$NO)
+		set TimeElapsed = 0
+		set QueryStatus = 0
+		while (TimeElapsed < Timeout)&&(QueryStatus<100)&&($$$ISOK(Status)) {
+			hang .01
+			set TimeElapsed = TimeElapsed + .01		
+			// Check query status again
+			set QueryStatus = RS.%GetStatus(,.Status)
+		}
+	}
+	
+	quit Status
 ]]></Implementation>
 </Method>
 
 <Method name="WriteJSONfromMDX">
 <Description><![CDATA[
 Automatic processing of MDX query and outputting resulting JSON.<br>
-<b>pMDX</b> - String containing MDX query.<br>]]></Description>
+<b>MDX</b> - String containing MDX query.<br>]]></Description>
 <ClassMethod>1</ClassMethod>
-<FormalSpec>pMDX:%String</FormalSpec>
+<FormalSpec>MDX:%String,Timeout:%Integer=0</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
 	#dim RS As MDX2JSON.ResultSet
-	set RS = ..GetResultSet(pMDX,.st)
+	set RS = ..GetResultSet(MDX, .st)
+	return:$$$ISERR(st) st
+	
+	set st = ..ExecuteResultSet(RS, , Timeout)
+	return:$$$ISERR(st) st
+		
+	set obj = RS.ToProxyObject(.st)
+	return:$$$ISERR(st) st
+	$$$DynObjToJSON(obj)
+	
+	return $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="WriteJSONfromQuery">
+<Description><![CDATA[
+Automatic processing of MDX query and outputting resulting JSON.<br>
+<b>MDX</b> - String containing MDX query.<br>]]></Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>CubeKey:%String,QueryKey:%String,Timeout:%Integer=0</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	#dim RS As MDX2JSON.ResultSet
+	set RS = ..GetResultSetFromQuery(CubeKey, QueryKey, .st)
+	return:$$$ISERR(st) st
+
+	set st = ..ExecuteResultSet(RS, , Timeout)
 	return:$$$ISERR(st) st
 		
 	set obj = RS.ToProxyObject(.st)

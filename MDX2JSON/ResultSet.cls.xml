@@ -27,7 +27,7 @@ Converts ResultSet to %ZEN.proxyObject.<br>
 
 	set tQueryKey = ..%QueryKey
 
-	set st = ..%GetQueryStatus(..%Cube,tQueryKey)
+	/*set st = ..%GetQueryStatus(..%Cube,tQueryKey)
 	if (st < 100) {
 		hang 1
 		set st = ..%GetQueryStatus(..%Cube,tQueryKey)
@@ -36,10 +36,12 @@ Converts ResultSet to %ZEN.proxyObject.<br>
 	if (st < 100) {
 		set pStatus = st
 		return ""
-	}
+	}*/
 
 	try {			
 		set obj.Info = ..InfoToProxyObject() // basic info about cube and query
+		quit:obj.Info.percentDone<100
+				
 		set obj.Cols = ..AxesToListOfObjects() // all axes
 		set obj.Data = ..DataToListOfDataTypes() // array of all cells, left-to-right, up-to-down
 	} catch ex {
@@ -74,13 +76,14 @@ Returns meta-information about ResultSet.</Description>
 	set info.colCount = $G(tAxisSize(2))
 	set info.colKey = $G(tAxisKeys(1))
 	set info.rowKey = $G(tAxisKeys(2))
-
+	set info.percentDone = ..%GetStatus()
 
 	// find name of cube in original case
 	set tCubeClass = $G($$$DeepSeeMetaGLVN("cubes",tCubeName))
 	set tCubeName = $G($$$DeepSeeMetaGLVN("classes",tCubeClass))								
 	set info.cubeName = tCubeName
 	set info.cubeClass = tCubeClass
+	set info.cubeKey = tCubeIndex
 
  	set info.numericGroupSeparator = ##class(%SYS.NLS.Format).GetFormatItem("NumericGroupSeparator")
 	set info.numericGroupSize = ##class(%SYS.NLS.Format).GetFormatItem("NumericGroupSize")
