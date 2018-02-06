@@ -150,7 +150,7 @@ Returns array of Axes</Description>
 	set tLevelNo = $LG(tNode,11)
 
 	set cell.caption = ##class(%DeepSee.UserPortal.Utils).%ResolveText($LG(tNode,5)) // text caption
-	set cell.vis = $LG(tNode,2) // visibility helper 
+	set cell.vis = $LG(tNode,2) // visibility helper - does not help (apperently it shows if the cell is the lowest level)  
 	set cell.format = $LG(tNode,12) // format for numbers, eg: $## ###.##
 	set cell.total = $LG(tNode,8) //COUNT,AVG function
 	set cell.type = $LG(tNode,1) // mbr,cmbr,lit,exp
@@ -197,7 +197,7 @@ Returns array of Axes</Description>
 	}
 
 	//To filter out invisible сells
-	if 'cell.vis {
+	if (..IsCellNull(cell, AxisNumber, Node)=1) {
 		return cell.children
 	}
 
