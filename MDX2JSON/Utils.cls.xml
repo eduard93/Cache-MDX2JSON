@@ -51,7 +51,7 @@ Transforms MDX query into executed <b>MDX2JSON.ResultSet</b>.<br>
 	set Params = ""
 	set Status = $$$OK
 	
-	if Timeout = 0 {
+	if ((Timeout = 0) || (Timeout = "")) {
 		set Status = RS.%ExecuteAsynch(QueryKey ,.Params, $$$YES)
 	} else {
 		set Status = RS.%ExecuteAsynch(QueryKey ,.Params, $$$NO)
