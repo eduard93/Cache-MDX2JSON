@@ -125,6 +125,8 @@ Automatic processing of MDX query and outputting resulting JSONP.<br>
 <Implementation><![CDATA[
 	set RS = ..GetResultSet(pMDX,.st)
 	return:$$$ISERR(st) st
+	set st = ..ExecuteResultSet(RS)
+	return:$$$ISERR(st) st
 	
 	set PageSize = 1000
 	set CurrPage = 1
@@ -162,6 +164,8 @@ Automatic processing of MDX Drillthrough query and outputting resulting listing 
 <Implementation><![CDATA[
 	set RS = ..GetResultSet(pMDX,.st)
 	return:$$$ISERR(st) st
+	set st = ..ExecuteResultSet(RS)
+	return:$$$ISERR(st) st
 	
 	set SQL = RS.%GetListingSQL()
 	do ##class(%ZEN.Auxiliary.jsonSQLProvider).%WriteJSONFromSQL(,SQL,,$$$MaxCacheInt)
@@ -180,6 +184,8 @@ Automatic processing of MDX query and outputting resulting XML/A.<br>
 <Implementation><![CDATA[
 	set RS = ..GetResultSet(pMDX,.st)
 	return:$$$ISERR(st) st
+	set st = ..ExecuteResultSet(RS)
+	return:$$$ISERR(st) st
 	
 	set st = RS.%OutputXMLA()
 
@@ -196,6 +202,8 @@ Gets filters for MDX expression.<br>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
 	set RS = ..GetResultSet(pMDX,.st)
+	return:$$$ISERR(st) st
+	set st = ..ExecuteResultSet(RS)
 	return:$$$ISERR(st) st
 	
 	set st=RS.%GetFiltersForCellRange(.filters,0,0,RS.%GetAxisSize(2),RS.%GetAxisSize(1),.measure)
