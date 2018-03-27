@@ -88,7 +88,7 @@ Example: send HTTP GET request to web application with Dispatch class <b>MDX2JSO
    <Route Url="/MDX/:query" Method="GET" Call="WriteJSONfromMDXURL"/>
    <Route Url="/MDXfilters/:query" Method="GET" Call="WriteFiltersForMDX"/>
    
-    <Route Url="/KPI" Method="POST" Call="%DeepSee.REST.v1.DataServer:WriteJSONfromKPI"/>
+    <Route Url="/KPI" Method="POST" Call="WriteJSONfromKPI"/>
 
    <!-- Test methods-->
    <Route Url="/Test" Method="GET" Call="Test"/>
@@ -459,6 +459,20 @@ DSW specific method, returns available themes</Description>
 	$$$ListToJSON(list)
 	
     quit sc
+]]></Implementation>
+</Method>
+
+<Method name="WriteJSONfromKPI">
+<ClassMethod>1</ClassMethod>
+<CodeMode>objectgenerator</CodeMode>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	set class = "%DeepSee.REST.v1.DataServer"
+	set codeFind  = "Set tKpiSC"
+	set base = ##class(%Dictionary.MethodDefinition).IDKEYOpen(class, "WriteJSONfromKPI").Implementation.Read($$$MaxStringLength)
+	set base = $replace(base, codeFind, "Set:'$LF(tKpiPropList, ""%series"") tKpiPropList = tKpiPropList _ $LB(""%series"")" _ $c(13, 10, 9, 9) _ codeFind)
+	set base = $replace(base, "..", "##class(" _class _ ").")
+	do %code.Write(base)
 ]]></Implementation>
 </Method>
 </Class>
