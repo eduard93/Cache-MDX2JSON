@@ -53,9 +53,23 @@ todo add optional parameter WEBAPP to Alter web app name if it needs to have ano
 </If>
 </Namespace>
 
+<If Condition="($system.Version.GetISCProduct()=4)">
 <If Condition='(##class(Config.Namespaces).Exists("%All")=0)'>
 <Log Text="Creating namespace %All" Level="0"/>
-<Namespace Name="%All" Create="yes" Ensemble="0">
+<Namespace Name="%All" Create="yes" Code="IRISTEMP" Data="IRISTEMP" Ensemble="0">
+<Configuration>
+	<Log Text="Mapping MDX2JSON package to %All namespace" Level="0"/>
+	<ClassMapping From="${Namespace}" Package="MDX2JSON"/>
+	<GlobalMapping From="${Namespace}" Global="MDX2JSON"/>
+</Configuration>
+</Namespace>
+</If>
+</If>
+
+<If Condition="($system.Version.GetISCProduct()&lt;4)">
+<If Condition='(##class(Config.Namespaces).Exists("%All")=0)'>
+<Log Text="Creating namespace %All" Level="0"/>
+<Namespace Name="%All" Create="yes" Code="CACHETEMP" Data="CACHETEMP" Ensemble="0">
 <Configuration>
 	<Log Text="Mapping MDX2JSON package to %All namespace" Level="0"/>
 	<ClassMapping From="${Namespace}" Package="MDX2JSON"/>
@@ -72,6 +86,7 @@ todo add optional parameter WEBAPP to Alter web app name if it needs to have ano
 <GlobalMapping From="${Namespace}" Global="MDX2JSON"/>
 </Configuration>
 </Namespace>
+</If>
 </If>
 
 <!--<RunInstall Class="MDX2JSON.Installer" Method="createrole" />-->
