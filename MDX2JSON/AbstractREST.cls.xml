@@ -254,7 +254,10 @@ Issue an '500' error and give some indication as to what occurred.<br>
 	// we are expecting status
 	#; Set the response Http status
 	Set %response.Status="500 Internal Server Error"
-
+	
+	#; Skip duplicate calls 
+	Quit:$isObject(pStatus) $$$OK
+	
 	#; Return a helpful error string
 	Write "{""Error"":"_$$$ZENJSSTR($System.Status.GetErrorText(pStatus,%session.Language))_"}"
 

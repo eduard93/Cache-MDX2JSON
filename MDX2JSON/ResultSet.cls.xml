@@ -155,8 +155,13 @@ Returns array of Axes</Description>
 	set cell.total = $LG(tNode,8) //COUNT,AVG function
 	set cell.type = $LG(tNode,1) // mbr,cmbr,lit,exp
 	set cell.valueID = $LG(tNode,6) // id in mdx dimension for mbr, path for cmbr
-	set cell.path = ##class(%DeepSee.Query.Engine).%GetSpecForAxisNode(CubeName, QueryKey, AxisNumber, Node) // MDX cell path
 	set cell.title = $LG(tNode,23)
+	
+	try {
+		set cell.path = ##class(%DeepSee.Query.Engine).%GetSpecForAxisNode(CubeName, QueryKey, AxisNumber, Node) // MDX cell path
+	} catch ex {
+		set cell.path = "path too long"		
+	}
 	
 	set cell.headerStyle = $LG(tNode,19)
 	set cell.cellStyle = $LG(tNode,18)
