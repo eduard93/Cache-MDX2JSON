@@ -167,7 +167,7 @@ Converts relevant parts of %DeepSee.Dashboard.Widget object into %ZEN.proxyObjec
 	if Widget.type = "portlet" {
 		set portletClass = Widget.subtypeClass
 		set:portletClass="" portletClass = Widget.subtype
-		set obj.settings = ..PortletSettongsToArray(portletClass)
+		set obj.settings = ..PortletSettingsToArray(portletClass)
 	}
 
 	set obj.mdx = $g(mdx)
@@ -180,12 +180,21 @@ Converts relevant parts of %DeepSee.Dashboard.Widget object into %ZEN.proxyObjec
 	set obj.cube = CubeName
 	set obj.displayInfo = ..GetWidgetDisplayInfo(Widget)
 	set obj.controls = $$$NewDynObjList
+	set obj.dataProperties = $$$NewDynObjList
 
 	for i=1:1:Widget.controls.Count()
 	{
 		set control = ..WidgetControlToProxyObject(Widget, i, CubeName)
 		if $IsObject(control) {
 			$$$Insert(obj.controls,control)
+		}
+	}
+	
+	for i=1:1:Widget.dataProperties.Count()
+	{
+		set dataProperty = ..WidgetDataPropertyToProxyObject(Widget.dataProperties.GetAt(i))
+		if $IsObject(dataProperty) {
+			$$$Insert(obj.dataProperties,dataProperty)
 		}
 	}
 
@@ -203,6 +212,35 @@ Converts relevant parts of %DeepSee.Dashboard.Widget object into %ZEN.proxyObjec
 	}
 
 	return obj
+]]></Implementation>
+</Method>
+
+<Method name="WidgetDataPropertyToProxyObject">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>dataProperty:%DeepSee.Dashboard.DataProperty</FormalSpec>
+<Implementation><![CDATA[
+	set obj = $$$NewDynObj
+	set obj.align = dataProperty.align
+	set obj.baseValue = dataProperty.baseValue
+	set obj.dataValue = dataProperty.dataValue
+	set obj.display = dataProperty.display
+	set obj.format = dataProperty.format
+	set obj.label = dataProperty.label
+	set obj.name = dataProperty.name
+	set obj.override = dataProperty.override
+	set obj.rangeLower = dataProperty.rangeLower
+	set obj.rangeUpper = dataProperty.rangeUpper
+	set obj.showAs = dataProperty.showAs
+	set obj.style = dataProperty.style
+	set obj.subtype = dataProperty.subtype
+	set obj.summary = dataProperty.summary
+	set obj.summaryValue = dataProperty.summaryValue
+	set obj.targetValue = dataProperty.targetValue
+	set obj.thresholdLower = dataProperty.thresholdLower
+	set obj.thresholdUpper = dataProperty.thresholdUpper
+	set obj.valueColumn = dataProperty.valueColumn
+	set obj.width = dataProperty.width
+	quit obj
 ]]></Implementation>
 </Method>
 
@@ -463,7 +501,7 @@ Determines position of a widget in dashboard's widget list. </Description>
 ]]></Implementation>
 </Method>
 
-<Method name="PortletSettongsToArray">
+<Method name="PortletSettingsToArray">
 <Description><![CDATA[
 On return, <var>pInfo</var> can contain a list of settings in the form:<br/>
 pInfo(n) = $LB(name,value,type,caption,title)<br/>
