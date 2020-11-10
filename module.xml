@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Document name="MDX2JSON.MODULE"><Module>
+ <Name>MDX2JSON</Name>
+  <Version>2.2.1</Version>
+  <Packaging>module</Packaging>
+  <SourcesRoot>MDX2JSON</SourcesRoot> 
+  <Resource Name="MDX2JSON.INC"/> 
+  <Resource Name="MDX2JSON.PKG"/> 
+  <CSPApplication 
+    Path="/MDX2JSON" 
+    Url="/MDX2JSON" 
+    CookiePath="/MDX2JSON/"
+    PasswordAuthEnabled="1"
+    UnauthenticatedEnabled="1"
+    DispatchClass="MDX2JSON.REST" 
+    />
+</Module>
+</Document></Export>
