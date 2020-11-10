@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Export generator="Cache" version="25">
-<Document name="MDX2JSON.MODULE"><Module>
+<Document name="MDX2JSON.ZPM"><Module>
  <Name>MDX2JSON</Name>
-  <Version>2.2.1</Version>
+  <Version>2.3.1</Version>
   <Packaging>module</Packaging>
-  <SourcesRoot>MDX2JSON</SourcesRoot> 
-  <Resource Name="MDX2JSON.INC"/> 
+  <SourcesRoot>./</SourcesRoot> 
   <Resource Name="MDX2JSON.PKG"/> 
   <CSPApplication 
     Path="/MDX2JSON" 
