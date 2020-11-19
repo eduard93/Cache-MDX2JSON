@@ -2,7 +2,7 @@
 <Export generator="Cache" version="25">
 <Document name="MDX2JSON.ZPM"><Module>
  <Name>MDX2JSON</Name>
-  <Version>2.3.1</Version>
+  <Version>2.3.2</Version>
   <Packaging>module</Packaging>
   <SourcesRoot>./</SourcesRoot> 
   <Resource Name="MDX2JSON.PKG"/> 
