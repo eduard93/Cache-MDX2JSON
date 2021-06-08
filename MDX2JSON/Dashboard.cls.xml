@@ -210,6 +210,18 @@ Converts relevant parts of %DeepSee.Dashboard.Widget object into %ZEN.proxyObjec
 			do:(key'="") obj.properties.%DispatchSetProperty(key,property)
 		} while key'=""
 	}
+	
+	if Widget.overrides.Count()>0 {
+		set obj.overrides = $$$NewDynObjList
+		do {
+			set overridestr = Widget.overrides.GetNext(.key) // we take DeepSee widget override string (in "json" format)
+			quit:key=""
+			do ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(overridestr,,.override,1) // convert it into %ZEN.proxyObject
+			if $IsObject(override) {
+				$$$Insert(obj.overrides,override)
+			}
+		} while key'=""
+	}
 
 	return obj
 ]]></Implementation>
@@ -254,25 +266,6 @@ Converts relevant parts of %DeepSee.Dashboard.Widget object into %ZEN.proxyObjec
 	{
 		$$$Insert(Obj.seriesTypes,Widget.dataSeries.GetAt(i).type)
 	}
-
-	set Obj.overrides = $$$NewDynObjList
-	do {
-		set overridestr = Widget.overrides.GetNext(.key) // we take DeepSee widget override string (in "json" format)
-		return:key=""
-
-
-		do ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(overridestr,,.override,1) // convert it into %ZEN.proxyObject
-
-		#if ($$$IsNewJSON)&&($$$JSONEnabled) // if we are on new versions
-			set overridestr = ##class(MDX2JSON.AbstractREST).OutputToStr(override,"%ToJSON") // convert it into valid json
-			set override = ##class(%Object).$fromJSON(overridestr) // and into %Object
-		#endif
-
-		if $IsObject(override) {
-			$$$Insert(Obj.overrides,override)
-		}
-
-	} while key'=""
 ]]></Implementation>
 </Method>
 
