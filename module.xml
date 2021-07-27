@@ -2,7 +2,7 @@
 <Export generator="Cache" version="25">
 <Document name="MDX2JSON.ZPM"><Module>
  <Name>MDX2JSON</Name>
-  <Version>2.3.3</Version>
+  <Version>2.3.4</Version>
   <Description>RESTful web api for MDX to JSON transformation (plus JSONP and XML/A) for InterSystems Caché. Also provides information about DeepSee objects.</Description>
   <Packaging>module</Packaging>
   <SourcesRoot>./</SourcesRoot> 
